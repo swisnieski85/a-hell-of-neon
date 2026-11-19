@@ -1,0 +1,99 @@
+kind: location
+location: Ethan Brand's Apartment
+day: 2
+slot_budget: 2
+slot_times: ["10:30 AM", "2:30 PM"]   # the day's slot clock, first pick -> first hour
+date: 20 October 2554
+time: "8:30 AM"
+opening_node: d2dawn_wake
+entry_scene: apartment
+ambient:
+  - rain-inside
+
+scenes:
+  apartment:
+    image: 01-apartment
+    intro: |
+      Your handheld buzzes from the table.
+    hotspots:
+      - id: chair
+        coords: { x: 0.25, y: 0.545, w: 0.09, h: 0.14 }
+        node: d2dawn_handheld
+        tooltip: Check your handheld
+        visible: always
+        requires:
+          not: _read_waves
+      
+      - id: tv
+        coords: { x: 0.725, y: 0.165, w: 0.08, h: 0.36 }
+        node: d2dawn_tv
+        tooltip: Watch the news
+        visible: lenses_on
+      
+      - id: door
+        coords: { x: 0.6, y: 0.3, w: 0.08, h: 0.36 }
+        node: d2dawn_leave
+        tooltip: Go to work
+        visible: always
+        requires:
+          all:
+            - _read_waves
+
+nodes:
+  - id: d2dawn_wake
+    blocks:
+      - prose: |
+          Three hours of good sleep, four more of restless tossing. You wake to the interminable sound of rain.
+    choices:
+      - label: Get up
+        goto_scene: apartment
+
+  - id: d2dawn_handheld
+    stepped: true
+    blocks:
+      - prose: |
+          Two outstanding waves, the first from Frenk.
+      - dialogue:
+          speaker: FRENK
+          text: |
+            ur girl woke up. hospital turned her out. got her in PC at HQ
+      - dialogue:
+          speaker: FRENK
+          text: |
+            hurry up, kell says we cant keep her long
+      - dialogue:
+          speaker: BRAND
+          text: |
+            Any hit on the face-match?
+      - dialogue:
+          speaker: FRENK
+          text: |
+            not yet. will let u know
+      - prose: |
+          The second is from Wash.
+      - dialogue:
+          speaker: WASH
+          text: |
+            Pulled the implant. Come on by, we'll talk
+      - dialogue:
+          speaker: BRAND
+          text: |
+            Thanks. Coming in soon
+    choices:
+      - label: Take the handheld
+        set: { _read_waves: true }
+
+  - id: d2dawn_tv
+    blocks:
+      - prose: |
+          "-reports of an officer-involved shooting at Harbor Island. Victims' rights advocates say a Mercer and Kell Security Combine operative gunned down 28-year-old Khalil Fayek in cold blood-"
+    choices:
+      - label: Ignore it
+
+  - id: d2dawn_leave
+    blocks:
+      - prose: |
+          Lots to do.
+    choices:
+      - label: Go to work
+        goto_map: day_map

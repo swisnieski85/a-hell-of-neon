@@ -1,0 +1,117 @@
+kind: location
+location: Ethan Brand's Apartment
+day: 2
+date: 20 October 2554
+time: "10:00 PM"
+opening_node: d2night_arrive
+entry_scene: apartment
+ambient:
+  - rain-inside
+
+scenes:
+  apartment:
+    image: 02-night-apartment
+    intro: |
+      Rose sits cross-legged at the foot of your bed, facing away from you. Rain runs down the light-well outside the window.
+    hotspots:
+      - id: rose
+        coords: { x: 0.46, y: 0.47, w: 0.12, h: 0.29 }
+        node: rose_next
+        keep_lit: true   # the router opens a new beat each window; never dim
+        tooltip: Talk to Rose
+        visible: always
+        requires:
+          all:
+            - rose_living_with_brand
+            - { not: _rose_window_spent }
+            - { not: rose_aftermath_done }
+
+      - id: chair
+        coords: { x: 0.25, y: 0.545, w: 0.09, h: 0.14 }
+        node: d2night_handheld
+        tooltip: Check your handheld
+        visible: always
+
+      - id: tv
+        coords: { x: 0.725, y: 0.165, w: 0.08, h: 0.36 }
+        node: d2night_tv
+        tooltip: Watch the news
+        visible: lenses_on
+
+      - id: commendation
+        coords: { x: 0.875, y: 0.125, w: 0.08, h: 0.36 }
+        node: d2night_commendation
+        tooltip: View your commendation
+        visible: always
+
+      - id: bed
+        coords: { x: 0.6, y: 0.75, w: 0.08, h: 0.24 }   # the floor at the foot of the bed
+        node: d2night_bed
+        tooltip: Go to sleep
+        visible: always
+        requires:
+          all:
+            - rose2a_done        # 2a gates sleep — the one hard Rose gate
+
+nodes:
+  - id: d2night_arrive
+    blocks:
+      - prose: |
+          Ten o'clock, and still raining. You lock the door behind you and hang up your jacket.
+      - prose: |
+          Rose is here. She has nothing with her except the clothes she was taken in, and she's been careful not to touch anything she doesn't need to.
+      - prose: |
+          You look at the apartment the way she must see it. One room and a bathroom. A bed, a table, a kitchenette, a window. A water stain on the ceiling. It's clean enough. It's plainly the home of a man who lives alone and doesn't have visitors.
+      - prose: |
+          It occurs to you that you haven't thought about where she's going to sleep.
+    choices:
+      - label: Look around
+        goto_scene: apartment
+
+  - id: d2night_tv
+    blocks:
+      - prose: |
+          "-Mercer and Kell Security Combine has declined to name the operative involved in Saturday night's fatal shooting at Harbor Island, citing an ongoing investigation. Advocates for the family of Khalil Fayek are calling for an independent review-"
+      - prose: |
+          Rose is watching you. She can't see the screen. To her, you're staring at a blank wall.
+    choices:
+      - label: Turn it off
+
+  - id: d2night_handheld
+    stepped: true
+    blocks:
+      - prose: |
+          One wave, from Frenk.
+      - dialogue:
+          speaker: FRENK
+          text: |
+            kell asked where ur girl went. told him she walked. didnt say where to
+      - dialogue:
+          speaker: BRAND
+          text: Thanks.
+      - dialogue:
+          speaker: FRENK
+          text: |
+            face-match still running. tomorrow prob
+    choices:
+      - label: Put down the handheld
+
+  - id: d2night_commendation
+    blocks:
+      - prose: |
+          The commendation hangs where it always has. You could take it down tonight. You leave it where it is.
+    choices:
+      - label: Look away
+
+  - id: d2night_bed
+    blocks:
+      - prose: |
+          You spread the blanket along the wall and lie down with your jacket under your head. Been a while since you roughed it like this, but you'll make do.
+      - prose: |
+          The lamp goes off. Rain in the light-well. After a while, her breathing slows and evens out. Nobody else has ever slept in this room.
+      - prose: |
+          You lie awake longer than you mean to.
+    choices:
+      - label: Sleep
+        transition: fade
+        goto_vignette: bookend-d3-dawn.yaml

@@ -1,0 +1,162 @@
+kind: linear
+location: The Eastern Range War (Red Mound front)
+date: 8 January 2536
+time: "5 PM"
+ambient:
+  - distant_explosions
+  - distant_gunfire
+
+nodes:
+  - id: roof_arrival
+    blocks:
+      - prose: |
+          You come up the stairwell fast and hit the door running, bursting onto a roof clouded by smoke.
+      - prose: |
+          The hospital's roof is wide. Gravel. Three ack-ack batteries, barrels angled up at the sky. They put them here as a kind of dare; no one wants to blow up a hospital. The farthest ack-ack battery fires, a deafening double-roar, and the cloud of choking smoke grows. The nearest one is tracking.
+      - prose: |
+          The panel is where they said it would be.
+    choices:
+      - label: Shut down the first battery
+        goto: roof_battery_two
+
+  - id: roof_battery_two
+    blocks:
+      - prose: |
+          The battery stops tracking; the barrels droop downward toward the gravel. You rush toward the second battery.
+    choices:
+      - label: Shut down the second battery
+        goto: roof_battery_two_retry
+
+  - id: roof_battery_two_retry
+    blocks:
+      - prose: |
+          There is blood on your hands, and it makes the fasteners slip.
+    choices:
+      - label: Shut down the damned battery!
+        goto: roof_battery_three
+
+  - id: roof_battery_three
+    blocks:
+      - prose: |
+          You wipe your hands and try again. This one, too, falls silent and still. You move toward the third.
+    choices:
+      - label: Shut down the last battery
+        goto: roof_after
+
+  - id: roof_after
+    blocks:
+      - prose: |
+          The barrels fall, still glowing with heat.
+      - prose: |
+          You stand there, catching your breath.
+      - prose: |
+          The sky is low, and brown. Somewhere south of you a building is coming apart; the sound arrives a moment after the light does. Small arms, three streets over. Then nothing. Then more.
+      - prose: |
+          You feel something wet run over the curve of your ear. You touch the flesh there. It stings, and your glove comes away dark.
+      - prose: |
+          You key the radio.
+    choices:
+      - label: ">>>"
+        goto: roof_radio
+
+  # The radio exchange — one transmission per click, stacking up. Young Brand
+  # doesn't look like his portrait yet, so his lines opt out of it.
+  - id: roof_radio
+    stepped: true
+    blocks:
+      - dialogue:
+          speaker: BRAND
+          portrait: false
+          text: Objective secure. Requesting extraction.
+      - dialogue:
+          speaker: CONTROL
+          text: Copy, secure. Extraction inbound. How many.
+      - dialogue:
+          speaker: BRAND
+          portrait: false
+          text: One.
+      - dialogue:
+          speaker: CONTROL
+          text: Say again?
+      - prose: |
+          You look at the door. Then you look at the gravel.
+      - dialogue:
+          speaker: BRAND
+          portrait: false
+          text: ...One.
+    choices:
+      - label: Go back inside
+        goto: stairwell_landing_one
+
+  - id: stairwell_landing_one
+    blocks:
+      - prose: |
+          The stairwell is dark. You sit on the landing with your back against the wall and your rifle across your knees.
+      - prose: |
+          You look at your hands. Still slick with smeared blood. It's under your nails. It's not your blood.
+      - prose: |
+          It's Farrah's, and Conlan's, and Bennet's. You are crying now.
+      - prose: |
+          They hadn't been ready to die. None of them had been.
+      - prose: |
+          The sound coming out of you changes. It gets thinner and climbs. An animal wail.
+      - prose: |
+          Then you are up. You are hitting the wall.
+    choices:
+      - label: Keep punching
+        goto: stairwell_landing_two
+    
+  - id: stairwell_landing_two
+    blocks:
+      - prose: |
+          The drywall is already ruined here, water-stained and blistered. It goes in easily. Your gloved fist punches through and finds a stud and something in your hand gives and you do it again and again and again. Until plaster dust hangs in the stairwell with a faint smell of chalk. Until you can no longer lift your arm.
+    choices:
+      - label: Catch your breath
+        goto: stairwell_breathe
+
+  - id: stairwell_breathe
+    blocks:
+      - prose: |
+          You breathe.
+      - prose: |
+          Below you, somewhere, a sound. Not gunfire. Footsteps. Human footsteps.
+      - prose: |
+          You pick up your rifle.
+    choices:
+      - label: Investigate
+        goto: corridor_one
+
+  - id: corridor_one
+    blocks:
+      - prose: |
+          The stairwell empties onto a fifth-floor corridor. The ceiling has come down at the far end. You move along it. There is a door standing half-open, leading to a conference room. In the conference room, there are people.
+      - prose: |
+          Five men on the floor, wounded, in the enemy's uniform. One has his leg wrapped in a curtain. One sits against the wall, holding his side. One has a dressing over his eyes. One is breathing fast and shallow. The fifth isn't moving at all. A woman kneels among them with a medic's bag open at her knees. Nobody in the room is armed.
+      - prose: |
+          She sees you. Sees your uniform. Sees the Cascadian flag on your shoulder. Sees what you are.
+      - prose: |
+          Nobody says anything. She stands up between you and the wounded and puts her arms out to the side.
+    choices:
+      - label: don't do it don't do it don't do it STOP
+        goto: corridor_two
+    
+  - id: corridor_two
+    blocks:
+      - prose: |
+          A faint twinge in your hands tells you something is broken there.
+      - prose: |
+          Somewhere to the west, something detonates. The light of it comes into the room and falls across all of them for a moment, then fades.
+      - prose: |
+          Another faint twinge in your chest. This time in your heart.
+    choices:
+      - label: Shoulder your rifle
+        goto: v00_flash_rifle
+
+  - id: v00_flash_rifle
+    blocks:
+      - prose: |
+          You raise your rifle and look down the sight. The woman screams. There's a blinding flash of light—
+    choices:
+      - label: Wake up
+        transition: fade
+        goto_vignette: 01-brands-apartment.yaml

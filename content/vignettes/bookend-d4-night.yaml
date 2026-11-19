@@ -1,0 +1,151 @@
+kind: location
+location: Ethan Brand's Apartment
+day: 4
+date: 22 October 2554
+time: "10:30 PM"
+opening_node: d4night_home
+entry_scene: apartment
+ambient:
+  - rain-inside
+
+scenes:
+  apartment:
+    image: 04-night-apartment
+    intro: |
+      Rose is at the table by the window. The chair across from her is empty.
+    hotspots:
+      - id: rose
+        coords: { x: 0.10, y: 0.30, w: 0.11, h: 0.50 }
+        node: rose_next
+        keep_lit: true   # the router opens a new beat each window; never dim
+        tooltip: Sit down with her
+        visible: always
+        requires:
+          all:
+            - rose_living_with_brand
+            - { not: _rose_window_spent }
+            - { not: rose_aftermath_done }
+            - { any: [ { not: autopsy3_done }, droz_wave_read ] }   # Droz first
+
+      # Why she was picked (addendum §13): after this window's scheduled beat.
+      - id: rose_why
+        coords: { x: 0.10, y: 0.30, w: 0.11, h: 0.50 }
+        node: rose_why
+        tooltip: Tell her why she was taken
+        visible: always
+        requires:
+          all:
+            - rose_living_with_brand
+            - heavy2_done
+            - _rose_window_spent
+            - { not: rose_why_done }
+
+      # Droz's wave — only after Autopsy 3; gates Rose and the bed until read.
+      - id: handheld
+        coords: { x: 0.82, y: 0.68, w: 0.10, h: 0.07 }    # the nightstand
+        node: d4night_droz_wave
+        tooltip: Check your handheld
+        visible: always
+        requires:
+          all:
+            - autopsy3_done
+            - { not: droz_wave_read }
+
+      # Brand's read on the package, to Frenk (frenk-thread.yaml): after
+      # Droz's wave, until he's named someone.
+      - id: frenk_wave
+        coords: { x: 0.82, y: 0.68, w: 0.10, h: 0.07 }    # the nightstand
+        node: frenk_suspect
+        tooltip: Wave Frenk
+        visible: always
+        requires:
+          all:
+            - droz_wave_read
+            - { not: suspect_droz }
+            - { not: suspect_security }
+
+      - id: bed
+        coords: { x: 0.31, y: 0.76, w: 0.12, h: 0.18 }    # the floor, where he sleeps
+        node: d4night_bed
+        tooltip: Go to sleep
+        visible: always
+        requires:
+          any: [ { not: autopsy3_done }, droz_wave_read ]        # Droz first
+
+nodes:
+  - id: d4night_home
+    stepped: true
+    blocks:
+      - prose: |
+          Ten-thirty. The lights are on.
+      - prose: |
+          Rose is at the table, still dressed, with a glass of water in front of her. She looks up when you come in.
+      - dialogue:
+          speaker: BRAND
+          text: You didn't have to wait up.
+      - dialogue:
+          speaker: ROSE
+          text: I know.
+      - prose: |
+          You put your handheld down on the nightstand. It buzzes as soon as it touches the wood.
+        requires: autopsy3_done
+    choices:
+      - label: Look around
+        goto_scene: apartment
+
+  # Personal, not business; the first version of the
+  # offer. Brand does not reply.
+  - id: d4night_droz_wave
+    stepped: true
+    blocks:
+      - prose: |
+          A wave from a contact you don't have saved.
+      - dialogue:
+          speaker: DROZ
+          text: |
+            Detective Brand. Callidus Droz. Forgive the personal wave. I got your contact from the visitor log.
+      - dialogue:
+          speaker: DROZ
+          text: |
+            I don't meet many of us outside my own team. Men who were there and came back. I'd like to buy you a drink if you're free.
+      - dialogue:
+          speaker: DROZ
+          text: |
+            We might have more in common than you realize. Let me know.
+      - prose: |
+          You don't answer it.
+    choices:
+      - label: Put down the handheld
+        set: { droz_wave_read: true }
+
+  - id: d4night_bed
+    blocks:
+      - prose: |
+          You take off your shoes and lie down on the floor with your jacket under your head.
+      # Told her tonight (Beat 4 can't fire before tonight, so `confessed` means tonight).
+      - prose: |
+          Rose turns off the lights. In the dark, she says goodnight, and you say it back.
+        requires: confessed
+      - prose: |
+          You sleep the whole night through.
+        requires: confessed
+      # Said nothing.
+      - prose: |
+          Rose turns off the lights without a word.
+        requires: confession_declined
+      - prose: |
+          You don't sleep much.
+        requires: confession_declined
+      # Neither: window unopened, the filler, or a beat still catching up.
+      - prose: |
+          Rose turns off the lights. "Goodnight," she says.
+        requires:
+          all: [ { not: confessed }, { not: confession_declined } ]
+      - prose: |
+          Tomorrow is Wednesday.
+        requires:
+          all: [ { not: confessed }, { not: confession_declined } ]
+    choices:
+      - label: Sleep
+        transition: fade
+        goto_vignette: bookend-d5-dawn.yaml

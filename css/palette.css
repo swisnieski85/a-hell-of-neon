@@ -1,0 +1,33 @@
+/* one root class swap, no per-element color logic.
+   Two palettes, two worlds: bare-eyed navy/cyan, entoptic green/gold. */
+
+body.lenses-off {
+  --bg: #0b111e;            /* dark navy, not black */
+  --bg-raise: #101a2b;
+  --text: #a2abbc;          /* desaturated gray */
+  --bright: #d4dbe8;
+  --dim: #57627a;
+  --glow: #5fd4e5;          /* cool cyan */
+  --choice: #8ce4f2;
+  --scene-filter: saturate(0.75) brightness(0.9);
+  --scene-border: #6e7688;         /* grayish frame around scene art */
+}
+
+body.lenses-on {
+  --bg: #0e1c15;            /* deep green / warmer navy */
+  --bg-raise: #142720;
+  --text: #d3b768;          /* gold */
+  --bright: #efdda2;
+  --dim: #77693f;
+  --glow: #ffc857;          /* warm gold */
+  --choice: #ffd77e;
+  --scene-filter: saturate(1.10) brightness(1.15);
+  --scene-border: #b6954d;         /* gold frame around scene art */
+}
+
+:root {
+  /* Brand's interior voice — literary serif, always italic */
+  --font-prose: "Palatino Linotype", Palatino, Georgia, "Times New Roman", serif;
+  /* The city's voice — machine chrome: bar, nameplates, choices, readouts */
+  --font-ui: "Cascadia Mono", Consolas, ui-monospace, Menlo, monospace;
+}

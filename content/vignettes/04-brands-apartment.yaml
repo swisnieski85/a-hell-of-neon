@@ -1,0 +1,149 @@
+kind: location
+location: Ethan Brand's Apartment
+date: 20 October 2554
+time: "1:30 AM"
+opening_node: apartment_night
+entry_scene: apartment
+ambient:
+  - rain-inside
+
+scenes:
+  apartment:
+    image: 01-apartment
+    intro: |
+      You walk through the door, locking it behind you. You're home.
+    hotspots:
+
+      - id: chair
+        coords: { x: 0.25, y: 0.545, w: 0.09, h: 0.14 }
+        node: apartment_handheld
+        tooltip: Check your handheld
+        visible: always
+
+      - id: to_bathroom
+        coords: { x: 0.435, y: 0.325, w: 0.08, h: 0.32 }
+        goto_scene: bathroom
+        tooltip: Go to the bathroom
+        visible: always
+      
+      - id: commendation
+        coords: { x: 0.875, y: 0.125, w: 0.08, h: 0.36 }
+        node: apartment_commendation
+        tooltip: View your commendation
+        visible: always
+      
+      - id: tv
+        coords: { x: 0.725, y: 0.165, w: 0.08, h: 0.36 }
+        node: tv
+        tooltip: Watch the news
+        visible: lenses_on
+
+      - id: bed
+        coords: { x: 0.6, y: 0.525, w: 0.08, h: 0.36 }
+        node: apartment_bed
+        tooltip: Go to sleep
+        visible: always
+        requires:
+          all:
+            - _seen_handheld2
+
+  bathroom:
+    image: 01-bathroom
+    intro: |
+      The bathroom light flickers and hums on.
+    hotspots:
+      - id: mirror
+        coords: { x: 0.405, y: 0.13, w: 0.16, h: 0.30 }
+        node: bathroom_mirror
+        tooltip: Wash your hands
+        visible: always
+
+      - id: readout
+        coords: { x: 0.1, y: 0.35, w: 0.13, h: 0.10 }
+        node: bathroom_readout
+        tooltip: Check the readout
+        visible: lenses_on
+
+      - id: to_apartment
+        coords: { x: 0.89, y: 0.40, w: 0.09, h: 0.18 }
+        goto_scene: apartment
+        tooltip: Return to the apartment
+        visible: always
+
+nodes:
+  - id: apartment_night
+    blocks:
+      - prose: |
+          You get back to your door late. Later than you'd have liked. The woman safely checked in at the hospital and the vid capture waved to Frenk.
+    choices:
+      - label: Go in
+        goto_scene: apartment
+  
+  - id: tv
+    blocks:
+      - prose: |
+          "-because what Echo Paradigm is shipping later this week is really a radical scope expansion for their product. They're going after parts of the emotional register that NOBODY's monetized yet. We're talking grief. We're talking fear. Every product in this space has been selling escape for the last twenty years, but Echo Paradigm are the first ones to figure out that escape isn't the point. The point is to make it mean something-"
+    choices:
+      - label: Ignore it
+
+  - id: apartment_handheld
+    stepped: true
+    blocks:
+      - prose: |
+          You glance at your handheld. You've got a wave from Frenk.
+      - dialogue:
+          speaker: FRENK
+          text: |
+            get some rest. we'll keep an eye on ur girl
+      - prose: |
+          Your fingers move over the keypad.
+      - dialogue:
+          speaker: BRAND
+          text: |
+            Thanks, Frenk. Sent you the vid feed from the stakeout, too. Do me a favor and run face-match on the heavy. Need to know who he is
+      - prose: |
+          The reply comes a few moments later.
+      - dialogue:
+          speaker: FRENK
+          text: |
+            10-4
+      - prose: |
+          You drop the handheld on the table and turn away. You need sleep.
+    choices:
+      - label: Put down the handheld
+        set: { _seen_handheld2: true }
+
+  - id: apartment_commendation
+    blocks:
+      - dialogue:
+          speaker: BRAND
+          text: |
+            ...
+    choices:
+      - label: Look away
+
+  - id: bathroom_mirror
+    blocks:
+      - prose: |
+          You turn on the water and wash your hands. Blood on them. Khalil's. It's under your nails. Hard to get out.
+      - prose: |
+          By the time you're done, you realize you've been clenching your jaw so hard your teeth are starting to ache. You shut the water off and turn away.
+    choices:
+      - label: Turn away
+
+  - id: bathroom_readout
+    blocks:
+      - prose: |
+          A helpful readout shows the temperature outside (54 degrees), the weather (rainy, as always), the air quality (below average), and your daily exercise score (unusually good today).
+    choices:
+      - label: Look away
+
+  - id: apartment_bed
+    blocks:
+      - prose: |
+          Exhausted, you collapse into the bed, face-down, and fall asleep in seconds.
+    choices:
+      - label: Sleep
+        transition: fade
+        # Night One ends here; the demo's end card is retired. Day 2 begins.
+        goto_vignette: bookend-d2-dawn.yaml

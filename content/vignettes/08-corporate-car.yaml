@@ -1,0 +1,373 @@
+kind: location
+location: MKSC HQ — Impound
+slot: true
+# no date — inherited from the day's dawn bookend
+# no time — slot vignettes inherit the slot hour (slot_times on the dawn bookend)
+opening_node: car_open
+entry_scene: impound
+ambient:
+  - ac_drone
+
+scenes:
+  impound:
+    image: 08-impound
+    intro: |
+      Bay nine. The Echo car sits under the strip lights, matte black and clean. Hartigan waits by a pillar a few meters off, hands in his coat pockets. A folder lies on the trunk lid.
+    hotspots:
+      - id: car
+        coords: { x: 0.43, y: 0.58, w: 0.20, h: 0.19 }
+        node_off: car_car_bare
+        node_on: car_car_tag
+        tooltip: Look at the car
+        visible: always
+
+      - id: file
+        coords: { x: 0.64, y: 0.60, w: 0.17, h: 0.07 }
+        node: car_file
+        tooltip: Read Echo's file
+        visible: always
+        requires: _met_hartigan
+
+      - id: hartigan_first
+        coords: { x: 0.315, y: 0.52, w: 0.055, h: 0.27 }
+        node: car_hartigan
+        tooltip: Talk to Hartigan
+        visible: always
+        requires:
+          not: _met_hartigan
+
+      - id: hartigan_wait
+        coords: { x: 0.315, y: 0.52, w: 0.055, h: 0.27 }
+        node: car_hartigan_wait
+        tooltip: Talk to Hartigan
+        visible: always
+        requires:
+          all:
+            - _met_hartigan
+            - not: _read_file
+
+      # The player chooses what to put on the table: Echo's own timeline, the
+      # operator ID (lensed tag), and the paper key tag (bare-eyed only). Only
+      # the key tag gets past him. Open until it's been shown, so a player who
+      # finds it late can come back with it.
+      - id: hartigan_evidence
+        coords: { x: 0.315, y: 0.52, w: 0.055, h: 0.27 }
+        node: car_evidence
+        tooltip: Talk to Hartigan
+        visible: always
+        requires:
+          all:
+            - _read_file
+            - not: _shown_keytag
+
+      - id: hartigan_done
+        coords: { x: 0.315, y: 0.52, w: 0.055, h: 0.27 }
+        node: car_hartigan_done
+        tooltip: Talk to Hartigan
+        visible: always
+        requires: _shown_keytag
+
+      - id: exit_early
+        coords: { x: 0.16, y: 0.36, w: 0.09, h: 0.38 }
+        node: car_exit_early
+        tooltip: Leave
+        visible: always
+        requires:
+          not: _pressed
+
+      - id: exit
+        coords: { x: 0.16, y: 0.36, w: 0.09, h: 0.38 }
+        node: car_exit
+        tooltip: Leave
+        visible: always
+        requires: _pressed
+
+nodes:
+  - id: car_open
+    blocks:
+      - prose: |
+          The MKSC impound lot is two levels under HQ: bare concrete, strip lights, and a hundred cars nobody has come back for.
+      - prose: |
+          You asked Echo Paradigm to send someone to talk to you about their car. They sent their head of security. That tells you how much they want it back.
+    choices:
+      - label: Go to bay nine
+        goto_scene: impound
+
+  - id: car_hartigan
+    stepped: true
+    blocks:
+      - prose: |
+          He's in his fifties, gray at the temples, in a coat that cost more than your rent. He puts his handheld away when he sees you and holds out a hand.
+      - dialogue:
+          speaker: HARTIGAN
+          text: Ethan Brand. Lyle Hartigan, Echo Paradigm corporate security. I was eleven years with Mercer and Kell before that. Robbery, third floor. Probably before your time.
+      - dialogue:
+          speaker: BRAND
+          text: I've heard the name.
+      - dialogue:
+          speaker: HARTIGAN
+          text: Nothing too bad, I hope.
+      - dialogue:
+          speaker: BRAND
+          text: You left for the pension, is what I heard.
+      - dialogue:
+          speaker: HARTIGAN
+          text: |
+            And the dental. Never regretted it.
+      - prose: |
+          He nods at the car.
+      - dialogue:
+          speaker: HARTIGAN
+          text: |
+            I'm here to take her home. Everything your lot sergeant asked for is in the folder. Ownership, the theft report, the vehicle logs. All in order.
+      - dialogue:
+          speaker: BRAND
+          text: Mind if I read it?
+      - dialogue:
+          speaker: HARTIGAN
+          text: That's what it's for.
+    choices:
+      - label: Step back
+        set: { _met_hartigan: true }
+
+  - id: car_hartigan_wait
+    blocks:
+      - dialogue:
+          speaker: HARTIGAN
+          text: Take your time. I'm on Echo's clock, not yours.
+    choices:
+      - label: Step back
+
+  # Bare-eyed, the windshield is just glass, and the key tag inside is the
+  # one record nobody could clear from the layer.
+  - id: car_car_bare
+    stepped: true
+    blocks:
+      - prose: |
+          Fleet Asset 4471-K. The same car you watched back into the terminal lot on Saturday night, nose out. There's a bullet hole in the rear quarter panel from the shootout. The trunk is shut. The evidence tape across it has already been cut.
+      - prose: |
+          This is where they put Rose. Hartigan hasn't asked about her.
+      - prose: |
+          Through the windshield, you can see into the car. A paper tag hangs from the mirror on a loop of string, the kind a garage attendant writes out by hand.
+      - prose: |
+          The driver's door isn't locked. You lean in and turn the tag over:
+      - prose: |
+          MOTOR POOL B2 · 4471-K |
+          OUT 18:31 · 8169
+      - prose: |
+          You put it in your pocket.
+    choices:
+      - label: Step back
+        set: { _saw_keytag: true }
+
+  - id: car_car_tag
+    stepped: true
+    blocks:
+      - prose: |
+          The fleet tag lights up on the back of the car when you look at it through the lenses:
+      - prose: |
+          ECHO PARADIGM |
+          FLEET ASSET 4471-K |
+          STATUS: RECOVERED · MKSC HOLD |
+          OPERATOR ID: —
+      - prose: |
+          At one minute to midnight on Saturday, the same tag said IN SERVICE, and it gave an operator ID. You wrote it down: 8169-au24-11y6-z0hm.
+      - prose: |
+          Someone has cleared it since.
+      - prose: |
+          Echo's branding fills the windshield, gold on black. You can't see inside.
+    choices:
+      - label: Step back
+        set: { _saw_tag: true }
+
+  - id: car_file
+    stepped: true
+    blocks:
+      - prose: |
+          Echo's release request, neatly bound. A certificate of ownership. A copy of the theft report. And a printout of the car's tracking log for Saturday.
+      - prose: |
+          19 OCT 2554 · 18:38 |
+          FLEET ASSET 4471-K · TELEMATICS OFFLINE |
+          LAST POSITION: ECHO PARADIGM HQ · MOTOR POOL B2
+      - prose: |
+          19 OCT 2554 · 18:40–22:00 |
+          INTERNAL SEARCH CONDUCTED · VEHICLE NOT LOCATED
+      - prose: |
+          19 OCT 2554 · 22:04 |
+          THEFT REPORTED TO MERCER & KELL SECURITY COMBINE
+      - prose: |
+          The tracking went offline at 6:38. The car was reported stolen at 10:04. In between, according to Echo, its security staff searched for the car for three and a half hours.
+      - prose: |
+          With the tracking off, there was nothing to search with. And whoever took the car switched the tracking off before anyone noticed it was gone.
+    choices:
+      - label: Close the folder
+        set: { _read_file: true }
+
+  # ---------- The evidence: the player chooses what to show ----------
+  # Each piece can be shown once. The timeline and the ID get deflected; the
+  # key tag (bare-eyed only) is the one he can't explain away, and it earns
+  # the off-the-record moment.
+
+  - id: car_evidence
+    blocks:
+      - prose: |
+          Hartigan waits, hands in his coat pockets.
+    choices:
+      - label: Show him the timeline
+        goto: car_show_timeline
+        requires: { not: _shown_timeline }
+      - label: Give him the operator ID
+        goto: car_show_id
+        requires: { all: [ _saw_tag, { not: _shown_id } ] }
+      - label: Show him the key tag
+        goto: car_show_keytag
+        requires: { all: [ _saw_keytag, { not: _shown_keytag } ] }
+      - label: Step back
+
+  - id: car_show_timeline
+    stepped: true
+    blocks:
+      - dialogue:
+          speaker: BRAND
+          text: Your tracking went offline at 6:38. You reported the car stolen at 10:04.
+      - dialogue:
+          speaker: HARTIGAN
+          text: That's right.
+      - dialogue:
+          speaker: BRAND
+          text: What were your people searching for three and a half hours?
+      - dialogue:
+          speaker: HARTIGAN
+          text: |
+            The motor pool. The garages. Camera footage. We like to be sure a car is gone before we embarrass ourselves in front of the combines.
+      - dialogue:
+          speaker: BRAND
+          text: And the car thief who knew how to switch off your tracking before anyone noticed?
+      - dialogue:
+          speaker: HARTIGAN
+          text: We're looking into how that happened.
+    choices:
+      - label: Step back
+        set: { _shown_timeline: true, _pressed: true }
+
+  - id: car_show_id
+    stepped: true
+    blocks:
+      - dialogue:
+          speaker: BRAND
+          text: |
+            I saw this car at one minute to midnight, Lyle. Two hours after you reported it stolen. Your fleet tag said it was in service. It had an operator ID on it.
+      - prose: |
+          He takes a moment before he answers.
+      - dialogue:
+          speaker: HARTIGAN
+          text: The tags hold their last status. It's a known fault.
+      - dialogue:
+          speaker: BRAND
+          text: Somebody fixed the fault, then. The ID's gone now. 8169-au24-11y6-z0hm. Whose is it?
+      - dialogue:
+          speaker: HARTIGAN
+          text: |
+            I can't discuss personnel records. You know that. You want them, get a subpoena. You'll have them about the time I retire.
+    choices:
+      - label: Step back
+        set: { _shown_id: true, _pressed: true }
+
+  - id: car_show_keytag
+    stepped: true
+    blocks:
+      - prose: |
+          You take the paper tag out of your pocket and hold it up where he can read it.
+      - dialogue:
+          speaker: BRAND
+          text: |
+            Your motor pool signed this car out at 6:31. Seven minutes before the tracking went dark. To operator 8169.
+      - prose: |
+          He takes the tag and reads it. Then he reads it again.
+      - dialogue:
+          speaker: HARTIGAN
+          text: Where'd you get this?
+      - dialogue:
+          speaker: BRAND
+          text: It was hanging from the mirror. Somebody cleared the layer. Nobody thought about the paper.
+      - prose: |
+          He looks at the car for a long moment.
+      - dialogue:
+          speaker: HARTIGAN
+          text: |
+            Off the record, Brand. I've been at Echo eight years. You don't make it in a place like that asking questions you don't absolutely need answered.
+      - dialogue:
+          speaker: BRAND
+          text: That's a choice.
+      - dialogue:
+          speaker: HARTIGAN
+          text: It's the one I made.
+      - prose: |
+          He hands the tag back to you.
+    choices:
+      - label: Step back
+        set: { _shown_keytag: true, _pressed: true }
+
+  - id: car_hartigan_done
+    blocks:
+      - dialogue:
+          speaker: HARTIGAN
+          text: We're done here, I think. Unless you want to sign the release.
+    choices:
+      - label: Step back
+
+  - id: car_exit_early
+    blocks:
+      - prose: |
+          Not yet. He came here for the car. You came here for answers, and you haven't asked for them yet.
+    choices:
+      - label: Stay
+
+  - id: car_exit
+    stepped: true
+    blocks:
+      - dialogue:
+          speaker: HARTIGAN
+          text: The release, Ethan. Before you go.
+      - prose: |
+          He holds out a stylus.
+    choices:
+      - label: Sign it
+        goto: car_sign
+      - label: Refuse
+        goto: car_refuse
+
+  - id: car_sign
+    blocks:
+      - prose: |
+          You sign. You can't hold the car for long, and you've already got what it had to tell you.
+      - dialogue:
+          speaker: HARTIGAN
+          text: Appreciated. Good to meet you, Ethan.
+      - prose: |
+          You leave him standing in bay nine with Echo's car.
+    choices:
+      - label: Go
+        transition: fade
+        set: { car_done: true }
+        goto_map: day_map
+
+  - id: car_refuse
+    stepped: true
+    blocks:
+      - dialogue:
+          speaker: BRAND
+          text: It's evidence in a kidnapping. It stays.
+      - dialogue:
+          speaker: HARTIGAN
+          text: |
+            Captain Mercer signed it this morning. Shall I call her?
+      - prose: |
+          You glower at him. And then you sign.
+      - prose: |
+          He puts the stylus away. You leave him standing in bay nine with Echo's car.
+    choices:
+      - label: Go
+        transition: fade
+        set: { car_done: true }
+        goto_map: day_map

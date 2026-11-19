@@ -1,0 +1,535 @@
+kind: location
+location: Harbor Island · Terminal 12
+date: 19 October 2554
+time: "11:00 PM"
+opening_node: t12_opening
+entry_scene: perch
+ambient:
+  - rain-outside
+# No entry_lenses — Brand arrives in whatever state the player left V02.
+clock:
+  step: 5
+  events:
+    - at: 45
+      node: t12_khalil_arrives
+
+scenes:
+  perch:
+    # The view from the perch changes as the night fills in — most-specific
+    # stage first, empty lot as the fallback. Each base still takes the
+    # usual -off/-on suffixes in assets/scenes/.
+    image:
+      - image: 03-perch-meet
+        requires: _contact_here
+      - image: 03-perch-khalil
+        requires: _khalil_here
+      - image: 03-perch-empty
+    hotspots:
+      # -- Stage 1: the empty lot --
+      - id: lot
+        coords: { x: 0.40, y: 0.45, w: 0.20, h: 0.22 }
+        node_off: t12_lot_off
+        node_on: t12_lot_on
+        tooltip: Watch the lot
+        visible: always
+        requires:
+          not: _khalil_here
+
+      - id: kit
+        coords: { x: 0.65, y: 0.55, w: 0.12, h: 0.14 }
+        node: t12_kit
+        tooltip: Check the kit
+        visible: always
+
+      - id: manifest
+        coords: { x: 0.125, y: 0.435, w: 0.12, h: 0.14 }
+        node: t12_manifest
+        tooltip: Look at shipping manifest display
+        visible: lenses_on
+
+      - id: portal
+        coords: { x: 0.33, y: 0.425, w: 0.12, h: 0.14 }
+        node: t12_portal
+        tooltip: Look at SUBSTRATE portal
+        visible: lenses_on
+
+      - id: city_lights
+        coords: { x: 0.36, y: 0.05, w: 0.12, h: 0.14 }
+        node: t12_lights
+        tooltip: Look at city lights
+        visible: lenses_on
+
+      # -- Stage 2: Khalil, alone and sweating --
+      - id: khalil
+        coords: { x: 0.55, y: 0.50, w: 0.10, h: 0.14 }
+        node_off: t12_khalil_off
+        node_on: t12_khalil_on
+        tooltip: Watch Khalil
+        visible: always
+        requires:
+          all:
+            - _khalil_here
+            - not: _contact_here
+
+      - id: wait_contact
+        coords: { x: 0.80, y: 0.48, w: 0.11, h: 0.16 }
+        node: t12_car_arrives
+        tooltip: Keep watching
+        visible: always
+        requires:
+          all:
+            - _khalil_observed
+            - not: _contact_here
+
+      # -- Stage 3: the heavy and his car; the meet is live --
+      - id: contact
+        coords: { x: 0.535, y: 0.485, w: 0.09, h: 0.16 }
+        node_off: t12_contact_off
+        node_on: t12_contact_on
+        tooltip: Watch the big man
+        visible: always
+        requires: _contact_here
+
+      - id: car
+        coords: { x: 0.385, y: 0.575, w: 0.13, h: 0.14 }
+        node_off: t12_car_off
+        node_on: t12_car_on
+        tooltip: Study the car
+        visible: always
+        requires: _contact_here
+
+      - id: meet
+        coords: { x: 0.535, y: 0.65, w: 0.12, h: 0.14 }
+        node: t12_meet
+        tooltip: Watch the meet
+        visible: always
+        requires: _contact_here
+
+  lot:
+    image: 03-lot
+    intro: |
+      Rain. Steam off the beater's hood where it still idles. Your own breathing, too fast. Khalil face-down and still on the pavement now, and a Combine car sitting dead-center in the light with its trunk open.
+
+      And the camera. Up on the roof, ninety meters back, still running, filming an empty parapet and the rain. It caught the whole meet, the face, the voice. Everything.
+    hotspots:
+      - id: perch_above
+        coords: { x: 0.15, y: 0.275, w: 0.11, h: 0.20 }
+        node: t12_kit_lost
+        tooltip: Look up at the perch
+        visible: always
+
+      - id: car_ground
+        coords: { x: 0.375, y: 0.60, w: 0.18, h: 0.22 }
+        node_off: t12_car_ground_off
+        node_on: t12_car_ground_on
+        tooltip: Look at the car
+        visible: always
+
+      - id: rose_reach
+        coords: { x: 0.65, y: 0.60, w: 0.11, h: 0.18 }
+        node: t12_rose_reach
+        tooltip: Go to her
+        visible: always
+        requires:
+          not: _reached_rose
+
+      - id: rose
+        coords: { x: 0.65, y: 0.60, w: 0.11, h: 0.18 }
+        node_off: t12_rose_bare
+        node_on: t12_rose_layer
+        tooltip: Look at her
+        visible: always
+        requires: _reached_rose
+
+nodes:
+  # ---------- Opening — no location image yet ----------
+
+  - id: t12_opening
+    blocks:
+      - prose: |
+          The cab lets you out three blocks away and you walk the rest. No sense giving anyone a vehicle to notice.
+      - prose: |
+          On Harbor Island, containers are stacked high, with gantry cranes standing over them. Terminal 12 is at the end, past the reefer yard. You get there two hours early, and spend the first hour just finding a good place to set up.
+    choices:
+      - label: Set up the perch
+        goto: t12_perch_setup
+
+  - id: t12_perch_setup
+    blocks:
+      - prose: |
+          The warehouse roof gives you the whole lot. You lie down behind the parapet and unpack the kit: directional mic on its little tripod, camera beside it, both angled down at the empty square of concrete where a deal is going to happen.
+      - prose: |
+          Then you wait.
+    choices:
+      - label: Wait
+        goto_scene: perch
+
+  # ---------- Stage 1: the empty lot ----------
+
+  - id: t12_lot_off
+    blocks:
+      - prose: |
+          Empty concrete. Rain coming down at a steady clip. A pallet on its side. Standing water gone iridescent with something spilled into it, machine oil or maybe a thermos of coffee.
+      - prose: |
+          Nothing yet.
+    choices:
+      - label: Keep waiting
+
+  - id: t12_lot_on
+    stepped: true
+    blocks:
+      - prose: |
+          The lot's suddenly glowing. A container manifest stands over by the stacks in gold, cargo waiting to be moved. A directional arrow, orphaned, pointing to the customs office. A SUBSTRATE portal, for some reason. And in the night sky above, the blinding light of a hundred entoptic billboards begging for your attention.
+    choices:
+      - label: Look away
+
+  - id: t12_kit
+    blocks:
+      - prose: |
+          The mic is good to about ninety meters in still air. Maybe half that, with the rain. The camera you trust more. You check the angle, check the storage, check it again. No harm being thorough.
+    choices:
+      - label: Settle in
+
+  - id: t12_manifest
+    blocks:
+      - prose: |
+          Twelve hundred boxes in this yard and every one of them accounted for. Origin, destination, weight, seal number, customs status, the name of the bonded agent who signed for it and the timestamp when he did.
+      - prose: |
+          Everything in this city is inventoried. Everything chipped, anyway. Not like you.
+    choices:
+      - label: Look away
+
+  - id: t12_portal
+    blocks:
+      - prose: |
+          There's a SUBSTRATE portal. Echo Paradigm's famous Immersion game found emotional residue here. Out here, in the dark. You don't want to think about what it fed on to open that. The portal glows blue and staticky; without a proper Immersion implant, you can't peer beyond to see what delights SUBSTRATE has readied for those who find it.
+    choices:
+      - label: Look away
+
+  - id: t12_lights
+    blocks:
+      - prose: |
+          Across the water, the skyline is covered in ads. Fashion and high-end clubs and a sugar cell called Solace: a woman in the sky with her eyes closed, twelve stories tall.
+
+          The rain falls through all of it.
+    choices:
+      - label: Look away
+
+  # ---------- Khalil arrives ----------
+
+  - id: t12_khalil_arrives
+    stepped: true
+    blocks:
+      - prose: |
+          Headlights. You hunker down and go still.
+      - prose: |
+          A beater noses into the square below and stops off to the right. The engine keeps running. Whoever's driving doesn't mean to stay.
+      - prose: |
+          A man gets out. You know him even before you can see his face. The hunch, the stride, the nervous, mousy energy.
+      - prose: |
+          Khalil.
+    choices:
+      - label: Hold still
+        set: { _khalil_here: true }
+
+  - id: t12_khalil_off
+    blocks:
+      - prose: |
+          Khalil Fayek. You've had him in a room twice. A runner, a nobody, the kind of man who carries other men's product and takes the fall so they don't have to. Scared of everything, which is why he's still alive.
+      - prose: |
+          He's scared now, too. He can't hold still. He paces a tight little box around the beater, and he keeps looking down the dark road in and checks the handheld in his fist.
+      - prose: |
+          What's the problem? He must've done a hundred of these exchanges by now.
+    choices:
+      - label: Keep watching
+        set: { _khalil_observed: true }
+
+  - id: t12_khalil_on
+    blocks:
+      - prose: |
+          A little panel winks into view next to Khalil's face, his own receiver barking out the information he wants everyone to know about him and a couple things the city requires that he'd rather they not. His name, his age, his city ID, his criminal record, his poor credit history. The panel's red like blood. It's a color everyone knows means "loser". A man who's broke. Exactly the kind of guy you'd clock in an old harbor freight terminal picking up a consignment of Shred.
+    choices:
+      - label: Keep watching
+        set: { _khalil_observed: true }
+
+  # ---------- The corporate car arrives ----------
+
+  - id: t12_car_arrives
+    stepped: true
+    blocks:
+      - prose: |
+          More headlights, and these are different. Clean lines, bright lights, corporate matte-black, the low expensive hum of something that came off a Combine lot.
+      - prose: |
+          The nice car reverses in slow and parks on the other side of the terminal from Khalil. Khalil actually steps back from it.
+      - prose: |
+          The engine cuts. A big man gets out of the driver's side and does not look around. Either he's oblivious or he's unafraid.
+    choices:
+      - label: Stay on them
+        set: { _contact_here: true }
+
+  - id: t12_contact_off
+    blocks:
+      - prose: |
+          Big. Still. A long coat gone black with the rain. He stands with muscular confidence, the kind of man who's fully in control of himself and wants the world to know it.
+      - prose: |
+          You don't know his face yet. You will, before the night's out; the camera's getting all of it. That's the job: put a name on the man Khalil answers to.
+    choices:
+      - label: Keep watching
+
+  - id: t12_contact_on
+    blocks:
+      - prose: |
+          The layer shows a panel next to him for an instant. Then it's gone. Everyone else in this city trails ad-halos and credit flags and years of social ghost. This man has nothing. He's wiped everything the entoptic layer's allowed to say about him.
+      - prose: |
+          So either he's got no criminal history, or he's got a great hacker on his staff who can wipe what, theoretically, is unable to be wiped.
+    choices:
+      - label: Keep watching
+
+  - id: t12_car_off
+    blocks:
+      - prose: |
+          Engine off now, ticking as it cools. Parked dead center, headlights dark. He backed it in, nose out, so he can leave fast.
+      - prose: |
+          Nice car. Too nice for this. It sits heavy at the back. Something in the trunk. Product, probably. Khalil's leaving loaded tonight.
+    choices:
+      - label: File it away
+
+  - id: t12_car_on
+    stepped: true
+    blocks:
+      - prose: |
+          Through the lenses, the car shows a fleet tag in faint gold, broadcasting to anyone with the layer:
+      - prose: |
+          ECHO PARADIGM |
+          FLEET ASSET 4471-K |
+          STATUS: IN SERVICE |
+          OPERATOR ID: 8169-au24-11y6-z0hm
+      - prose: |
+          A dispatch beacon, live, announcing a Combine car on Combine business at nearly midnight.
+    choices:
+      - label: Mark the time
+
+  # ---------- The meet ----------
+
+  - id: t12_meet
+    stepped: true
+    blocks:
+      - prose: |
+          The two of them stand close and the mic gives you a third of it, the wind and the rain stealing the rest.
+      - dialogue:
+          speaker: CONTACT
+          text: —not what you were told, I know—
+      - dialogue:
+          speaker: KHALIL
+          text: —said product, man, that's not what this—
+      - dialogue:
+          speaker: CONTACT
+          text: —it's the same night's work. Costs you nothing extra—
+      - prose: |
+          The big man goes to the back of his car and opens the trunk. The lid swings up between you and whatever's inside. From up here, all you can see is the two of them looking down into it.
+      - prose: |
+          Khalil looks for a long time. He looks irritated. The mic catches the big man's voice go flat and patient.
+      - dialogue:
+          speaker: CONTACT
+          text: —make it ugly. They want it ugly. Slow. Do that, and there's a case of the good stuff in it for you, free and clear—
+      - dialogue:
+          speaker: KHALIL
+          text: —that ain't my kind of—
+      - dialogue:
+          speaker: CONTACT
+          text: —it is tonight—
+      - prose: |
+          Make it ugly. Slow. Nobody talks that way about a shipment.
+      - prose: |
+          Khalil is thinking about it. Whatever's in that trunk, he's thinking about it.
+      - prose: |
+          You hold. You came for the man up the chain from Khalil and here he is, on your camera, face and voice and all, and the smart thing, the only thing, is to lie still and let it happen and walk away with all of it. You don't know what's in that trunk. You've done colder things than watch.
+    choices:
+      - label: Hold. Keep filming.
+        goto: t12_break
+
+  # The railroad — the button reads as the cold, correct choice, and Brand's
+  # body has already overruled it. No real "abandon her" branch, by design.
+  # From the roof the raised trunk lid hides what's inside (it faces away from
+  # the perch in 03-perch-meet); Brand moves on a bad feeling and only sees
+  # her once he's at ground level, in t12_standoff.
+  # From here to ground level the rooftop view no longer applies — the
+  # perch image drops out (hide_scene) until the lot scene opens.
+  - id: t12_break
+    hide_scene: true
+    blocks:
+      - prose: |
+          No, slag that. You're done just watching. You're moving. Your hand is on the rail and your bad fingers are screaming and the kit is still running on the parapet behind you, filming from an empty roof, and you leave it.
+      - prose: |
+          You go over the parapet and down the fire stair and come up along the container stacks with your handgun up, closing. Your feet are steady and quick and quiet.
+    choices:
+      - label: Move
+        goto: t12_standoff
+
+  # ---------- The stand-off ----------
+
+  - id: t12_standoff
+    hide_scene: true
+    stepped: true
+    blocks:
+      - prose: |
+          You come out of cover with the handgun up, and from down here you can see into the trunk.
+      - prose: |
+          A woman, folded on her side, wrists bound in front of her, not moving. Dark hair, a pale line of face. Unconscious, or worse.
+      - prose: |
+          Then your voice is the loudest thing in the rain.
+      - dialogue:
+          speaker: BRAND
+          text: MERCER AND KELL. On the ground. Hands where I can see them—
+      - prose: |
+          The big man goes still, calculating. But Khalil turns and sees you and sees the handgun. And then his eyes flick up over your shoulder, in the direction you came from, scanning for just a second before they fix on the roofline of the warehouse, and he sees it, the perch, the angle, the kit. You can see him do the math. He's been watched. The whole meet. On a Combine detective's camera. Everything he just stood next to, everything he just agreed to, all of it recorded, all of it enough to put him away for life. He's cornered, and this is it, fight or flight or freeze, and only one of the three is a good idea—
+      - prose: |
+          A cornered nobody, worth nothing. He reaches for his waistband. You fire first.
+      - prose: |
+          Khalil folds and goes down face first into the pavement like a bag of cement. Then the big man moves.
+        sfx: gunshot
+      - prose: |
+          His hand's already inside the coat and there's no talking now — the gun comes up and you're both firing, muzzle-light strobing the rain, rounds walking sparks off the containers and punching through the beater's door beside you. You get the stacks between you. He's good, better than you, disciplined and skilled, and he's not trying to win it. He's just trying to run. He goes on foot into the dark, disappearing into the warren of container stacks.
+    choices:
+      - label: Go after him
+        goto: t12_chase
+      - label: Let him go
+        goto: t12_let_go
+
+  # The one death in V03: chasing the heavy into his own ground.
+  - id: t12_chase
+    hide_scene: true
+    stepped: true
+    blocks:
+      - prose: |
+          You go into the stacks after him.
+      - prose: |
+          He has the advantage the second you enter. Six-high steel on both sides, black corridors, rain coming down between the rows loud enough to bury footsteps. You know he's in here. You just don't know where, and that's the whole problem, and it's a problem he doesn't have, because he doesn't have to go anywhere. He just has to wait for you to come to him.
+      - prose: |
+          It's dark and it's wet and your hand is cramping and your heart is racing, and for these reasons, you come around the third turn a half-second behind where you should be. And he is already there, already still, already sighted. Ready.
+      - prose: |
+          You never even get the handgun up.
+    choices:
+      - label: ">>>"
+        death: true
+        sfx: gunshot
+
+  - id: t12_let_go
+    hide_scene: true
+    stepped: true
+    blocks:
+      - prose: |
+          You let him go.
+      - prose: |
+          Every instinct you have says follow. He's the whole case, the next man up the chain, and he's thirty meters away and slowing to a walk because he knows you won't go after him. And you won't. You've done the same math he did: chase him into that maze in the dark and you die in it, and the woman in the trunk dies, maybe from shock and cold or maybe in the agony and horror he was trying to get Khalil to deliver for him.
+      - prose: |
+          So you lower the handgun and you turn your back on the man you came here for. Behind you, in the trunk of the Combine car, someone is trying to breathe. And Khalil is groaning on the pavement. He's still alive.
+    choices:
+      - label: Go to Khalil
+        goto: t12_khalil_dying
+
+  # ---------- Khalil, dying ----------
+
+  - id: t12_khalil_dying
+    hide_scene: true
+    stepped: true
+    blocks:
+      - prose: |
+          You crouch over him. He's looking up past you at the rain, or at nothing. His chest is rising in sporadic fits and spurts. There's blood bubbling from the wound in his chest and his words come out a pained and labored gurgle.
+      - dialogue:
+          speaker: KHALIL
+          text: —she was nobody, they said she was nobody, it's for the Shred, man—
+      - prose: |
+          He isn't talking to you. You're not even sure he can see you. His eyes are rolling wildly in his head. At last, they fix on the wound in his chest and widen.
+      - dialogue:
+          speaker: KHALIL
+          text: —ah. Ah, God. Ohhh, God—
+      - prose: |
+          He wails, weakly, and spasms, and goes still.
+    choices:
+      - label: Stand up
+        goto_scene: lot
+
+  # ---------- After — ground level ----------
+
+  - id: t12_kit_lost
+    blocks:
+      - prose: |
+          You look up at the perch. Everything you came here for is up there, the face, the voice, the whole meet, recorded clean. It'll keep. Something more important to do down here for now.
+    choices:
+      - label: Leave it
+
+  - id: t12_car_ground_off
+    blocks:
+      - prose: |
+          The car sits where he left it, nose out, still faintly warm. A Combine car, abandoned in a hurry, with a bound woman in its open trunk and a whole pile of product. You can see it now, bricks of it, sealed and stamped, tucked in beside her.
+    choices:
+      - label: Step away
+
+  - id: t12_car_ground_on
+    blocks:
+      - prose: |
+          The car sits where he left it, nose out, still faintly warm. Bricks of product, sealed and stamped, tucked in beside the woman. And the fleet tag is still lit, still broadcasting.
+      - prose: |
+          Whatever anyone says tomorrow about who had this car and when, you saw its Echo Paradigm beacon live at one minute to midnight.
+    choices:
+      - label: Step away
+
+  # ---------- The woman ----------
+
+  - id: t12_rose_reach
+    stepped: true
+    blocks:
+      - prose: |
+          She's slid down against the wheel well, deadweight, exactly where she was when the trunk came open. Out cold. Early 30s at most, dressed like an office professional. Bound at the wrists, a strip of tape across her mouth, dark hair stuck wet to her face. You get an arm under her and take the weight and she doesn't stir.
+      - prose: |
+          She's a hundred and twenty pounds of unconscious weight in the rain.
+      - prose: |
+          You get two fingers to her throat. A pulse, slow but there. Breathing. Drugged, most likely; they'd have wanted her quiet in the trunk. You peel the tape off gentle so it won't be the thing she wakes to.
+    choices:
+      - label: Steady her
+        set: { _reached_rose: true }
+
+  # Lenses off: a soft prompt toward the toggle — the reveal lands through
+  # the layer, and leaving is gated behind having looked.
+  - id: t12_rose_bare
+    blocks:
+      - prose: |
+          Bare-eyed, she's just a sleeping woman in the rain. Out of habit, the habit of looking at everyone twice, your hand finds your lenses.
+    choices:
+      - label: Wait with her
+
+  - id: t12_rose_layer
+    clock_min: 59 # the exit read marks 11:59 — pin the corner clock to match
+    stepped: true
+    blocks:
+      - prose: |
+          You look at her through the entoptic layer, out of habit, the way you look at everyone. And the layer has nothing to say.
+      - prose: |
+          No ad-halo. No credit flags. No social overlay, no targeting, no criminal history. None of it. Almost everyone in this city is lit up in the layer for anyone to see.
+      - prose: |
+          She's dark. The layer shows nothing where she is.
+      - prose: |
+          Even you show up in the layer. The lenses carry a beacon, by law: your name, your badge number, a line saying you can't be written to. She has none of it. No implant, no lenses, no beacon. A person the city cannot see.
+      - prose: |
+          She shifts slightly in your arms and groans.
+      - dialogue:
+          speaker: BRAND
+          text: You're all right. You're all right now.
+      - prose: |
+          You get her up, her weight settling against your shoulder, and as you turn, the layer catches the Combine car one last time. The fleet tag, still lit:
+      - prose: |
+          ECHO PARADIGM |
+          FLEET ASSET 4471-K |
+          STATUS: IN SERVICE |
+          OPERATOR ID: 8169-au24-11y6-z0hm
+      - prose: |
+          You mark the time out of habit. Eleven fifty-nine.
+      - prose: |
+          You've got a dead runner, a Combine car nobody will admit belongs to anybody, a stranger's face on a camera up on the roof, and an unconscious girl who doesn't exist.
+      - prose: |
+          And somewhere in the dark, the big man is walking home. You'd know him again by his build.
+    choices:
+      - label: Get her out of here
+        transition: fade
+        goto_map: reseattle_post_v03

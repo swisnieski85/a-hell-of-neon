@@ -1,0 +1,250 @@
+kind: location
+location: MKSC HQ — Operations Floor
+slot: true
+# no date — slot vignettes play on whatever day they're picked; the status
+# bar inherits the date from the day's dawn bookend
+# no time — slot vignettes inherit the slot hour (slot_times on the dawn bookend)
+opening_node: autopsy2_open
+entry_scene: desk
+ambient:
+  - ac_drone
+
+scenes:
+  desk:
+    image: 06-desk
+    intro: |
+      Your desk is the nearest one by the window, with a few papers on it you haven't touched in a week. On top of them is the data slate from Combine legal.
+    hotspots:
+      - id: records
+        coords: { x: 0.21, y: 0.60, w: 0.07, h: 0.07 }
+        node: autopsy2_records
+        tooltip: Read the records
+        visible: always
+        requires:
+          not: _read_records
+
+      - id: records_again
+        coords: { x: 0.21, y: 0.60, w: 0.07, h: 0.07 }
+        node: autopsy2_records_again
+        tooltip: Read the records
+        visible: always
+        requires: _read_records
+
+      - id: frenk_early
+        coords: { x: 0.41, y: 0.43, w: 0.065, h: 0.27 }
+        node: autopsy2_frenk_early
+        tooltip: Talk to Frenk
+        visible: always
+        requires:
+          not: _read_records
+
+      - id: frenk
+        coords: { x: 0.41, y: 0.43, w: 0.065, h: 0.27 }
+        node: autopsy2_frenk
+        tooltip: Talk to Frenk
+        visible: always
+        requires:
+          all:
+            - _read_records
+            - not: _talked_frenk
+
+      - id: frenk_done
+        coords: { x: 0.41, y: 0.43, w: 0.065, h: 0.27 }
+        node: autopsy2_frenk_done
+        tooltip: Talk to Frenk
+        visible: always
+        requires: _talked_frenk
+
+      - id: window
+        coords: { x: 0.00, y: 0.05, w: 0.29, h: 0.52 }
+        node: autopsy2_window
+        tooltip: Look out the window
+        visible: lenses_on
+
+      - id: exit_early
+        coords: { x: 0.46, y: 0.84, w: 0.14, h: 0.12 }   # bottom of the aisle
+        node: autopsy2_exit_early
+        tooltip: Leave
+        visible: always
+        requires:
+          not: _talked_frenk
+
+      - id: exit
+        coords: { x: 0.46, y: 0.84, w: 0.14, h: 0.12 }   # bottom of the aisle
+        node: autopsy2_exit
+        tooltip: Leave
+        visible: always
+        requires: _talked_frenk
+
+nodes:
+  - id: autopsy2_open
+    stepped: true
+    blocks:
+      - prose: |
+          The operations floor at MKSC HQ is forty desks under flat white light, most of them empty at this hour. Frenk is at his, gazing out the window, seemingly unoccupied.
+      - dialogue:
+          speaker: FRENK
+          text: There he is. Legal dropped something on your desk. Said Echo's lawyers blacked out half of it and you're lucky to get the other half.
+      - dialogue:
+          speaker: BRAND
+          text: That's fast.
+      - dialogue:
+          speaker: FRENK
+          text: That's what I said. They said nobody fought it. Make of that what you want.
+    choices:
+      - label: Sit down
+        goto_scene: desk
+
+  - id: autopsy2_records
+    stepped: true
+    blocks:
+      - prose: |
+          A cover sheet from Combine legal, then the records themselves.
+      - prose: |
+          ECHO PARADIGM BROADCAST SERVICES |
+          SUBSCRIBER DELIVERY LOG · COMPLIANCE COPY |
+          SUBSCRIBER: OSTROWSKI, DANIEL P. · AGE 31 |
+          PERIOD: 20 JUL 2554 – 18 OCT 2554
+      - prose: |
+          Ninety days of everything sent to one man's implant. Most of it is what you'd expect: messages, news, music, ads. And SUBSTRATE, nearly every night. Seventy-one sessions in ninety days, a little over two hours each. He liked his game.
+      - prose: |
+          There's one general SUBSTRATE update in the window. It's the one from August, the one that put the current woman in the ad outside your window. The log lists it like this:
+      - prose: |
+          03 AUG 2554 · 0200 |
+          SUBSTRATE CONTENT · GENERAL RELEASE (V 42.118.3) |
+          RECIPIENTS: 1,946,312 |
+          DELIVERED
+      - prose: |
+          Then, the morning of the day he crashed:
+      - prose: |
+          18 OCT 2554 · 0312 |
+          SUBSTRATE CONTENT · ████████████████████ |
+          RECIPIENTS: 1 |
+          DELIVERED
+      - prose: |
+          One recipient. Him.
+      - prose: |
+          The rest of that day is short. A SUBSTRATE session from 1404 to 1651. At 1712, the implant stops reporting.
+      - prose: |
+          Everything else about the package is blacked out: its name, its size, where it came from. Echo's lawyers let you see that something was sent. They didn't let you see what.
+      - prose: |
+          Somebody sent a SUBSTRATE package to one man at three in the morning. That afternoon he played for nearly three hours. By evening he was torturing his wife.
+    choices:
+      - label: Put the slate down
+        set: { _read_records: true }
+
+  - id: autopsy2_records_again
+    blocks:
+      - prose: |
+          18 OCT 2554 · 0312. SUBSTRATE CONTENT. RECIPIENTS: 1.
+      - prose: |
+          It reads the same the second time.
+    choices:
+      - label: Put the slate down
+
+  - id: autopsy2_frenk_early
+    blocks:
+      - dialogue:
+          speaker: FRENK
+          text: Don't look at me. Read your mail.
+    choices:
+      - label: Step back
+
+  - id: autopsy2_frenk
+    stepped: true
+    blocks:
+      - dialogue:
+          speaker: BRAND
+          text: Frenk. Look at this.
+      - prose: |
+          He walks over and reads over your shoulder. You point him to the line. He reads it twice.
+      - dialogue:
+          speaker: FRENK
+          text: Recipients, one.
+      - dialogue:
+          speaker: BRAND
+          text: That's the dead man from the morgue. Ostrowski.
+      - dialogue:
+          speaker: FRENK
+          text: That's not how updates work. Updates go to everybody, usually, 'cept maybe beta testers.
+      - dialogue:
+          speaker: BRAND
+          text: Well, this one went to him.
+      - dialogue:
+          speaker: FRENK
+          text: Huh. Ain't that something. So what was in it?
+      - dialogue:
+          speaker: BRAND
+          text: That's the part they blacked out.
+      - dialogue:
+          speaker: FRENK
+          text: Legal won't get you more than this. Not without a judge, and not this month.
+      - dialogue:
+          speaker: BRAND
+          text: Then I ask Echo.
+      - dialogue:
+          speaker: FRENK
+          text: They're not gonna tell you.
+      - dialogue:
+          speaker: BRAND
+          text: Maybe not. I want to hear what they say anyway.
+      - dialogue:
+          speaker: FRENK
+          text: |
+            Echo doesn't do walk-ins. I'll get you on somebody's calendar. Whoever runs SUBSTRATE, or whoever they'll let you see.
+      - dialogue:
+          speaker: BRAND
+          text: Thanks.
+      - dialogue:
+          speaker: FRENK
+          text: Yeah-huh. Add it to the list.
+      - prose: |
+          You look at the name on the slate again. A thirty-one-year-old newlywed who played a game most nights. Nobody special. Somebody picked him anyway.
+    choices:
+      - label: Step back
+        set: { _talked_frenk: true }
+
+  - id: autopsy2_frenk_done
+    blocks:
+      - dialogue:
+          speaker: FRENK
+          text: I'll wave you when I've got a time. Go do something useful.
+    choices:
+      - label: Step back
+
+  - id: autopsy2_window
+    blocks:
+      - prose: |
+          Across the street, an Echo Paradigm banner runs down the side of a tower, thirty stories of gold: SUBSTRATE. WEDNESDAY. NOON.
+      - prose: |
+          That one goes to everybody.
+    choices:
+      - label: Look away
+
+  - id: autopsy2_exit_early
+    blocks:
+      - prose: |
+          Not yet. You haven't done anything with what legal sent you.
+    choices:
+      - label: Stay
+
+  - id: autopsy2_exit
+    stepped: true
+    blocks:
+      - prose: |
+          You put the slate in your jacket and go.
+      - prose: |
+          You're on the stairs when your handheld buzzes. Frenk.
+      - dialogue:
+          speaker: FRENK
+          text: |
+            echo got back to me. u got 20 min w a substrate team lead. name's droz
+      - dialogue:
+          speaker: FRENK
+          text: |
+            front desk has ur name. wear a clean shirt
+    choices:
+      - label: Go
+        transition: fade
+        set: { autopsy2_done: true }
+        goto_map: day_map

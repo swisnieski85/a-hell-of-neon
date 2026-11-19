@@ -1,0 +1,41 @@
+# Directories
+.claude/
+.specify/
+
+# OS junk
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+.DS_Store
+._*
+
+# Editors / IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# GIMP Projects
+*.xcf
+
+# Node (only used for local content validation scripts)
+node_modules/
+package-lock.json
+
+# Logs and temp files
+*.log
+*.tmp
+.cache/
+
+# Documents
+*.docx
+CLAUDE.md
+poc-spec.md
+
+
+# Art and audio masters (kept locally, not in git; see README "Assets")
+assets/master/
+
+# Story bible (kept locally, not in git)
+STORY-BIBLE-ADDENDUM.md

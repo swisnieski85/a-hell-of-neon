@@ -1,0 +1,313 @@
+kind: location
+location: MKSC Coroner's Office
+date: 19 October 2554
+time: "10 AM"
+opening_node: morgue_arrival
+entry_scene: morgue
+entry_lenses: "off" # Brand arrives bare-eyed; the evidence demands the toggle
+ambient:
+  - ac_drone
+
+scenes:
+  morgue:
+    image: 02-morgue
+    hotspots:
+      # The slab reads differently in every state: bare eyes before and after
+      # the tox panel, the entoptic case file when lensed. Two dual hotspots
+      # so the body re-glows unvisited once there's a reason to come back
+      # (the bruise hides under the readout — a lenses-off discovery only).
+      # The tox panel stays sealed until Wash has briefed Brand, so the
+      # briefing (who the dead man is, what he did) can't be skipped by
+      # reading the panel first. body_tox re-glows once it opens.
+      - id: body
+        coords: { x: 0.40, y: 0.5, w: 0.16, h: 0.14 }
+        node_off: morgue_body_bare
+        node_on: morgue_body_sealed
+        tooltip: Examine the body
+        visible: always
+        requires:
+          not: _wash_briefed
+
+      - id: body_tox
+        coords: { x: 0.40, y: 0.5, w: 0.16, h: 0.14 }
+        node_off: morgue_body_bare
+        node_on: morgue_body_tox
+        tooltip: Examine the body
+        visible: always
+        requires:
+          all:
+            - _wash_briefed
+            - not: _read_tox
+
+      - id: body_again
+        coords: { x: 0.40, y: 0.5, w: 0.16, h: 0.14 }
+        node_off: morgue_body_bruise
+        node_on: morgue_body_tox
+        tooltip: Examine the body
+        visible: always
+        requires: _read_tox
+
+      # Wash's conversation advances with the evidence — three states, three
+      # hotspots on the same spot, each re-glowing as it unlocks.
+      - id: wash
+        coords: { x: 0.505, y: 0.125, w: 0.10, h: 0.30 }
+        node: morgue_wash_brief
+        tooltip: Talk to Wash
+        visible: always
+        requires:
+          not: _read_tox
+
+      - id: wash_tox
+        coords: { x: 0.505, y: 0.125, w: 0.10, h: 0.30 }
+        node: morgue_wash_tox
+        tooltip: Talk to Wash
+        visible: always
+        requires:
+          all:
+            - _read_tox
+            - not: _saw_bruise
+
+      - id: wash_bruise
+        coords: { x: 0.505, y: 0.125, w: 0.10, h: 0.30 }
+        node: morgue_wash_port
+        tooltip: Talk to Wash
+        visible: always
+        requires:
+          all:
+            - _read_tox
+            - _saw_bruise
+            - not: _asked_wash
+
+      # Once the ask is made, Wash just waves Brand off — no replaying the
+      # whole exchange.
+      - id: wash_done
+        coords: { x: 0.505, y: 0.125, w: 0.10, h: 0.30 }
+        node: morgue_wash_done
+        tooltip: Talk to Wash
+        visible: always
+        requires: _asked_wash
+
+      # The exit is always clickable; before the work is done it only turns
+      # Brand around (morgue_exit_early).
+      - id: exit_early
+        coords: { x: 0.35, y: 0.90, w: 0.30, h: 0.09 }   # bottom edge, behind Brand
+        node: morgue_exit_early
+        tooltip: Take the elevator
+        visible: always
+        requires:
+          not: _asked_wash
+
+      - id: exit
+        coords: { x: 0.35, y: 0.90, w: 0.30, h: 0.09 }   # bottom edge, behind Brand
+        node: morgue_exit
+        tooltip: Take the elevator
+        visible: always
+        requires:
+          all:
+            - _read_tox
+            - _saw_bruise
+            - _asked_wash
+
+nodes:
+  - id: morgue_arrival
+    blocks:
+      - prose: |
+          The elevator dings and lets you out into the morgue. You suppress a shiver. Wash keeps it cold down here.
+      - prose: |
+          There's a human shape on the slab under a sheet, a drain in the floor, and an unpleasant chemical odor you never get used to. Wash doesn't seem to notice anymore.
+    choices:
+      - label: Announce yourself
+        goto: morgue_greeting
+
+  - id: morgue_greeting
+    stepped: true
+    blocks:
+      - dialogue:
+          speaker: WASH
+          text: There he is. Look like shit, brohaim. Been sleepin'?
+      - prose: |
+          You haven't been. Not really.
+      - dialogue:
+          speaker: BRAND
+          text: Sure.
+      - dialogue:
+          speaker: WASH
+          text: Guess that's just your face, then.
+      - dialogue:
+          speaker: BRAND
+          text: Well done. I got things to do, Wash, and places to be.
+      - dialogue:
+          speaker: WASH
+          text: You said. So come look at this 'fore you run off.
+    choices:
+      - label: Look around
+        goto_scene: morgue
+
+  - id: morgue_wash_brief
+    stepped: true
+    blocks:
+      - dialogue:
+          speaker: WASH
+          text: |
+            Male, early 30s. Newlywed. Came in twelve hours ago. Neighbors called in screaming, next unit over. Responders found him working on his wife. He'd tied her down, cut her Achilles, and started working on her toes with a sewing needle and a pair of blunt-nose pliers. She's still alive, last I heard. Shock ward. Touch and go.
+      - dialogue:
+          speaker: BRAND
+          text: And him?
+      - dialogue:
+          speaker: WASH
+          text: Turned on the officers when they came through the door. Charged 'em. They put him down proper. Eight rounds, center mass.
+      - dialogue:
+          speaker: BRAND
+          text: Hell of a thing.
+      - dialogue:
+          speaker: WASH
+          text: |
+            It's textbook, brohaim. The torture, the death-by-cop. That's a Shred crashout, top to bottom. That's why I called you. You're the Shred guy.
+      - dialogue:
+          speaker: BRAND
+          text: Certainly what it looks like. So what is it I had to see? What's the problem?
+      - dialogue:
+          speaker: WASH
+          text: Put your glasses on and read his tox panel. Then you tell me what the problem is.
+    choices:
+      - label: Step back
+        set: { _wash_briefed: true }
+
+  - id: morgue_body_bare
+    blocks:
+      - prose: |
+          You draw back the sheet. A man. Youngish. Nothing about him you haven't seen a hundred times. The entry wounds are clean and close-grouped; whoever fired knew the job.
+      - prose: |
+          Nothing here tells you anything. Not with your bare eyes.
+    choices:
+      - label: Cover him
+
+  - id: morgue_body_sealed
+    blocks:
+      - prose: |
+          The office's entoptic layer resolves over the slab: a case file, still sealed under Wash's credentials. An intake number and nothing else.
+      - prose: |
+          Wash called you down here. Let him tell it.
+    choices:
+      - label: Step back
+
+  - id: morgue_body_tox
+    stepped: true
+    blocks:
+      - prose: |
+          You put the sheet down and let the office's entoptic layer resolve. Case file, pinned in the air over the body where Wash left it open for you. Intake data. Cause of death. The tox panel.
+      - prose: |
+          You read down the panel. Reflex. You've read a thousand of these.
+      - prose: |
+          Then you read it again.
+      - prose: |
+          Shred, and every metabolite, every marker, every breakdown product they screen for. It all reads the same.
+      - prose: |
+          NEGATIVE.
+      - prose: |
+          The man on the slab did every last thing a Shred crashout does. And he never touched the stuff.
+    choices:
+      - label: Step back
+        set: { _read_tox: true }
+
+  - id: morgue_body_bruise
+    blocks:
+      - prose: |
+          You lean over the head. Above the left ear, the skin is darkened. A bruise, spreading, recent. You'd have missed it under the entoptic readouts.
+    choices:
+      - label: Cover him
+        set: { _saw_bruise: true }
+
+  - id: morgue_wash_tox
+    stepped: true
+    blocks:
+      - prose: |
+          Wash is watching you.
+      - dialogue:
+          speaker: WASH
+          text: Yeah. That's the face I made too.
+      - dialogue:
+          speaker: BRAND
+          text: Run it again.
+      - dialogue:
+          speaker: WASH
+          text: |
+            That IS the second run. It's clean, Brand. He's got no history, no residue, nothing. I've had Shred crashouts on this table with enough in them to drop a horse. This one's got nothing.
+      - prose: |
+          You look at the man again. Bare-eyed this time.
+    choices:
+      - label: Turn back to the body
+
+  - id: morgue_wash_port
+    stepped: true
+    blocks:
+      - dialogue:
+          speaker: BRAND
+          text: There's a bruise on his head. Left side, above the ear.
+      - dialogue:
+          speaker: WASH
+          text: I saw it. Figured he hit it on a table or somethin' going down. Eight rounds, a man falls hard.
+      - dialogue:
+          speaker: BRAND
+          text: That's where the implant sits, Wash. Right there.
+      - dialogue:
+          speaker: WASH
+          text: So it is.
+      - dialogue:
+          speaker: BRAND
+          text: You don't think that's strange?
+      - dialogue:
+          speaker: WASH
+          text: Man's gotta' hit the ground somewhere, brohaim.
+      - dialogue:
+          speaker: BRAND
+          text: Doesn't make it any likelier he'd hit it there, in particular, does it?
+      - prose: |
+          You look at Wash quietly for a moment.
+      - dialogue:
+          speaker: WASH
+          text: ...You want me to pull the implant when I open him up.
+      - dialogue:
+          speaker: BRAND
+          text: Yeah. I want you to pull the implant when you open him up.
+      - dialogue:
+          speaker: WASH
+          text: Don't know what you think this is.
+      - dialogue:
+          speaker: BRAND
+          text: Neither do I. That's the problem.
+      - prose: |
+          He looks at you. He'll do it. He doesn't like it, but he'll do it, because it's you asking.
+      - dialogue:
+          speaker: WASH
+          text: Go on, then. Wherever you gotta be. Call you when I know something.
+    choices:
+      - label: Nod
+        set: { _asked_wash: true }
+
+  - id: morgue_wash_done
+    blocks:
+      - dialogue:
+          speaker: WASH
+          text: Go on, then. Wherever you gotta be. Call you when I know something.
+    choices:
+      - label: Step back
+
+  - id: morgue_exit_early
+    blocks:
+      - prose: |
+          Not yet. Wash called you down here for a reason, and you haven't found it.
+    choices:
+      - label: Stay
+
+  - id: morgue_exit
+    blocks:
+      - dialogue:
+          speaker: BRAND
+          text: Midnight. Harbor Island.
+      - prose: |
+          Wash raises a hand without looking up from the body.
+    choices:
+      - label: Go to work
+        transition: fade
+        goto_map: reseattle_post_v02

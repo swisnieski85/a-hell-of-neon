@@ -1,0 +1,171 @@
+# ============================================================================
+# ARCHIVED STUB — not in the manifest. Kept for its design notes and as a
+# revert point; the live version is rose-thread.yaml. Loading both would
+# register every Rose node id twice.
+# ============================================================================
+# ROSE THREAD — the chained apartment-bookend conversations (Beats 2a-4 + the
+# two non-beat scenes). `kind: fragment`: not a place, a node library — the
+# engine pools these nodes so ANY bookend's "Talk to Rose" hotspot can open
+# `rose_next` and the chain fires inside that bookend.
+# ============================================================================
+#
+# THE CHAIN (addendum §6): Rose's beats are NOT locked to days. They execute in
+# order — 2a -> 2b -> 3 -> [Autopsy 3 gate] -> 4 -> aftermath — on whatever day
+# the player opens the window. Beat 4 is therefore NEVER reachable without 2b
+# and 3. A player who neglects the windows loses the confession; the scenes are
+# free, so that column is earned by nothing more than choosing to talk to her.
+#
+# ONE BEAT PER WINDOW: every beat except 2a sets the vignette-local flag
+# `_rose_window_spent`, which hides the bookend's Rose hotspot until the next
+# bookend (entering a vignette wipes underscore flags). 2a deliberately does
+# NOT spend the window — 2a+2b share the first night (the one two-beat window;
+# the split is what protects the confession axis).
+#
+# TIMING-NEUTRAL PROSE: any beat here can fire on any day, dawn or night.
+# 2b is the exposed one — it is anchored to "the night he brings her home" but
+# under the chain it can fire two mornings later, when the arrangement is
+# settled fact. Phrase for any day, or branch an opening line on context.
+#
+# FLAGS (all persistent/unprefixed): rose2a_done, rose2b_done, rose3_done,
+# rose4_done + confessed (set together — `confessed` is the ending-column
+# flag), rose_aftermath_done.
+# ============================================================================
+
+kind: fragment
+location: Ethan Brand's Apartment
+
+nodes:
+
+  # --- ROUTER: first match wins, top to bottom -----------------------------
+  # (branch entries are goto-only; the engine resolves them without rendering)
+  - id: rose_next
+    branch:
+      - requires: { all: [ rose4_done, { not: rose_aftermath_done } ] }
+        goto: rose_aftermath
+      - requires: { all: [ rose3_done, autopsy3_done, { not: rose4_done } ] }
+        goto: rose_beat4
+      - requires: { all: [ rose3_done, { not: autopsy3_done } ] }
+        goto: rose_filler        # repeatable "not yet" — never sets a chain flag
+      - requires: { all: [ rose2b_done, { not: rose3_done } ] }
+        goto: rose_beat3
+      - requires: { all: [ rose2a_done, { not: rose2b_done } ] }
+        goto: rose_beat2b
+      - requires: { all: [ rose1_done, { not: rose2a_done } ] }
+        goto: rose_beat2a
+
+  # --- BEAT 2a — sleeping arrangements (MANDATORY, gates sleep) -------------
+  # Keep PURELY logistical: where she sleeps, where he sleeps, he takes the
+  # floor, goodnight. ~40 seconds. NONE of 2b's friction may leak in here —
+  # if it does, the split does nothing.
+  # PLANT: the commendation is visible somewhere in the apartment (wall / open
+  #   drawer). She SEES it. She does NOT ask. Beat 3 needs it there.
+  # Does NOT spend the window — 2b stays available tonight.
+  - id: rose_beat2a
+    blocks:
+      - prose: |
+          TODO — logistics only; the floor; goodnight. Plant: she sees the
+          commendation and says nothing.
+    choices:
+      - label: Goodnight
+        set: { rose2a_done: true }
+
+  # --- BEAT 2b — why she's uneasy (OPTIONAL, the real beat) ----------------
+  # Brand asks a question ABOUT HER (which he has done exactly never). Her
+  # anxiety is NOT about danger — she doesn't think he'll hurt her. It's that
+  # it is WRONG ANYWAY: an unmarried woman sleeping in a man's room is a
+  # certain kind of thing, and stays that kind of thing even when both parties
+  # are decent, nothing happens, and there's nowhere else to go. A category
+  # Brand does not have: he thinks in harm; she thinks in what a thing IS.
+  # This is the SEED OF THE CONFESSION — Brand's massacre is survivable in his
+  # head because he has done the math (they were doomed anyway; nobody found
+  # out; no one harmed who wasn't already lost). Rose is the first person to
+  # suggest the arithmetic is not the point — about something trivial, with
+  # nil stakes, in a situation she chose and does not regret. He files it
+  # away, uncomprehending; it detonates two days later.
+  # CRITICAL: do NOT let the scene endorse Brand's read; no reassurance
+  #   resolution. She must NOT be able to explain it well. Register:
+  #   "I know it's stupid. I know you're not - I know. It's still not right.
+  #    I don't know how to say it better than that."
+  # The inarticulacy IS the point. Do NOT smooth this friction away.
+  - id: rose_beat2b
+    blocks:
+      - prose: |
+          TODO — why she's uneasy. It's wrong anyway. Inarticulate on purpose.
+          Do not resolve to reassurance.
+    choices:
+      - label: Continue
+        set: { rose2b_done: true, _rose_window_spent: true }
+
+  # --- BEAT 3 — the commendation (OPTIONAL) --------------------------------
+  # Motive: REPAIR. In 2b she foreclosed — clearly, awkwardly — even the
+  # appearance of anything romantic, and she feels it. So she reaches for
+  # something warm: she asks, gently, about the commendation she saw.
+  # He tells the REHEARSED story. The official version. The lie he has told a
+  # hundred times, smooth as a stone. SHE BELIEVES HIM. She smiles. She is
+  # impressed. She says something kind.
+  # And Brand has to sit inside her admiration for a thing that did not
+  # happen. Worse than being caught: the first time lying has COST him
+  # anything, because it's the first time someone's belief mattered. The beat
+  # ends with him NOT correcting her — that is the choice he will be undoing
+  # when he confesses. END ON SILENCE after she says something kind.
+  # She can be WRONG here — sincerely, generously wrong — and the wrongness
+  # indicts him: she treats him as a man who did a hard right thing because
+  # she assumes people do right things. Everyone else in his life is tactful
+  # about the war; if Rose also let him keep it, Beat 4 would have no runway.
+  - id: rose_beat3
+    blocks:
+      - prose: |
+          TODO — she asks about the commendation; the rehearsed lie; her
+          belief and kindness; his silence. End on the silence.
+    choices:
+      - label: "..."
+        set: { rose3_done: true, _rose_window_spent: true }
+
+  # --- PRE-CONFESSION FILLER (repeatable; sets no chain flag) --------------
+  # Fires when Beat 3 is done but Autopsy 3 is not. Must read as NOT YET,
+  # never NOTHING HERE — the player infers from this window whether the arc
+  # is live. Shape: Rose is opening up more; Brand is shutting down. Suddenly
+  # embarrassed, awkward. He almost says something. He does not. She notices
+  # and does not push — fine HERE, unlike Beat 3, because there is genuinely
+  # nothing yet to not-push on. The unspoken thing does the work.
+  - id: rose_filler
+    blocks:
+      - prose: |
+          TODO — "not yet," never "nothing here." He almost says it; he doesn't.
+    choices:
+      - label: Continue
+        set: { _rose_window_spent: true }
+
+  # --- BEAT 4 — the confession (chain-gated on 2b+3, flag-gated on Autopsy 3)
+  # Shaped as a RETRACTION of Beat 3, not a fresh revelation — the
+  # commendation retold, corrected. Brand opens up about the massacre and why.
+  # Rose says it was monstrously evil, but does not hold it against him:
+  # every man is a spaghetti tangle of light and dark, and the work of life is
+  # separating one strand from the other. She urges him to see her confessor.
+  # WHY THE AUTOPSY-3 GATE: he has just met the men he'll become if he doesn't
+  # put it down — veterans industrializing atrocity because they cannot.
+  # The gate also means this cannot fire before Day 4 night (Autopsy 3 is
+  # Day 4 at the earliest), so it lands at night or at Day-5 dawn — if dawn,
+  # write it as a conversation that has been waiting all night.
+  # Sets rose4_done AND confessed — the ending-column flag.
+  - id: rose_beat4
+    blocks:
+      - prose: |
+          TODO — the confession as a correction of Beat 3; monstrously evil,
+          and not held against him; the confessor.
+    choices:
+      - label: "..."
+        set: { rose4_done: true, confessed: true, _rose_window_spent: true }
+
+  # --- THE AFTERMATH (NOT boilerplate — the payoff; a REAL scene) ----------
+  # The morning after Brand told her the worst thing about himself. Reachable
+  # only if the confession fired Day 4 night (the Day 5 dawn window hosts it).
+  # A Day-5-dawn confession has no morning after — the airless version; open
+  # item, leaning "let it stand."
+  - id: rose_aftermath
+    blocks:
+      - prose: |
+          TODO — the morning after. A real scene, not filler.
+    choices:
+      - label: Continue
+        set: { rose_aftermath_done: true, _rose_window_spent: true }

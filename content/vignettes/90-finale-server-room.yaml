@@ -1,0 +1,496 @@
+kind: location            # the server room has art and hotspots; the call, lobby and codas don't use it
+location: Echo Paradigm — Server Room
+date: 23 October 2554
+time: "11:00 AM"
+opening_node: finale_call
+entry_scene: server_room
+
+scenes:
+  server_room:
+    image: 90-server-room       # -on is the color original; -off is the navy grade
+    ambient: [ noisy-cooler ]   # the racks and the generator, until it's shot
+    intro: |
+      Droz hasn't moved. Neither has his gun.
+    hotspots:
+      # --- Before Brand answers ---
+      - id: droz_talk
+        coords: { x: 0.625, y: 0.465, w: 0.095, h: 0.32 }   # Droz in the far doorway
+        node: finale_offer
+        tooltip: Talk to Droz
+        visible: always
+        requires:
+          not: _answered
+
+      - id: countdown
+        coords: { x: 0.675, y: 0.25, w: 0.065, h: 0.07 }    # the display over the doorway
+        node: finale_countdown
+        tooltip: Look at the countdown
+        visible: always
+        requires:
+          not: _answered
+
+      - id: generator_look
+        coords: { x: 0.225, y: 0.455, w: 0.22, h: 0.385 }   # the generator, left foreground
+        node: finale_generator_look
+        tooltip: Look at the generator
+        visible: always
+        requires:
+          not: _answered
+
+      # Unconfessed players can still look at it after answering; they can't
+      # shoot it. What they get is Brand's eyes going back to Droz, so the
+      # missing option reads as him, not as the interface.
+      - id: generator_look_after
+        coords: { x: 0.225, y: 0.455, w: 0.22, h: 0.385 }
+        node: finale_generator_after
+        tooltip: Look at the generator
+        visible: always
+        requires:
+          all: [ _answered, { not: confessed } ]
+
+      # --- After "Yeah. I am." — the choice (addendum §18) ---
+      - id: droz_shoot
+        coords: { x: 0.625, y: 0.465, w: 0.095, h: 0.32 }
+        node: finale_shoot_droz
+        tooltip: Shoot Droz
+        visible: always
+        requires: _answered
+
+      - id: generator_shoot
+        coords: { x: 0.225, y: 0.455, w: 0.22, h: 0.385 }
+        node: finale_shoot_generator
+        tooltip: Shoot the generator
+        visible: always
+        requires:
+          all: [ _answered, confessed ]
+
+nodes:
+  # ---------- The call ----------
+  - id: finale_call
+    hide_scene: true
+    stepped: true
+    blocks:
+      - prose: |
+          You're between one thing and the next when your handheld buzzes.
+      - dialogue:
+          speaker: FRENK
+          text: |
+            echo called the captain. asked for u by name
+      - dialogue:
+          speaker: FRENK
+          text: |
+            their audit turned up a push nobody signed off on. goes out w the release at noon. the team that wrote it locked themselves in a server room on 38
+      - dialogue:
+          speaker: FRENK
+          text: |
+            hartigan passed ur operator code up the line. it went straight to that floor
+        requires: car_done
+      - dialogue:
+          speaker: FRENK
+          text: |
+            legal says the routing on that handheld goes back inside echo's own network. same floor
+        requires: heavy2_done
+      - dialogue:
+          speaker: FRENK
+          text: |
+            they want it quiet. u already know the file. go
+      # Brand's own read, from the Day 4 night / Day 5 dawn wave to Frenk
+      # (frenk-thread.yaml).
+      - dialogue:
+          speaker: FRENK
+          text: |
+            its drozs team. like u said
+        requires: suspect_droz
+      - dialogue:
+          speaker: FRENK
+          text: |
+            and its not security. its a feature team. drozs
+        requires: suspect_security
+      - prose: |
+          You know whose team it is.
+        requires: { not: { any: [ suspect_droz, suspect_security ] } }
+    choices:
+      - label: Go
+        goto: finale_lobby
+
+  # ---------- The lobby; the generator set up ----------
+  - id: finale_lobby
+    hide_scene: true
+    stepped: true
+    blocks:
+      - prose: |
+          The lobby is the same white stone, and the fountain is still running. This time the desk just sends you up to thirty-eight, where the elevator opens on a corridor full of Echo security standing around a closed door.
+      # car_done: Echo's cleanup has a face.
+      - prose: |
+          Hartigan is there, in a different good suit.
+        requires: car_done
+      - dialogue:
+          speaker: HARTIGAN
+          text: Ethan. Glad they sent you.
+        requires: car_done
+      - dialogue:
+          speaker: HARTIGAN
+          text: |
+            We cut the power to this floor at ten-forty. The servers in there didn't notice. They brought their own generator.
+        requires: car_done
+      - dialogue:
+          speaker: HARTIGAN
+          text: |
+            They're armed. The company would rather its own people didn't shoot its own engineers on its own floor. That's what you're for.
+        requires: car_done
+      - prose: |
+          A security lead with a tablet meets you at the elevator.
+        requires: { not: car_done }
+      - prose: |
+          They cut the power to this floor at ten-forty, he says. The servers in there didn't notice. The team brought its own power. And they're armed, and the company would rather its own people didn't shoot its own engineers on its own floor.
+        requires: { not: car_done }
+      - prose: |
+          That's what you're for.
+        requires: { not: car_done }
+      - prose: |
+          The door is unlocked. Something heavy has been pushed against it from the inside.
+    choices:
+      - label: Force the door
+        goto: finale_room
+
+  # ---------- The room (art up, no hotspots yet) ----------
+  - id: finale_room
+    ambient: [ noisy-cooler ]   # through the door: the room is loud
+    stepped: true
+    blocks:
+      - prose: |
+          You draw your gun and put your shoulder to the door. Whatever is behind it scrapes back a foot, then another, and you're through.
+      - prose: |
+          The server room is cold and loud. Racks of staging servers run the length of it, every light on. A few steps in front of you, a generator stands waist-high, running, cabled into the racks.
+      - prose: |
+          Somewhere down the rows, keyboards are clattering. The rest of his team, five of them, at terminals you can't see from here.
+      - prose: |
+          Callidus Droz stands in the doorway at the far end with a pistol pointed at you. Over his head, a display counts down: 00:38:12.
+      # heavy2_done: these men specified how Rose was to die.
+      - prose: |
+          These are the men who told the heavy how Rose was supposed to die, and who wanted to watch it through Khalil's eyes. She's been sleeping in your bed since Sunday.
+        requires: heavy2_done
+      # shred1_done: the scope.
+      - prose: |
+          You think of Alex Wu in the visiting room. I liked it. In half an hour, two million people find out what he meant.
+        requires: shred1_done
+      # shred2_done: Wash, one of the two million.
+      - prose: |
+          Wash has one of these in his head. The last time you saw him, you sat with him a while and neither of you said much.
+        requires: { all: [ shred2_done, stayed_with_wash ] }
+      - prose: |
+          Wash has one of these in his head. The last time you saw him, he was reaching for the bottle before the door closed behind you.
+        requires: { all: [ shred2_done, { not: stayed_with_wash } ] }
+    choices:
+      - label: Look around
+        goto_scene: server_room
+
+  - id: finale_countdown
+    blocks:
+      - prose: |
+          SUBSTRATE 43.0 · GENERAL RELEASE · 00:37:40. Under it, smaller, a line you've never seen on any of the ads: WORMWOOD · MERGED.
+    choices:
+      - label: Look away
+
+  - id: finale_generator_look
+    blocks:
+      - prose: |
+          It's the size of a filing cabinet, and it's running hard. Every cable in the room runs back to it. Echo cut the power forty minutes ago. This is the only thing keeping the racks lit.
+    choices:
+      - label: Look away
+
+  - id: finale_generator_after
+    blocks:
+      - prose: |
+          You glance at the generator. Then your eyes go back to Droz, and to his gun.
+    choices:
+      - label: Look away
+
+  # ---------- The offer ----------
+  - id: finale_offer
+    stepped: true
+    blocks:
+      - dialogue:
+          speaker: DROZ
+          text: Detective. I hoped it would be you.
+      - dialogue:
+          speaker: DROZ
+          text: Your sergeant's been asking our compliance office about my team since this morning. I had a feeling.
+        requires: suspect_droz
+      - dialogue:
+          speaker: BRAND
+          text: What are you doing?
+      - dialogue:
+          speaker: DROZ
+          text: What's it look like? We're pushing Wormwood to production. To about two million users.
+      - dialogue:
+          speaker: BRAND
+          text: Two million people who'll crash out. Like Daniel Ostrowski.
+      - dialogue:
+          speaker: DROZ
+          text: Yeah. Like Daniel Ostrowski.
+      - dialogue:
+          speaker: BRAND
+          text: How?
+      - dialogue:
+          speaker: DROZ
+          text: |
+            The Shred crashouts gave us the telemetry. Dozens of them, all with Immersion implants. We know what a brain does on the way down, and we know how to send it there. Ostrowski was the test. He just never knew. In half an hour, everyone else gets the release.
+      - dialogue:
+          speaker: BRAND
+          text: Why? Why are you doing this?
+      - prose: |
+          He thinks about it before he answers.
+      - dialogue:
+          speaker: DROZ
+          text: |
+            You know what the worst part of coming home was? Sixty-one of us got off the transports, but the city had already moved on. Sure, they threw us a parade. Gave us some medals. And that was it. Nobody here knows what we went through. What we did. None of them can. They don't even care to ask. So all these years, it's just been us, carrying it.
+      # Autopsy 3's "Ask about his war" is optional; if Brand asked, he
+      # knows what "what we did" means.
+      - prose: |
+          Three years of towns, he told you. House to house, until nobody asked who was behind a door.
+        requires: asked_droz_war
+      - dialogue:
+          speaker: DROZ
+          text: I've tried putting it down. I've tried for eighteen years. Can't seem to let it go.
+      - dialogue:
+          speaker: DROZ
+          text: |
+            So we're going to hand it off to them instead. In half an hour, people are going to start getting a taste of it. And they'll remember doing it. And then they'll know.
+      - dialogue:
+          speaker: DROZ
+          text: And then we won't be alone with it anymore.
+      - dialogue:
+          speaker: BRAND
+          text: Half of them won't live through the afternoon.
+      - dialogue:
+          speaker: DROZ
+          text: The ones who do will understand.
+      - dialogue:
+          speaker: DROZ
+          text: |
+            I saw it on you, upstairs. The way you said Red Mound. You did something out there, or something was done to you, and you've been carrying it by yourself ever since.
+      - prose: |
+          His voice is gentle now.
+      - dialogue:
+          speaker: DROZ
+          text: You don't have to be alone with it anymore. You can stay here, with us.
+      - prose: |
+          He pauses.
+      - dialogue:
+          speaker: DROZ
+          text: You're just like us, Detective. There's freedom in knowing the truth. That you're a killer.
+    choices:
+      - label: "Yeah. I am."
+        goto: finale_answer
+
+  # Both columns say the same thing. The difference is what he does next:
+  # back in the scene, the hotspots are the choice (addendum §18).
+  - id: finale_answer
+    stepped: true
+    blocks:
+      - prose: |
+          You lower your gun.
+      - dialogue:
+          speaker: BRAND
+          text: Yeah. I am.
+      - prose: |
+          Droz smiles.
+    choices:
+      - label: ">>>"
+        set: { _answered: true }
+
+  # --- REDEMPTION: the generator ------------------------------------------
+  # Quick, from the hip, before Droz can react. He never expected it. The
+  # gunshot that follows is Droz's answer and the last word in the room.
+  - id: finale_shoot_generator
+    ambient: []              # the generator stops
+    stepped: true
+    blocks:
+      - prose: |
+          You turn the gun toward the generator and fire three times, fast.
+      - prose: |
+          The generator bucks, coughs, and stops.
+    choices:
+      - label: ">>>"
+        goto: finale_dark
+
+  - id: finale_dark
+    ambient: []
+    image: 90-server-room-dark
+    stepped: true
+    blocks:
+      - prose: |
+          Every rack in the room goes dark at once. Over the doorway, the countdown goes out at 00:36:51.
+      - prose: |
+          Droz hasn't moved. He looks at the generator, and then at you. Your gun is pointed at the floor.
+    choices:
+      - label: ">>>"
+        sfx: gunshot
+        goto: finale_blackout
+
+  # The gunshot, then dark. A beat, a click, and the hospital fades in.
+  - id: finale_blackout
+    blackout: true
+    ambient: []
+    choices:
+      - label: ">>>"
+        goto: finale_redemption_coda
+
+  - id: finale_redemption_coda
+    location: Elliott Bay Medical Center   # the status bar follows Brand out of Echo
+    date: 24 October 2554
+    time: "9:00 AM"
+    ambient: []
+    image: 90-hospital
+    stepped: true
+    blocks:
+      - prose: |
+          Thursday morning. A hospital room, white and quiet.
+      - prose: |
+          The bullet went in under your collarbone and came out through your back. The surgeon says you'll keep the arm.
+      - prose: |
+          The room is already paid for. Lyle Hartigan left his card on the tray table.
+        requires: car_done
+      - prose: |
+          The room is already paid for. Nobody will tell you by whom.
+        requires: { not: car_done }
+      - prose: |
+          The news says there was a small fire on the thirty-eighth floor of Echo Paradigm's headquarters on Wednesday morning, and no one was hurt. SUBSTRATE 43.0 went out at noon, on schedule. People say they like it.
+      # rose_why (addendum §13): how much he told her about why she was taken.
+      - prose: |
+          She told you to find out whether they'd do it to someone else. You can tell her now. They won't.
+        requires: rose_why_told_all
+      - prose: |
+          You owe her the rest of what the man in the motel said. What they wanted to watch. You'll tell her today.
+        requires: rose_why_told_part
+      - prose: |
+          Somebody knocks on the open door.
+    choices:
+      - label: ">>>"
+        goto: finale_rose
+
+  # The last image: she's there. Nothing more.
+  - id: finale_rose
+    image: 90-hospital-rose
+    ambient: []
+    location: Elliott Bay Medical Center
+    date: 24 October 2554
+    time: "9:00 AM"
+    blocks:
+      - prose: |
+          Rose is standing in the doorway.
+    choices:
+      - label: End
+        goto_screen: end
+        ending: redemption
+
+  # --- QUIETISM: Droz ------------------------------------------------------
+  # The only shot an unconfessed Brand has; a confessed Brand can choose it
+  # too (addendum §18); the home scene branches on `confessed`. Cuts on
+  # V00's flash.
+  - id: finale_shoot_droz
+    ambient: []                   # cut on the flash
+    blocks:
+      - prose: |
+          You raise your gun. Droz is still smiling. There's a blinding flash of light—
+    choices:
+      - label: ">>>"
+        goto: finale_quietism_coda
+
+  - id: finale_quietism_coda
+    ambient: []
+    hide_scene: true
+    stepped: true
+    blocks:
+      - prose: |
+          Afterward, you find the switch on the side of the generator and turn it off. The racks go dark. It's eleven twenty-six.
+      # The count (V00: "How many." / "...One."). Droz and his five; V00's
+      # fifth floor was six too.
+      - prose: |
+          Hartigan is the first one through the door. He looks at the room for a long moment.
+        requires: car_done
+      - dialogue:
+          speaker: HARTIGAN
+          text: How many.
+        requires: car_done
+      - prose: |
+          Echo's security comes in after you. The lead looks at the room for a long moment.
+        requires: { not: car_done }
+      - dialogue:
+          speaker: SECURITY
+          text: How many.
+        requires: { not: car_done }
+      - dialogue:
+          speaker: BRAND
+          text: Six.
+      - prose: |
+          He gets on his handheld. Echo has people for this.
+      - prose: |
+          By the evening news it's a hostage situation: an unstable employee, a barricaded server room, an MKSC detective who went in alone. They say your name this time.
+      - prose: |
+          In the elevator, Captain Mercer tells you there'll be a commendation.
+    choices:
+      - label: ">>>"
+        goto: finale_quietism_home
+        requires: { not: confessed }
+      - label: ">>>"
+        goto: finale_quietism_home_confessed
+        requires: confessed
+
+  # Confessed variant: she's home, and he doesn't tell her. "It's over" is the
+  # V00 "...One." again: true, and leaving out what matters. He gave up one
+  # secret and came home with another.
+  - id: finale_quietism_home_confessed
+    location: Ethan Brand's Apartment
+    time: "9:10 PM"
+    ambient: [ rain-inside ]
+    image: 04-night-apartment
+    stepped: true
+    blocks:
+      - prose: |
+          You get home a little after nine.
+      - prose: |
+          The lights are on. Rose is at the table by the window with her list in front of her. Landlord is crossed off. The last line says Home, Thursday.
+      - prose: |
+          She stands up when she sees you, and looks you over. You aren't hurt.
+      - dialogue:
+          speaker: ROSE
+          text: Is it over?
+      - dialogue:
+          speaker: BRAND
+          text: Yeah. It's over.
+      - prose: |
+          She lets out a breath and sits back down.
+      - prose: |
+          That's two things you've kept from her now. What they wanted to watch, and what you did today.
+        requires: rose_why_told_part
+      - prose: |
+          Over the table, the nail where the commendation hung is still in the wall.
+        requires: commendation_down
+      - prose: |
+          She goes back to her list.
+    choices:
+      - label: End
+        goto_screen: end
+        ending: quietism
+
+  - id: finale_quietism_home
+    location: Ethan Brand's Apartment
+    time: "9:10 PM"
+    ambient: []
+    image: 90-empty-apartment
+    stepped: true
+    blocks:
+      - prose: |
+          You get home a little after nine.
+      - prose: |
+          The lights are off. The bed is made. The blanket is folded against the wall.
+      # Her leaving has a plain cause (the landlord came through early). What's
+      # missing is what was never said between them.
+      - prose: |
+          Her list is gone from the table. In its place there's a note in the same small, neat hand: The landlord came through a day early. Thank you for everything. Rose.
+    choices:
+      - label: End
+        goto_screen: end
+        ending: quietism

@@ -1,0 +1,38 @@
+vignettes:
+  # --- Night One (shipped) ---
+  - 00-the-roof.yaml
+  - 01-brands-apartment.yaml
+  - 02-coroners-office.yaml
+  - 03-terminal-12.yaml
+  - 04-brands-apartment.yaml
+
+  # --- Mid-game (Day 2 onward) ---
+  # Autopsy spine (mandatory):
+  - 05-autopsy-1-results.yaml
+  - 06-autopsy-2-wave-records.yaml
+  - 07-autopsy-3-stonewall.yaml
+  # Echo routes (need one):
+  - 08-corporate-car.yaml
+  - 09-corporate-heavy-1-apartment.yaml
+  - 10-corporate-heavy-2-motel.yaml
+  # Shred (enriching, optional):
+  - 11-shred-1-alex-wu.yaml
+  - 12-shred-2-wash.yaml
+  # Rose (relationship / confession axis):
+  - 13-rose-1-request.yaml
+  - rose-thread.yaml          # fragment: chained bookend conversations (2a-4)
+  - frenk-thread.yaml         # fragment: Brand's read on the package, to Frenk (D4 night / D5 dawn)
+
+  # Free dawn/night bookends at the apartment (day advance + Rose windows):
+  - bookend-d2-dawn.yaml
+  - bookend-d2-night.yaml
+  - bookend-d3-dawn.yaml
+  - bookend-d3-night.yaml
+  - bookend-d4-dawn.yaml
+  - bookend-d4-night.yaml
+  - bookend-d5-dawn.yaml
+
+  # --- Endings ---
+  - 90-finale-server-room.yaml   # Redemption + Quietism (stop-the-push)
+  - 91-ending-tragedy.yaml
+  - 92-ending-nihilism.yaml

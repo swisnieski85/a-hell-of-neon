@@ -1,0 +1,142 @@
+kind: location
+location: Ethan Brand's Apartment
+day: 3
+slot_budget: 2
+slot_times: ["10:30 AM", "2:30 PM"]   # the day's slot clock, first pick -> first hour
+date: 21 October 2554
+time: "8:00 AM"
+opening_node: d3dawn_wake
+entry_scene: apartment
+ambient:
+  - rain-inside
+
+scenes:
+  apartment:
+    image: 03-apartment
+    intro: |
+      Rose is up and dressed in her own clothes, sitting at the table by the window. There's an envelope in front of her with a list written on the back.
+    hotspots:
+      - id: rose
+        coords: { x: 0.10, y: 0.30, w: 0.11, h: 0.50 }
+        node: rose_next
+        keep_lit: true   # the router opens a new beat each window; never dim
+        tooltip: Talk to Rose
+        visible: always
+        requires:
+          all:
+            - rose_living_with_brand
+            - { not: _rose_window_spent }
+            - { not: rose_aftermath_done }
+
+      - id: chair
+        coords: { x: 0.25, y: 0.545, w: 0.09, h: 0.14 }
+        node: d3dawn_handheld
+        tooltip: Check your handheld
+        visible: always
+        requires:
+          not: _read_waves
+
+      - id: list
+        coords: { x: 0.25, y: 0.545, w: 0.09, h: 0.14 }
+        node: d3dawn_list
+        tooltip: Look at her list
+        visible: always
+        requires: _read_waves
+
+      - id: tv
+        coords: { x: 0.725, y: 0.165, w: 0.08, h: 0.36 }
+        node: d3dawn_tv
+        tooltip: Watch the news
+        visible: lenses_on
+
+      - id: door
+        coords: { x: 0.6, y: 0.3, w: 0.08, h: 0.36 }
+        node: d3dawn_leave
+        tooltip: Head out
+        visible: always
+        requires:
+          all:
+            - _read_waves
+
+nodes:
+  - id: d3dawn_wake
+    blocks:
+      - prose: |
+          You wake on the floor with your jacket under your head and a stiff back. For a moment you don't know why you're down there. Then you hear the tap running in the bathroom, and you remember.
+      - prose: |
+          It's still strange, having someone else in the room.
+    choices:
+      - label: Get up
+        goto_scene: apartment
+
+  - id: d3dawn_handheld
+    stepped: true
+    blocks:
+      - prose: |
+          One wave, from Frenk, timestamped 0610.
+      - dialogue:
+          speaker: FRENK
+          text: |
+            face-match came back on ur heavy. 94% on a booking photo from 2541. name on the booking is armando del rio. nothing on that name since, not a parking ticket
+      - dialogue:
+          speaker: FRENK
+          text: |
+            last known is unit 6C, 412 delridge way. 13 yrs old so dont get excited
+      - prose: |
+          A name from a thirteen-year-old booking record. It might be his. It might just be the name he was using that year. Either way, it's an address, and that's more than you had yesterday.
+      - dialogue:
+          speaker: BRAND
+          text: Thanks, Frenk. I owe you.
+      - dialogue:
+          speaker: FRENK
+          text: |
+            u owe me like six
+      - prose: |
+          You can't help but chuckle. The handheld buzzes again.
+      - dialogue:
+          speaker: FRENK
+          text: |
+            u dont need me to tell u this but u got a lot of leads to follow
+      - dialogue:
+          speaker: FRENK
+          text: |
+            and maybe not a lot of time. honest advice: you pick a few and follow em where they go
+      - dialogue:
+          speaker: FRENK
+          text: |
+            and stay safe. dont get sloppy and dont try to be a hero
+      - dialogue:
+          speaker: BRAND
+          text: |
+            Thanks, old man.
+      - dialogue:
+          speaker: FRENK
+          text: |
+            u know what they say re: old and bold detectives
+    choices:
+      - label: Put down the handheld
+        set: { _read_waves: true, facematch_done: true }
+
+  - id: d3dawn_list
+    blocks:
+      - prose: |
+          Her handwriting is small and neat. Locksmith. Landlord. Clothes. Bank card.
+    choices:
+      - label: Step back
+
+  - id: d3dawn_tv
+    blocks:
+      - prose: |
+          "-and Echo Paradigm confirms the SUBSTRATE update will roll out to all Immersion users this Wednesday at noon. The company says the update installs automatically, with no action required. Analysts are calling it the most significant release since the game's launch-"
+      - prose: |
+          Rose keeps writing. She can't see it.
+    choices:
+      - label: Ignore it
+
+  - id: d3dawn_leave
+    blocks:
+      - prose: |
+          You pick your jacket up off the floor and put it on. Rose glances up from her list and nods. You nod back.
+    choices:
+      - label: Head out
+        goto_map: day_map

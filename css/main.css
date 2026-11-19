@@ -1,0 +1,1079 @@
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html, body { min-height: 100%; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-ui);
+  transition: background 0.35s ease, color 0.35s ease;
+}
+
+.hidden { display: none !important; }
+
+button { font-family: inherit; }
+
+:focus-visible {
+  outline: 1px solid var(--glow);
+  outline-offset: 3px;
+}
+
+/* ---------- Status bar (hardcoded) ---------- */
+
+#status-bar {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  height: 52px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  /* wide right padding keeps bar content clear of the floating DEBUG button,
+     which overlays the bar's right edge */
+  padding: 0 110px 0 20px;
+  background: color-mix(in srgb, var(--bg) 72%, black);
+  border-bottom: 1px solid color-mix(in srgb, var(--glow) 18%, transparent);
+  z-index: 10;
+}
+
+#lens-toggle {
+  background: none;
+  border: 1px solid color-mix(in srgb, var(--glow) 35%, transparent);
+  padding: 0;
+  width: 40px;
+  height: 40px;
+  cursor: pointer;
+}
+
+#lens-toggle img {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+#lens-toggle:hover:not(.inert) {
+  border-color: var(--glow);
+  box-shadow: 0 0 10px color-mix(in srgb, var(--glow) 40%, transparent);
+}
+
+#lens-toggle.inert { cursor: default; border-color: rgba(255, 255, 255, 0.08); }
+
+/* First-use cue (until the player first toggles the lenses): the portrait
+   button pulses, and a label beside it says what it is. */
+#lens-toggle.nudge {
+  border-color: var(--glow);
+  animation: lens-nudge 1.6s ease-in-out infinite;
+}
+@keyframes lens-nudge {
+  0%, 100% { box-shadow: 0 0 4px color-mix(in srgb, var(--glow) 30%, transparent); }
+  50%      { box-shadow: 0 0 16px color-mix(in srgb, var(--glow) 85%, transparent),
+                         0 0 2px var(--glow); }
+}
+#lens-hint {
+  font-size: 11px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--glow);
+  white-space: nowrap;
+  animation: lens-hint-in 0.6s ease both;
+}
+@keyframes lens-hint-in {
+  from { opacity: 0; transform: translateX(-6px); }
+  to   { opacity: 1; transform: none; }
+}
+#lens-toggle.inert img { filter: grayscale(1) opacity(0.5); }
+
+/* Custom tooltips — the UI speaks in its own chrome, not the browser's.
+   Anything with data-tip gets one: the lens toggle and scene hotspots. */
+#lens-toggle[data-tip] { position: relative; }
+
+#lens-toggle[data-tip]::before,
+.hotspot[data-tip]::before {
+  content: "";
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  background: color-mix(in srgb, var(--bg) 80%, black);
+  border-top: 1px solid color-mix(in srgb, var(--glow) 45%, transparent);
+  border-left: 1px solid color-mix(in srgb, var(--glow) 45%, transparent);
+}
+
+#lens-toggle[data-tip]::after,
+.hotspot[data-tip]::after {
+  content: attr(data-tip);
+  position: absolute;
+  padding: 8px 12px;
+  background: color-mix(in srgb, var(--bg) 80%, black);
+  border: 1px solid color-mix(in srgb, var(--glow) 45%, transparent);
+  box-shadow: 0 0 16px color-mix(in srgb, var(--glow) 15%, transparent);
+  color: var(--bright);
+  font-size: 10px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+/* Lens toggle: below the button, left-aligned */
+#lens-toggle[data-tip]::before { top: calc(100% + 6px); left: 15px; transform: rotate(45deg); }
+#lens-toggle[data-tip]::after  { top: calc(100% + 10px); left: -1px; }
+
+/* Hotspots: below the box, centered */
+.hotspot[data-tip]::before { top: calc(100% + 6px); left: 50%; transform: translateX(-50%) rotate(45deg); }
+.hotspot[data-tip]::after  { top: calc(100% + 10px); left: 50%; transform: translateX(-50%); }
+
+#lens-toggle[data-tip]::before,
+#lens-toggle[data-tip]::after,
+.hotspot[data-tip]::before,
+.hotspot[data-tip]::after {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity 0.15s ease, visibility 0.15s ease;
+  z-index: 20;
+}
+
+#lens-toggle[data-tip]:hover::before,
+#lens-toggle[data-tip]:hover::after,
+#lens-toggle[data-tip]:focus-visible::before,
+#lens-toggle[data-tip]:focus-visible::after,
+.hotspot[data-tip]:hover::before,
+.hotspot[data-tip]:hover::after,
+.hotspot[data-tip]:focus-visible::before,
+.hotspot[data-tip].tip-shown::before,
+.hotspot[data-tip].tip-shown::after,
+.hotspot[data-tip]:focus-visible::after {
+  opacity: 1;
+  visibility: visible;
+  transition-delay: 0.35s;
+}
+
+/* A tap (touch screens) shows the tooltip at once; hover keeps its delay. */
+.hotspot[data-tip].tip-shown::before,
+.hotspot[data-tip].tip-shown::after { transition-delay: 0s; }
+
+#bar-spacer { flex: 1; }
+
+#bar-datetime {
+  font-size: 12px;
+  letter-spacing: 0.28em;
+  color: var(--bright);
+  white-space: nowrap;
+}
+
+#bar-extra { min-width: 40px; } /* empty container for future fields (cash…) */
+
+/* Dev menu: one DEBUG button, top right, opening a panel of controls.
+   Floats over everything so it stays reachable on bar-less screens (the map
+   would otherwise trap a debug-resume save with no way back to the title).
+   Visible on the title screen too (skip straight into the mid-game from a
+   fresh page); hidden only on the end card. */
+#debug-menu {
+  position: fixed;
+  top: 14px;
+  right: 20px;
+  z-index: 11;
+}
+body[data-screen="end"] #debug-menu { display: none; }
+
+#debug-menu button {
+  background: none;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: var(--dim);
+  font-size: 10px;
+  letter-spacing: 0.18em;
+  padding: 5px 8px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+#debug-menu button:hover,
+#debug-menu button.on,
+#debug-open[aria-expanded="true"] {
+  color: var(--glow);
+  border-color: color-mix(in srgb, var(--glow) 45%, transparent);
+}
+
+#debug-panel {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  display: grid;
+  grid-template-columns: auto auto;
+  gap: 8px 12px;
+  align-items: center;
+  padding: 12px;
+  background: color-mix(in srgb, var(--bg) 80%, black);
+  border: 1px solid color-mix(in srgb, var(--glow) 30%, transparent);
+  box-shadow: 0 0 16px color-mix(in srgb, var(--glow) 12%, transparent);
+}
+#debug-panel[hidden] { display: none; }
+
+/* Each row's label and buttons sit in the panel's two grid columns. */
+.debug-row { display: contents; }
+.debug-label {
+  font-size: 10px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--dim);
+  white-space: nowrap;
+}
+.debug-buttons { display: flex; gap: 4px; }
+#debug-reload { justify-self: start; }
+
+/* Reload-resume is meaningless on the title screen. */
+body[data-screen="title"] .debug-row-reload { display: none; }
+
+body.has-bar #screens { padding-top: 52px; }
+/* …and the screen sheds the same 52px, or every bar screen scrolls by it */
+body.has-bar .screen { min-height: calc(100vh - 52px); }
+
+/* ---------- Screens ---------- */
+
+.screen {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* ---------- Title — text on black. The sign itself. ---------- */
+
+#screen-title {
+  justify-content: center;
+  background: #000;
+  gap: 72px;
+}
+
+/* Boot ritual: the sign fades in slow and alone, then the headphones note
+   below it; the first gesture trades the note for the menu. */
+#screen-title h1 { animation: screen-in 2.6s ease both; }
+
+@keyframes screen-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+#screen-title h1 {
+  font-family: "Segoe UI", system-ui, sans-serif;
+  font-weight: 200;
+  font-size: clamp(30px, 6vw, 58px);
+  letter-spacing: 0.42em;
+  text-indent: 0.42em;
+  text-align: center;
+  color: #e6fbff;
+  text-shadow:
+    0 0 6px rgba(95, 212, 229, 0.9),
+    0 0 24px rgba(95, 212, 229, 0.45),
+    0 0 64px rgba(95, 212, 229, 0.25);
+}
+
+/* A few tubes are going. Offset timings so they don't stutter in unison. */
+.title-sign {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 18px;
+}
+
+/* Fine print under the neon — fades in on the sign's heels */
+.title-sub {
+  font-size: 11px;
+  letter-spacing: 0.48em;
+  text-indent: 0.48em;
+  text-transform: uppercase;
+  color: #57627a;
+  animation: screen-in 1.8s ease 0.8s both;
+}
+
+#screen-title h1 .flicker {
+  animation: neon-stutter 7s linear infinite;
+}
+
+#screen-title h1 .tube-a { animation-duration: 8.3s; animation-delay: -3.1s; }
+#screen-title h1 .tube-o { animation-duration: 7.6s; animation-delay: -5.4s; }
+
+@keyframes neon-stutter {
+  0%, 41%, 44.5%, 63%, 63.6%, 100% { opacity: 1; text-shadow: inherit; }
+  41.5%, 44%   { opacity: 0.32; text-shadow: none; }
+  63.2%, 63.5% { opacity: 0.55; text-shadow: none; }
+}
+
+.title-menu {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  align-items: center;
+}
+
+/* Intro note and menu share one grid cell below the sign, so swapping them
+   never re-centers the banner */
+.title-under { display: grid; justify-items: center; }
+.title-under > * { grid-area: 1 / 1; }
+
+.title-intro {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 18px;
+  text-align: center;
+  animation: screen-in 1s ease both; /* rises with the sign, no wait */
+  transition: opacity 0.4s ease, visibility 0.4s ease;
+}
+
+.title-intro.out { opacity: 0; visibility: hidden; }
+
+.intro-note {
+  font-size: 12px;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: #57627a;
+}
+
+.intro-continue {
+  font-size: 13px;
+  letter-spacing: 0.08em;
+  color: #79aebc;
+  animation: intro-pulse 2.4s ease-in-out infinite;
+}
+
+@keyframes intro-pulse {
+  0%, 100% { opacity: 0.55; }
+  50%      { opacity: 1; }
+}
+
+/* Before the first gesture the menu holds its place in the layout but stays
+   dark — display:none would re-center the banner when it appears */
+.title-menu.unlit { visibility: hidden; }
+
+/* Menu materializes on the first gesture, once the intro note has gone */
+.title-menu.wake { animation: menu-in 1s ease 0.45s both; }
+
+@keyframes menu-in {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: none; }
+}
+
+.title-options {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  align-items: center;
+}
+
+/* Endings reached — four boxes along the bottom, hidden until the first
+   ending. Hollow until reached, then filled cyan. Hover or focus shows the
+   name; a reached ending also shows its line. */
+#screen-title { position: relative; }
+
+#endings-row {
+  position: absolute;
+  bottom: 44px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 18px;
+  animation: screen-in 1.2s ease 0.6s both;
+}
+
+.ending-box {
+  position: relative;
+  width: 22px;
+  height: 22px;
+  border: 1px solid rgba(95, 212, 229, 0.45);
+  background: transparent;
+  cursor: default;
+}
+
+.ending-box.reached {
+  background: #5fd4e5;
+  border-color: #5fd4e5;
+  box-shadow: 0 0 10px rgba(95, 212, 229, 0.55);
+}
+
+.ending-tip {
+  position: absolute;
+  bottom: calc(100% + 12px);
+  left: 50%;
+  transform: translateX(-50%);
+  width: max-content;
+  max-width: min(280px, 80vw);
+  padding: 8px 12px;
+  background: #050a0c;
+  border: 1px solid rgba(95, 212, 229, 0.45);
+  color: #c8f2fb;
+  font-size: 11px;
+  line-height: 1.5;
+  text-align: center;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity 0.15s ease, visibility 0.15s ease;
+}
+
+.ending-tip .ending-name {
+  display: block;
+  letter-spacing: 0.3em;
+  text-indent: 0.3em;
+}
+
+.ending-tip .ending-desc {
+  display: block;
+  margin-top: 6px;
+  letter-spacing: 0.04em;
+  color: #79aebc;
+}
+
+.ending-box:hover .ending-tip,
+.ending-box:focus-visible .ending-tip,
+.ending-box:focus .ending-tip { opacity: 1; visibility: visible; }
+
+#screen-title button.choice { color: #79aebc; }
+#screen-title button.choice:hover:not(:disabled) { color: #c8f2fb; }
+#screen-title button.choice:disabled { color: #333c40; }
+
+/* ---------- The end — the title's black-and-neon language ---------- */
+
+#screen-end {
+  justify-content: center;
+  background: #000;
+  gap: 72px;
+}
+
+#screen-end h1 {
+  font-family: "Segoe UI", system-ui, sans-serif;
+  font-weight: 200;
+  font-size: clamp(24px, 4.5vw, 44px);
+  letter-spacing: 0.42em;
+  text-indent: 0.42em;
+  text-align: center;
+  color: #e6fbff;
+  text-shadow:
+    0 0 6px rgba(95, 212, 229, 0.9),
+    0 0 24px rgba(95, 212, 229, 0.45),
+    0 0 64px rgba(95, 212, 229, 0.25);
+  animation: screen-in 2.6s ease both;
+}
+
+/* The click-through arrives once the card has settled */
+#screen-end .end-menu { animation: screen-in 1.2s ease 1.6s both; }
+#screen-end button.choice { color: #79aebc; }
+#screen-end button.choice:hover { color: #c8f2fb; }
+
+/* Visually hidden, still read by screen readers (#sr-live). */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* ---------- Choice buttons — the terminal's cursor ---------- */
+
+button.choice {
+  background: none;
+  border: none;
+  color: var(--choice);
+  font-family: var(--font-ui);
+  font-size: 15px;
+  letter-spacing: 0.06em;
+  padding: 6px 10px;
+  cursor: pointer;
+  transition: color 0.15s ease;
+}
+
+button.choice::before {
+  content: ">";
+  display: inline-block;
+  width: 1.4ch;
+  opacity: 0;
+  transition: opacity 0.15s ease;
+}
+
+button.choice:hover:not(:disabled) {
+  text-shadow: 0 0 10px color-mix(in srgb, var(--glow) 65%, transparent);
+}
+
+button.choice:hover:not(:disabled)::before,
+button.choice:focus-visible::before { opacity: 1; }
+
+button.choice:disabled { cursor: default; text-shadow: none; }
+
+/* Choices that replace a ">>>" ignore clicks for 0.5s (engine.js); they fade
+   up over the same half second so the pause reads as them arriving. */
+.choices.arriving button.choice { animation: choice-arrive 0.5s ease both; }
+
+@keyframes choice-arrive {
+  from { opacity: 0.25; }
+  to   { opacity: 1; }
+}
+
+/* ---------- Vignette ---------- */
+
+/* Split layout: scene on the left, dialogue box on the right. The screen is
+   exactly one viewport tall and never scrolls; only the transcript does. */
+#screen-vignette {
+  box-sizing: border-box;
+  height: calc(100vh - 52px);
+  min-height: 0;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 28px;
+  padding: 20px 28px;
+  overflow: hidden;
+  /* The scene's width — as wide as it can be: 60% of the window, leaving the
+     dialogue box at least ~360px, and short enough to fit the window's
+     height. Shared so the dialogue box can match the image's height. */
+  --scene-w: min(60vw, calc(100vw - 420px), calc((100vh - 100px) * 16 / 9));
+}
+
+#scene-box {
+  position: relative;
+  width: var(--scene-w);
+  aspect-ratio: 16 / 9;
+  background: #000;
+  border: 1px solid var(--scene-border);
+  transition: border-color 0.35s ease;
+  box-shadow: 0 0 48px color-mix(in srgb, var(--glow) 7%, transparent);
+  flex-shrink: 0;
+}
+
+#scene-image, #scene-image img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+#scene-image img { object-fit: cover; filter: var(--scene-filter); }
+
+/* Scenes whose art is one shared file for both lens states (no dedicated
+   -off variant) get a heavier bare-eyed wash — dedicated -off art carries
+   its own darker grading, shared art can't. */
+body.lenses-off #scene-image.shared-art img {
+  filter: saturate(0.35) brightness(0.78) contrast(0.95);
+}
+
+/* Scene changes cross-fade: render.js stacks the new art over the old at
+   opacity 0, then lifts it (dropping the old image once the fade ends). */
+#scene-image img,
+#map-image img { transition: opacity 0.25s ease; }
+#scene-image img.incoming,
+#map-image img.incoming { opacity: 0; }
+
+/* Retune blink — one dark frame when the lenses go on or off */
+#scene-box::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: #000;
+  opacity: 0;
+  pointer-events: none;
+}
+
+body.lenses-on  #scene-box::after { animation: retune-on  0.26s steps(2, end); }
+body.lenses-off #scene-box::after { animation: retune-off 0.26s steps(2, end); }
+
+@keyframes retune-on  { 0% { opacity: 0.6; } 100% { opacity: 0; } }
+@keyframes retune-off { 0% { opacity: 0.6; } 100% { opacity: 0; } }
+
+/* Missing art renders as a diegetic viewfinder frame */
+.placeholder {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  color: var(--dim);
+  font-size: 13px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  text-align: center;
+  padding: 24px;
+}
+
+.placeholder::before,
+.placeholder::after {
+  content: "";
+  position: absolute;
+  width: 26px;
+  height: 26px;
+}
+
+.placeholder::before {
+  top: 12px; left: 12px;
+  border-top: 1px solid var(--dim);
+  border-left: 1px solid var(--dim);
+}
+
+.placeholder::after {
+  bottom: 12px; right: 12px;
+  border-bottom: 1px solid var(--dim);
+  border-right: 1px solid var(--dim);
+}
+
+.placeholder small {
+  font-size: 10px;
+  letter-spacing: 0.18em;
+  color: color-mix(in srgb, var(--dim) 65%, transparent);
+}
+
+#hotspot-layer { position: absolute; inset: 0; }
+#hotspot-layer.inert { pointer-events: none; opacity: 0.35; }
+
+.hotspot {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+}
+
+.hotspot img.marker {
+  width: 38px;
+  height: 38px;
+  object-fit: contain;
+  pointer-events: none;
+  transition: transform 0.15s ease;
+}
+
+.hotspot:hover img.marker { transform: scale(1.08); }
+
+/* Unvisited: silhouette glow on a slow pulse. Visited: dimmed, no glow.
+   brightness() lifts the dark marker art so it reads against dark scenes —
+   still one asset, two CSS states. */
+.hotspot.unvisited img.marker {
+  filter: brightness(1.9) drop-shadow(0 0 1px rgba(0, 0, 0, 0.9))
+          drop-shadow(0 0 6px var(--glow));
+  animation: hspulse 2s ease-in-out infinite;
+}
+
+.hotspot.visited img.marker {
+  filter: brightness(1.4) drop-shadow(0 0 1px rgba(0, 0, 0, 0.9));
+  opacity: 0.75;
+}
+
+@keyframes hspulse {
+  0%, 100% { opacity: 0.82; }
+  50%      { opacity: 1; }
+}
+
+/* ---------- Dialogue box — Brand's voice ---------- */
+
+/* The right-hand column: a scrolling transcript over a pinned choice bar. */
+#dialogue-box {
+  flex: 1 1 0;
+  min-width: 300px;
+  max-width: 640px;
+  /* Exactly the image's height, so the box is flush with its top and bottom.
+     Text-only nodes keep the same height (centered), so the transcript
+     doesn't jump when a vignette drops its scene partway (V03). */
+  height: calc(var(--scene-w) * 9 / 16);
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Scene-less nodes (text-only vignettes, hide_scene): the box widens and
+   takes the middle of the screen on its own. */
+#screen-vignette.no-scene #dialogue-box { max-width: 760px; }
+
+/* The transcript: everything read in this vignette, oldest first. The only
+   thing on the vignette screen that scrolls. position: relative makes it the
+   offsetParent the engine measures against when it scrolls a node into view. */
+#node-panel {
+  position: relative;
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 4px 14px 20px 2px;
+  scrollbar-width: thin;
+  scrollbar-color: color-mix(in srgb, var(--glow) 35%, transparent) transparent;
+  /* Anchored to the bottom, like a chat log: short text sits just above the
+     choice bar instead of at the top of an empty box. margin-top: auto (not
+     justify-content) keeps the top reachable once it overflows. */
+  display: flex;
+  flex-direction: column;
+}
+#transcript-history { margin-top: auto; }
+
+#transcript-history,
+#transcript-current,
+#transcript-history .entry {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+#transcript-history:not(:empty) { margin-bottom: 20px; }
+
+/* Already-read entries step back a little so the open node reads first. */
+#transcript-history .entry { opacity: 0.72; }
+
+/* The player's own actions — a hotspot clicked, a choice taken — echoed into
+   the transcript in bold, behind the same ">" the choice buttons show on hover. */
+p.player-action {
+  font-family: var(--font-ui);
+  font-weight: 700;
+  font-size: 14px;
+  letter-spacing: 0.04em;
+  color: var(--glow);
+}
+p.player-action::before { content: "> "; }
+
+/* Blackout nodes (blackout: true): a quick cut to black, a beat of dark,
+   then only the choice bar comes back. Leaving the blackout fades the art
+   and the (fresh) transcript back in slowly. */
+#scene-box { transition: border-color 0.35s ease, opacity 1.6s ease; }
+#node-panel { transition: opacity 1.6s ease; }
+#screen-vignette.blackout #scene-box,
+#screen-vignette.blackout #node-panel { opacity: 0; transition: opacity 0.2s ease; }
+#screen-vignette.blackout #choice-bar {
+  border-top-color: transparent;
+  animation: screen-in 0.8s ease 1.4s both;
+}
+
+/* An ending's last image lingers (engine lingerOut): the text and choices fade
+   first, the art holds alone, then it fades to black before the end card. */
+#screen-vignette.closing-text #node-panel,
+#screen-vignette.closing-text #choice-bar { opacity: 0; transition: opacity 1.4s ease; }
+#screen-vignette.closing-image #scene-box { opacity: 0; transition: opacity 2s ease; }
+
+/* The pinned choice bar: >>> and the node's choices. Never scrolls away. */
+#choice-bar {
+  flex: none;
+  margin-top: 8px;
+  padding-top: 12px;
+  border-top: 1px solid color-mix(in srgb, var(--glow) 18%, transparent);
+  transition: opacity 0.18s ease;
+}
+#choice-bar:empty { border-top-color: transparent; padding-top: 0; }
+#choice-bar .choices { margin-top: 0; }
+
+/* Beat transition: the engine veils the choice bar while the next node lands */
+#choice-bar.veiled {
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* Narrow or tall windows: stack the scene over the dialogue box; the box
+   takes the remaining height and still scrolls on its own. */
+@media (max-width: 900px), (max-aspect-ratio: 5/4) {
+  #screen-vignette {
+    flex-direction: column;
+    align-items: center;
+    gap: 14px;
+    padding: 12px 16px;
+  }
+  #scene-box { width: min(100%, calc((100vh - 52px) * 0.42 * 16 / 9)); }
+  #dialogue-box {
+    width: 100%;
+    max-width: 640px;
+    min-width: 0;
+    height: auto;
+  }
+}
+
+p.prose {
+  font-family: var(--font-prose);
+  font-style: italic;
+  font-size: 18px;
+  line-height: 1.75;
+  color: var(--text);
+}
+
+.dialogue {
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+  padding: 12px 14px;
+  background: color-mix(in srgb, var(--bg-raise) 80%, transparent);
+  border-left: 1px solid color-mix(in srgb, var(--glow) 45%, transparent);
+}
+
+.dialogue img.portrait {
+  width: 76px;
+  height: 114px;
+  object-fit: cover;
+  border: 1px solid color-mix(in srgb, var(--glow) 30%, transparent);
+  flex-shrink: 0;
+}
+
+.nameplate {
+  font-size: 11px;
+  letter-spacing: 0.3em;
+  color: var(--glow);
+  margin-bottom: 6px;
+}
+
+.dialogue-text {
+  font-size: 14px;
+  line-height: 1.65;
+  color: var(--bright);
+}
+
+/* Glossary terms — first-ever occurrence only (js/glossary.js). Very quiet:
+   the prose keeps its color; only a faint dotted underline marks the word. */
+.term {
+  position: relative;
+  cursor: help;
+  text-decoration: underline dotted color-mix(in srgb, var(--glow) 45%, transparent);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 4px;
+}
+
+.term:hover,
+.term:focus-visible {
+  text-decoration-color: color-mix(in srgb, var(--glow) 80%, transparent);
+}
+
+/* Definition tooltip — one floating element on <body> (#term-tip), placed by
+   js/glossary.js: above the word when there's room, below when there isn't,
+   clamped inside the window. Living outside the transcript, nothing that
+   scrolls or clips can cut it off. Same chrome as the data-tip family. */
+#term-tip {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 100;            /* over the status bar, debug menu and modals */
+  width: max-content;
+  max-width: min(340px, calc(100vw - 16px));
+  padding: 10px 14px;
+  background: color-mix(in srgb, var(--bg) 80%, black);
+  border: 1px solid color-mix(in srgb, var(--glow) 45%, transparent);
+  box-shadow: 0 0 16px color-mix(in srgb, var(--glow) 15%, transparent);
+  color: var(--bright);
+  font-family: var(--font-ui);
+  font-style: normal;
+  font-size: 11px;
+  line-height: 1.6;
+  letter-spacing: 0.04em;
+  white-space: normal;
+  text-align: left;
+  pointer-events: none;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.15s ease, visibility 0.15s ease;
+}
+#term-tip.measuring { visibility: hidden; opacity: 0; transition: none; }
+#term-tip.visible   { visibility: visible; opacity: 1; }
+
+/* The little pointer, toward the word: under the tooltip when it sits above,
+   on top of it when it flips below. */
+.term-tip-arrow {
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  background: color-mix(in srgb, var(--bg) 80%, black);
+  border-bottom: 1px solid color-mix(in srgb, var(--glow) 45%, transparent);
+  border-right: 1px solid color-mix(in srgb, var(--glow) 45%, transparent);
+  bottom: -5px;
+  transform: translateX(-50%) rotate(45deg);
+}
+#term-tip.below .term-tip-arrow {
+  bottom: auto;
+  top: -5px;
+  transform: translateX(-50%) rotate(225deg);
+}
+
+.choices {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 12px;
+  align-items: flex-start;
+}
+
+/* Stepped nodes: each newly revealed block fades in over the stack */
+#node-panel .reveal { animation: block-in 0.35s ease both; }
+
+@keyframes block-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+/* ---------- Map (stub: no status bar, no lens states) ---------- */
+
+#screen-map { justify-content: center; padding: 24px; }
+
+#map-box {
+  position: relative;
+  /* third clamp: never taller than the viewport minus bar and padding —
+     the whole map stays on screen without scrolling */
+  width: min(1040px, 94vw, calc((100vh - 116px) * 16 / 9));
+  aspect-ratio: 16 / 9;
+  background: #000;
+  border: 1px solid var(--scene-border); /* same framed-art border as scenes */
+  transition: border-color 0.35s ease;
+  box-shadow: 0 0 48px color-mix(in srgb, var(--glow) 7%, transparent);
+}
+
+#map-image, #map-image img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+/* Muted so the interface (pin, chrome) carries the color — full-strength
+   map art was drowning out the neon. */
+#map-image img { object-fit: cover; filter: saturate(0.35) brightness(0.9); }
+
+/* The map's lens toggle is display-only (inert), but the portrait itself
+   shouldn't look disabled — keep it full-strength there. */
+body[data-screen="map"] #lens-toggle.inert img { filter: none; }
+
+/* Holographic grid under the placeholder until reseattle.png lands */
+#map-image .placeholder {
+  background:
+    repeating-linear-gradient(0deg,
+      color-mix(in srgb, var(--glow) 6%, transparent) 0 1px, transparent 1px 48px),
+    repeating-linear-gradient(90deg,
+      color-mix(in srgb, var(--glow) 6%, transparent) 0 1px, transparent 1px 48px);
+}
+
+#map-hotspots { position: absolute; inset: 0; }
+
+/* Map pin — a portrait in a Google-style pin: circular head, short tail
+   tapering to a point on the location. Label lives in the tooltip (data-tip). */
+.map-pin {
+  flex-direction: column;
+  transition: transform 0.15s ease;
+}
+
+.map-pin:hover { transform: scale(1.08); }
+
+.map-pin img.pin-face {
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  object-fit: cover;
+  background: #000;
+  border: 2px solid var(--glow);
+  box-shadow: 0 0 12px color-mix(in srgb, var(--glow) 40%, transparent); /* static fallback (reduced motion) */
+  animation: pin-glow 2s ease-in-out infinite;
+  pointer-events: none;
+}
+
+/* Breathing neon halo — same 2s rhythm as the hotspot pulse */
+@keyframes pin-glow {
+  0%, 100% { box-shadow: 0 0 10px color-mix(in srgb, var(--glow) 35%, transparent); }
+  50%      { box-shadow: 0 0 22px color-mix(in srgb, var(--glow) 85%, transparent),
+                         0 0 44px color-mix(in srgb, var(--glow) 30%, transparent); }
+}
+
+.map-pin .pin-tail {
+  width: 0;
+  height: 0;
+  border-left: 7px solid transparent;
+  border-right: 7px solid transparent;
+  border-top: 13px solid var(--glow);
+  margin-top: -2px;
+  pointer-events: none;
+}
+
+#coming-soon {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.82);
+  color: var(--bright);
+  font-size: 26px;
+  letter-spacing: 0.5em;
+  text-indent: 0.5em;
+  cursor: pointer;
+  z-index: 5;
+}
+
+/* ---------- Modal (New Game overwrite confirm) ---------- */
+
+#modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.72);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 60;
+}
+
+#modal {
+  background: var(--bg-raise);
+  border: 1px solid color-mix(in srgb, var(--glow) 30%, transparent);
+  padding: 30px 36px;
+  max-width: 460px;
+  text-align: center;
+}
+
+#modal p {
+  margin-bottom: 22px;
+  font-size: 14px;
+  line-height: 1.6;
+  letter-spacing: 0.04em;
+  color: var(--bright);
+}
+
+.modal-buttons {
+  display: flex;
+  gap: 24px;
+  justify-content: center;
+}
+
+/* ---------- Fade transition (400/200/400) ---------- */
+
+#fade-overlay {
+  position: fixed;
+  inset: 0;
+  background: #000;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.4s ease;
+  z-index: 50;
+}
+
+#fade-overlay.active {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* ---------- Reduced motion ---------- */
+
+@media (prefers-reduced-motion: reduce) {
+  #screen-title h1,
+  #screen-title h1 .flicker,
+  #screen-end h1,
+  #screen-end .end-menu,
+  .title-sub,
+  .title-intro,
+  .intro-continue,
+  .title-menu.wake,
+  #endings-row,
+  .choices.arriving button.choice,
+  #node-panel .reveal,
+  .hotspot.unvisited img.marker,
+  .map-pin img.pin-face,
+  #scene-box::after,
+  #lens-toggle.nudge,
+  #lens-hint { animation: none !important; }
+  #lens-toggle.nudge { box-shadow: 0 0 12px color-mix(in srgb, var(--glow) 70%, transparent); }
+  .hotspot img.marker,
+  .map-pin,
+  #choice-bar,
+  .title-intro,
+  button.choice, button.choice::before,
+  #lens-toggle[data-tip]::before,
+  #lens-toggle[data-tip]::after,
+  .hotspot[data-tip]::before,
+  .hotspot[data-tip]::after,
+  .term,
+  #term-tip,
+  #scene-image img,
+  #map-image img { transition: none; }
+}

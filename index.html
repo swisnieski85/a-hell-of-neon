@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>A Hell of Neon</title>
+  <link rel="icon" href="favicon.ico">
+  <link rel="stylesheet" href="css/palette.css">
+  <link rel="stylesheet" href="css/main.css">
+</head>
+<body class="lenses-off">
+
+  <header id="status-bar" class="hidden">
+    <button id="lens-toggle" class="hidden" type="button">
+      <img id="lens-icon" src="assets/icons/brand_icon_off.png" alt="">
+    </button>
+    <!-- First-use cue: from the moment Brand has the lenses until the player
+         first toggles them (state.lens_hint_done). -->
+    <div id="lens-hint" class="hidden">&larr; Your lenses. Click to put them on.</div>
+    <div id="bar-spacer"></div>
+    <div id="bar-datetime"></div>
+    <div id="bar-extra"></div><!-- reserved: cash and future fields land here -->
+  </header>
+
+  <!-- Dev menu — one DEBUG button that opens a panel of dev controls. Floats
+       outside the bar so it stays reachable on bar-less screens (the map).
+       Hidden entirely when DEV_DEBUG_MENU is false (js/config.js). -->
+  <div id="debug-menu">
+    <button id="debug-open" type="button" aria-expanded="false" aria-controls="debug-panel">DEBUG</button>
+    <div id="debug-panel" hidden>
+      <div class="debug-row debug-row-reload">
+        <span class="debug-label">On reload</span>
+        <button id="debug-reload" type="button"></button>
+      </div>
+      <div class="debug-row">
+        <span class="debug-label">Skip to</span>
+        <div id="debug-days" class="debug-buttons"></div>
+      </div>
+      <!-- Thread-progress rows (Autopsy, Car, Heavy, Shred, Rose) are added
+           here by ui.js from js/debug-threads.js. -->
+    </div>
+  </div>
+
+  <main id="screens">
+    <section id="screen-title" class="screen hidden">
+      <div class="title-sign">
+        <h1><span class="flicker tube-a">A</span> HELL <span class="flicker tube-o">O</span>F NE<span class="flicker">O</span>N</h1>
+        <p class="title-sub">a cyberpunk neo-noir story</p>
+      </div>
+      <div class="title-under">
+        <div class="title-intro">
+          <p class="intro-note">For the best experience, play with headphones</p>
+          <p class="intro-continue">[Click to continue]</p>
+        </div>
+        <div class="title-menu">
+          <button id="btn-new" class="choice" type="button">[New Game]</button>
+          <button id="btn-continue" class="choice" type="button">[Continue]</button>
+          <button id="btn-options" class="choice" type="button">[Options]</button>
+        </div>
+        <div class="title-options hidden">
+          <button id="btn-clear-data" class="choice" type="button">[Clear saved data]</button>
+          <button id="btn-options-back" class="choice" type="button">[Back]</button>
+        </div>
+      </div>
+      <!-- Endings reached: hidden until the first one. Filled by ui.js. -->
+      <div id="endings-row" class="hidden" role="list" aria-label="Endings"></div>
+    </section>
+
+    <section id="screen-vignette" class="screen hidden">
+      <div id="scene-box" class="hidden">
+        <div id="scene-image"></div>
+        <div id="hotspot-layer"></div>
+      </div>
+      <!-- Split layout: the dialogue box holds a scrolling transcript of the
+           whole vignette (history + the node now open) and a pinned choice
+           bar. Only the transcript scrolls; the page never does. -->
+      <div id="dialogue-box">
+        <div id="node-panel">
+          <div id="transcript-history"></div>
+          <div id="transcript-current"></div>
+        </div>
+        <div id="choice-bar"></div>
+      </div>
+      <!-- Screen readers: each newly shown line is announced from here. The
+           transcript itself re-renders in place, so it can't be the live
+           region without re-reading whole nodes. -->
+      <div id="sr-live" class="sr-only" aria-live="polite"></div>
+    </section>
+
+    <section id="screen-map" class="screen hidden">
+      <div id="map-box">
+        <div id="map-image"></div>
+        <div id="map-hotspots"></div>
+        <div id="coming-soon" class="hidden">COMING&nbsp;SOON</div>
+      </div>
+    </section>
+
+    <section id="screen-end" class="screen hidden">
+      <div class="title-sign">
+        <h1>THE END</h1>
+        <p class="title-sub">thank you for playing</p>
+      </div>
+      <div class="end-menu">
+        <button id="btn-end-title" class="choice" type="button">[Return to title]</button>
+      </div>
+    </section>
+  </main>
+
+  <div id="modal-backdrop" class="hidden">
+    <div id="modal">
+      <p id="modal-text"></p>
+      <div class="modal-buttons">
+        <button id="modal-ok" class="choice" type="button"></button>
+        <button id="modal-cancel" class="choice" type="button"></button>
+      </div>
+    </div>
+  </div>
+
+  <div id="fade-overlay"></div>
+
+  <script src="vendor/js-yaml.min.js"></script>
+  <script type="module" src="js/main.js"></script>
+</body>
+</html>

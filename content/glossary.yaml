@@ -1,0 +1,94 @@
+# Glossary — novel terms of the world. Auto-detected in prose and dialogue
+# (case-sensitive, whole words). The first time a term appears in play it gets
+# a quiet underline and its definition as a tooltip; every appearance after
+# that renders as plain text. First-sightings live in the save (seen_terms).
+# `aliases:` lists other word forms that count as the same term (Cascadian
+# for Cascadia); the tooltip shows once for the whole family.
+#
+# Definitions are written in-world — SUBSTRATE's own voice: official,
+# sanitized, and not necessarily the whole truth.
+
+terms:
+  - term: Cascadia
+    aliases: [ Cascadian ]
+    definition: >-
+      One of several hundred polities comprising the North American
+      Confederation, covering roughly the westernmost third of the former
+      states of Washington and Oregon as well as the former province of British
+      Columbia.
+
+  - term: Combine
+    definition: >-
+      A corporate conglomerate chartered to provide services once held by
+      municipal government, such as security, broadcasting, and utilities.
+      ReSeattle's combines include Mercer and Kell Security Combine and Echo
+      Paradigm. Among employees, "the Combine" means one's own.
+
+  - term: crash
+    aliases: [ crashout ]
+    definition: >-
+      The violent psychotic break suffered by a trivial minority of Shred users.
+      A crash is sudden and total: the user is seized by delusion and an
+      appetite for cruelty, and commits acts of extreme violence, often against
+      whoever is nearest, with no apparent awareness or memory of self. Most
+      users never crash; those who do are typically killed, either in self-defense
+      or by police afterward.
+
+  - term: Echo Paradigm
+    definition: >-
+      One of ReSeattle's dominant corporate combines. Developer of the
+      Immersion implant and the entoptic game SUBSTRATE, and the broadcast
+      infrastructure the city's augmented life runs on.
+  
+  - term: entoptic
+    definition: >-
+      Phenomena projected directly into the brain rather than displayed in the
+      world. An entoptic ad isn't on a sign or in the air; a broadcaster tells
+      the receiver in your head there's an ad there, and what it looks like from
+      exactly where you stand, and the receiver renders it in your field of
+      view. "Entoptics" may also refer to the implants that enable this, or to
+      smart glasses that substitute for the implants.
+  
+  - term: Halcyon
+    definition: >-
+      Echo Paradigm's next-generation adaptive model, trained on anonymized
+      SUBSTRATE play. Halcyon learns how people feel so that Immersion can
+      meet each user where they are.
+
+  - term: Immersion
+    definition: >-
+      Echo Paradigm's neural implant, installed in the left temporal region.
+      It receives entoptic broadcasts and projects them directly into the
+      mind, sight and sound with no external source. Some 98% of ReSeattle
+      residents have one installed.
+
+  - term: Read-only
+    definition: >-
+      Entoptic lenses are only capable of reading instructions from entoptic
+      broadcasters. Apart from the identity beacon required by law of every
+      wearer, they transmit nothing; interaction with entoptic displays is
+      therefore impossible.
+  
+  - term: Shred
+    definition: >-
+      A dangerous illegal stimulant circulating in ReSeattle. Most users
+      chase a euphoric high, but a small fraction turn violently, horrifically
+      psychotic. Origin, chemistry, and supply are all unknown. Deaths
+      attributed to it have climbed sharply over the past year.
+  
+  - term: SUBSTRATE
+    definition: >-
+      Echo Paradigm's flagship entoptic game. Players walk the real city
+      and enter self-contained mental "portals" seeded where the game detects
+      concentrated emotional energy, solving puzzles for a sensation of
+      epiphany and release. Wildly popular; requires an Immersion implant.
+  
+  - term: sugar cell
+    definition: >-
+      A business establishment offering sensual delights via entoptic Immersion.
+
+  - term: Wormwood
+    definition: >-
+      An Echo Paradigm research initiative extending SUBSTRATE's emotional
+      range to include grief, fear, and other difficult experiences, so that
+      Halcyon can support users through the whole of their lives.

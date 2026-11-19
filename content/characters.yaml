@@ -1,0 +1,28 @@
+BRAND:
+  portrait_off: brand_portrait_off.webp
+  portrait_on: brand_portrait_on.webp
+CONTROL: {}     # no portrait — radio voice
+SECURITY: {}    # no portrait — Echo's security lead (V90 Quietism, no car_done)
+MAN: {}         # no portrait — the man with the knife (V91 street)
+FRENK:
+  portrait: frenk.webp
+WASH:
+  portrait: wash.webp
+KHALIL:
+  portrait: khalil.webp
+CONTACT:
+  portrait: the-heavy.webp
+HEAVY:          # V10, before he gives a name
+  portrait: the-heavy.webp
+JOHNSON:        # V10, after: "Mark Johnson," obviously fake; the nameplate takes it anyway
+  portrait: the-heavy.webp
+WOMAN:
+  portrait: rose.webp
+ROSE:
+  portrait: rose.webp
+DROZ:
+  portrait: droz.webp
+HARTIGAN:
+  portrait: hartigan.webp
+WU:
+  portrait: wu.webp

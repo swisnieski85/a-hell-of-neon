@@ -1,0 +1,224 @@
+kind: location
+location: 412 Delridge Way · Unit 6C
+slot: true
+# no date — inherited from the day's dawn bookend
+# no time — slot vignettes inherit the slot hour (slot_times on the dawn bookend)
+opening_node: heavy1_open
+entry_scene: tossed_apartment
+ambient:
+  - rain-inside
+
+scenes:
+  tossed_apartment:
+    image: 09-apartment
+    intro: |
+      Paper covers the floor, ankle-deep in places. The couch has been slit open. Somebody pulled down a few ceiling tiles. A dark doorway on the left leads to the back of the apartment.
+    hotspots:
+      - id: tv
+        coords: { x: 0.475, y: 0.35, w: 0.18, h: 0.25 }   # the TV and its stand
+        node_off: heavy1_tv_bare
+        node_on: heavy1_tv_lensed
+        tooltip: Look at the TV
+        visible: always
+
+      # One doorway in the art; it opens on a short hall with the bedroom and
+      # bathroom, picked from a small hub node.
+      - id: back_rooms
+        coords: { x: 0.205, y: 0.12, w: 0.09, h: 0.50 }
+        node: heavy1_back
+        tooltip: Check the back rooms
+        visible: always
+
+      - id: baggy
+        coords: { x: 0.45, y: 0.735, w: 0.065, h: 0.055 }   # small dark object mid-floor
+        node: heavy1_baggy
+        tooltip: Something on the floor
+        visible: always
+
+      - id: exit_early
+        coords: { x: 0.35, y: 0.90, w: 0.30, h: 0.09 }   # bottom edge, behind Brand
+        node: heavy1_exit_early
+        tooltip: Leave
+        visible: always
+        requires:
+          not:
+            all: [ _read_room, _read_closet ]
+
+      - id: exit
+        coords: { x: 0.35, y: 0.90, w: 0.30, h: 0.09 }
+        node: heavy1_exit
+        tooltip: Leave
+        visible: always
+        requires:
+          all: [ _read_room, _read_closet ]
+
+nodes:
+  # ---------- Arrival (text only; the scene image opens after) ----------
+
+  - id: heavy1_open
+    stepped: true
+    blocks:
+      - prose: |
+          412 Delridge Way is six floors of tired brick between a noodle counter and a shuttered pharmacy. Hardly worth a second glance.
+      - prose: |
+          Thirteen years at the one address the Combine has for him. It's a long shot. He may have left years ago. Or maybe staying put was his one piece of sloppiness.
+      - prose: |
+          Unit 6C is at the end of the hall. The door is shut, but the frame around the lock is splintered, and when you push it with two fingers it swings open.
+      - prose: |
+          You draw your handgun and go in.
+      - prose: |
+          Nobody's here now. But someone was.
+    choices:
+      - label: Look around
+        goto_scene: tossed_apartment
+
+  # ---------- The read: not a burglary ----------
+
+  - id: heavy1_tv_bare
+    stepped: true
+    blocks:
+      - prose: |
+          The TV is still on its stand. A real screen, the kind you can watch without an implant, and worth more than anything else in here.
+      - prose: |
+          Whoever did this slit the couch and pulled down the ceiling, and left the one thing a burglar would take. They weren't here to rob him.
+    choices:
+      - label: Step back
+        set: { _read_room: true }
+
+  - id: heavy1_tv_lensed
+    stepped: true
+    blocks:
+      - prose: |
+          The entoptic layer has almost nothing to say in here. The only color is through the blinds, from a sign on the building across the street. He kept his home neat, natural, and unaugmented.
+      - prose: |
+          The TV is still on its stand. A real screen, worth more than anything else in the room. Whoever did this slit the couch and pulled down the ceiling, and left the one thing a burglar would take. They weren't here to rob him.
+    choices:
+      - label: Step back
+        set: { _read_room: true }
+
+  # ---------- How he left ----------
+
+  # The back rooms: a hub, since the art has one doorway. Each room drops out
+  # of the list once read.
+  - id: heavy1_back
+    blocks:
+      - prose: |
+          A short hall. The bedroom's on the left, the bathroom on the right. Both doors stand open.
+    choices:
+      - label: Check the bedroom
+        requires: { not: _read_closet }
+        goto: heavy1_bedroom
+      - label: Check the bathroom
+        requires: { not: _read_bathroom }
+        goto: heavy1_bathroom
+      - label: Step back
+
+  - id: heavy1_bedroom
+    stepped: true
+    blocks:
+      - prose: |
+          The mattress has been cut open end to end, the stuffing pulled out in handfuls and tossed to the floor.
+      - prose: |
+          The closet door hangs open. His clothes are on the floor where they were thrown. Under them, in the dust on the closet floor, is a clean rectangle where a bag or a small suitcase used to sit.
+      - prose: |
+          Three hangers on the rail are empty, spaced evenly. Someone took a coat and two shirts, and took his time about it.
+      - prose: |
+          He packed. He packed calmly, and he was gone before the searchers got here. They threw his clothes on top of the place where his bag had been.
+    choices:
+      - label: Step back
+        set: { _read_closet: true }
+
+  - id: heavy1_bathroom
+    stepped: true
+    blocks:
+      - prose: |
+          The bathroom got the same treatment. The medicine cabinet has been emptied into the sink. The lid of the toilet tank is on the floor, cracked in half.
+      - prose: |
+          Nobody robbing an apartment searches a toilet tank. Somebody looking for a kilo does.
+      - prose: |
+          In the sink, among the pill bottles and grooming supplies, there's an empty blister pack of motion-sickness tablets, the over-the-counter kind. A crumpled receipt is stuck to it: one box, from an all-night drugstore, 0214 Sunday morning. Two hours after the terminal. The toothbrush holder is empty and there's no toothpaste in sight.
+      - prose: |
+          A man who gets seasick, and was planning for it. He's leaving by water.
+    choices:
+      - label: Step back
+        set: { _read_bathroom: true }
+
+  - id: heavy1_baggy
+    blocks:
+      - prose: |
+          On the floor, in the middle of everything, a small baggy of Shred. A few grams.
+      - prose: |
+          Whoever tore this place apart walked right past it. They weren't looking for a few grams.
+    choices:
+      - label: Leave it
+
+  # ---------- Leaving ----------
+
+  - id: heavy1_exit_early
+    blocks:
+      - prose: |
+          Not yet. Somebody tore this place apart looking for something. You want to know what, and whether he left on his own.
+    choices:
+      - label: Stay
+
+  # The bathroom is optional. Read it, and Brand knows the heavy is leaving by
+  # water: Frenk's sweep is narrow and lands in minutes (heavy_located, so
+  # Heavy 2 can be the same day). Miss it, and the sweep covers the whole
+  # city and lands overnight (heavy_search_wide: Heavy 2 opens tomorrow).
+  # A missed clue costs time, not the thread.
+  - id: heavy1_exit
+    stepped: true
+    blocks:
+      - prose: |
+          You stand in the middle of the wreck and put it all together. He packed calmly and left before the searchers came. He's leaving by water. And whoever tossed this place wants him, or something he had, badly enough to do this.
+        requires: _read_bathroom
+      - prose: |
+          You stand in the middle of the wreck and put it all together. He packed calmly and left before the searchers came. And whoever tossed this place wants him, or something he had, badly enough to do this.
+        requires: { not: _read_bathroom }
+      - prose: |
+          You wave Frenk.
+      - dialogue:
+          speaker: BRAND
+          text: |
+            Need a live camera sweep on the face from the terminal. Last forty-eight hours, cheap places near the water. Somebody else is looking for him, and they're not friendly.
+        requires: _read_bathroom
+      - dialogue:
+          speaker: FRENK
+          text: give me 10
+        requires: _read_bathroom
+      - prose: |
+          You're on the stairs when it comes back.
+        requires: _read_bathroom
+      - dialogue:
+          speaker: FRENK
+          text: |
+            got him. sandpiper motel, harbor ave. camera by the ice machine, 0640 this morning
+        requires: _read_bathroom
+      - dialogue:
+          speaker: FRENK
+          text: hes prob gone by now
+        requires: _read_bathroom
+      - prose: |
+          Probably. It's hours old. But it's the only lead you've got, and you didn't come here for his furniture.
+        requires: _read_bathroom
+      - dialogue:
+          speaker: BRAND
+          text: |
+            Need a live camera sweep on the face from the terminal. Last forty-eight hours. Somebody else is looking for him, and they're not friendly.
+        requires: { not: _read_bathroom }
+      - dialogue:
+          speaker: FRENK
+          text: |
+            the whole city? thats a lot of cameras. ill have something by tomorrow
+        requires: { not: _read_bathroom }
+    choices:
+      - label: Go
+        requires: _read_bathroom
+        transition: fade
+        set: { heavy1_done: true, heavy_located: true }
+        goto_map: day_map
+      - label: Go
+        requires: { not: _read_bathroom }
+        transition: fade
+        set: { heavy1_done: true, heavy_search_wide: true }
+        goto_map: day_map

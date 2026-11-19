@@ -1,0 +1,64 @@
+kind: fragment
+location: Ethan Brand's Apartment
+
+nodes:
+  # --- BRAND'S READ (2026-11-19 review) -------------------------------------
+  # After Autopsy 3, a handheld hotspot in the Day 4 night and Day 5 dawn
+  # bookends lets Brand tell Frenk who he thinks sent Ostrowski's package.
+  # Nothing in the game names the culprit before the finale; the player
+  # decides from what they've seen (Droz's pitch, the Wormwood panels). The
+  # wrong answer is the one Droz pointed him at: the car's operator ID and
+  # Security on nineteen through twenty-two (only offered after the Car).
+  # Neither answer changes which ending is reached. They change what Frenk
+  # and Droz say in the finale and what Brand knows in the Nihilism garage.
+  - id: frenk_suspect
+    stepped: true
+    blocks:
+      - prose: |
+          You pick up the handheld and open a wave to Frenk. He'll be up. Man never sleeps.
+      - prose: |
+          One package, one recipient, three in the morning, logged under SUBSTRATE. Echo says it didn't send it. Somebody there did.
+    choices:
+      - label: Droz's team. Wormwood.
+        goto: frenk_suspect_droz
+      - label: Echo security. The operator ID.
+        requires: car_done
+        goto: frenk_suspect_security
+      - label: Not enough to go on yet
+
+  - id: frenk_suspect_droz
+    stepped: true
+    blocks:
+      - dialogue:
+          speaker: BRAND
+          text: |
+            The Ostrowski package. I think it came from a SUBSTRATE team called Wormwood. Lead's Callidus Droz. Can you get somebody at Echo compliance to look at them?
+      - dialogue:
+          speaker: FRENK
+          text: |
+            u sure
+      - dialogue:
+          speaker: BRAND
+          text: No.
+      - dialogue:
+          speaker: FRENK
+          text: |
+            good enough. ill call in the morning
+    choices:
+      - label: Put down the handheld
+        set: { suspect_droz: true }
+
+  - id: frenk_suspect_security
+    stepped: true
+    blocks:
+      - dialogue:
+          speaker: BRAND
+          text: |
+            The Ostrowski package. Follow the operator ID off the Echo car. 8169. It belongs to somebody in Echo security.
+      - dialogue:
+          speaker: FRENK
+          text: |
+            on it
+    choices:
+      - label: Put down the handheld
+        set: { suspect_security: true }

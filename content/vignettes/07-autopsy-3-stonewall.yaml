@@ -1,0 +1,505 @@
+kind: location
+location: Echo Paradigm — HQ
+slot: true
+# no date — inherited from the day's dawn bookend
+# no time — slot vignettes inherit the slot hour (slot_times on the dawn bookend)
+opening_node: autopsy3_open
+entry_scene: meeting_room
+ambient:
+  - ac_drone
+
+scenes:
+  meeting_room:
+    image: 07-echo-hq
+    intro: |
+      A meeting room on the forty-first floor. Through the far wall, the city and the water. On either side, an open office where five people sit at five desks, hunched over computers. Droz sits at the far end of the table. He's poured you a cup of coffee.
+    hotspots:
+      - id: droz_look
+        coords: { x: 0.47, y: 0.36, w: 0.10, h: 0.13 }   # his head and his readout
+        node_off: autopsy3_look_bare
+        node_on: autopsy3_look_lensed
+        tooltip: Look at Droz
+        visible: always
+
+      # The conversation advances in four steps — four hotspots on the same
+      # spot, each re-glowing as it unlocks.
+      - id: droz_meet
+        coords: { x: 0.45, y: 0.49, w: 0.105, h: 0.12 }   # his torso and hands
+        node: autopsy3_meet
+        tooltip: Talk to Droz
+        visible: always
+        requires:
+          not: _met_droz
+
+      - id: droz_log
+        coords: { x: 0.45, y: 0.49, w: 0.105, h: 0.12 }   # his torso and hands
+        node: autopsy3_log
+        tooltip: Show him the delivery log
+        visible: always
+        requires:
+          all:
+            - _met_droz
+            - not: _asked_log
+
+      - id: droz_pitch
+        coords: { x: 0.45, y: 0.49, w: 0.105, h: 0.12 }   # his torso and hands
+        node: autopsy3_pitch
+        tooltip: Ask about his team
+        visible: always
+        requires:
+          all:
+            - _asked_log
+            - not: _heard_pitch
+
+      - id: droz_war
+        coords: { x: 0.45, y: 0.49, w: 0.105, h: 0.12 }   # his torso and hands
+        node: autopsy3_war
+        tooltip: Ask about his war
+        visible: always
+        requires:
+          all:
+            - _heard_pitch
+            - not: _asked_war
+
+      - id: droz_done
+        coords: { x: 0.45, y: 0.49, w: 0.105, h: 0.12 }   # his torso and hands
+        node: autopsy3_droz_done
+        tooltip: Talk to Droz
+        visible: always
+        requires: _asked_war
+
+      # The office is on both sides of the room in the art: three on the
+      # left, two on the right. One node, two hotspots.
+      - id: team_left
+        coords: { x: 0.03, y: 0.37, w: 0.27, h: 0.31 }   # figures + readouts
+        node_off: autopsy3_team_bare
+        node_on: autopsy3_team_lensed
+        tooltip: Look at the office
+        visible: always
+
+      - id: team_right
+        coords: { x: 0.80, y: 0.37, w: 0.17, h: 0.24 }   # figures + readouts
+        node_off: autopsy3_team_bare
+        node_on: autopsy3_team_lensed
+        tooltip: Look at the office
+        visible: always
+
+      # Entoptic, so it hangs on the window glass, clear of the tower.
+      - id: release
+        coords: { x: 0.72, y: 0.11, w: 0.165, h: 0.18 }   # matches the panel in 07-echo-hq-on
+        node: autopsy3_release
+        tooltip: Read the panel on the glass
+        visible: lenses_on
+
+      # The coffee — Droz's, set against Rose's in the aftermath. Hers tastes
+      # bad and she says so; his tastes good and isn't what it seems. Never
+      # point at the parallel in prose.
+      - id: coffee
+        coords: { x: 0.605, y: 0.645, w: 0.04, h: 0.08 }
+        node: autopsy3_coffee
+        tooltip: Drink the coffee
+        visible: always
+        requires:
+          not: _drank_coffee
+
+      - id: exit_early
+        coords: { x: 0.35, y: 0.88, w: 0.30, h: 0.11 }   # bottom edge, behind Brand
+        node: autopsy3_exit_early
+        tooltip: Leave
+        visible: always
+        requires:
+          not: _heard_pitch
+
+      # His war is optional: Brand can leave once he's heard the pitch. If he
+      # asked, the finale remembers it (asked_droz_war).
+      - id: exit
+        coords: { x: 0.35, y: 0.88, w: 0.30, h: 0.11 }   # bottom edge, behind Brand
+        node: autopsy3_exit
+        tooltip: Leave
+        visible: always
+        requires: _heard_pitch
+
+nodes:
+  # ---------- The lobby — no location image yet ----------
+
+  - id: autopsy3_open
+    hide_scene: true     # the lobby; the suite's art waits until he takes you up
+    stepped: true
+    blocks:
+      - prose: |
+          Echo Paradigm HQ is sixty floors of glass on the waterfront. The lobby is white stone, three stories high, and quiet save the muffled noise from the street and the faint burbling of a waterfall fountain.
+      - prose: |
+          The desk scans your handheld and logs you in. Frenk got you twenty minutes with a SUBSTRATE team lead named Callidus Droz. You expect to be sent up. Instead the elevator opens, and he comes to get you himself.
+      - prose: |
+          He's maybe a decade older than you, wearing a gray suit that fits him well. He smiles like he's glad to see you.
+      - dialogue:
+          speaker: DROZ
+          text: Detective Brand. Callidus Droz. Thanks for coming all the way out here.
+      - dialogue:
+          speaker: DROZ
+          text: Come on up. Our suite has a nice view.
+    choices:
+      - label: Go up
+        goto_scene: meeting_room
+
+  # ---------- Looking at him ----------
+
+  - id: autopsy3_look_bare
+    blocks:
+      - prose: |
+          Lean. A good haircut and a better suit. There's a mass of shiny scar tissue on the back of his right hand. He holds his coffee in his left.
+      - prose: |
+          He's easy company. You can't remember the last time someone was easy company.
+    choices:
+      - label: Step back
+
+  - id: autopsy3_look_lensed
+    blocks:
+      - prose: |
+          The layer gives you his panel, the way Echo staff wear them:
+      - prose: |
+          CALLIDUS DROZ |
+          PRINCIPAL ENGINEER |
+          HALCYON · WORMWOOD
+      - prose: |
+          Under it, a small gold service ribbon. Eastern Range War. You don't see many people wear that one in the layer. Most would rather nobody asked.
+    choices:
+      - label: Step back
+
+  # ---------- 1. The SUBSTRATE question; the veterans ----------
+
+  - id: autopsy3_meet
+    stepped: true
+    blocks:
+      - dialogue:
+          speaker: DROZ
+          text: Before we start. Do you play?
+      - dialogue:
+          speaker: BRAND
+          text: Play what?
+      - dialogue:
+          speaker: DROZ
+          text: SUBSTRATE. Near everyone does.
+      - dialogue:
+          speaker: BRAND
+          text: I can't. No implant.
+      - dialogue:
+          speaker: DROZ
+          text: Medical?
+      - dialogue:
+          speaker: BRAND
+          text: The war. Head wound. They said the surgery would kill me.
+      - prose: |
+          He sets his cup down.
+      - dialogue:
+          speaker: DROZ
+          text: You served? Where?
+      - dialogue:
+          speaker: BRAND
+          text: Cascadian Rangers. Red Mound.
+      - prose: |
+          He looks at you for a moment. Then another one.
+      - dialogue:
+          speaker: DROZ
+          text: |
+            I was an infantry commander myself. Fourth Portlandian. We were forty kilometers north of you when Red Mound went down. We heard about it on the net for a week.
+      # What Brand likes about him (2026-11-18): only another veteran asks
+      # this, and asks it this way. "How many" is V00's question; Brand gives
+      # the same answer, and later asks Droz the same thing back (autopsy3_war).
+      - prose: |
+          He turns his cup a little on the table before he asks.
+      - dialogue:
+          speaker: DROZ
+          text: If you don't mind my asking. How many of your people came home?
+      - dialogue:
+          speaker: BRAND
+          text: One.
+      - prose: |
+          He nods.
+      - dialogue:
+          speaker: DROZ
+          text: |
+            My whole team served, believe it or not. Every one of them.
+      - prose: |
+          He nods toward the five people at their desks.
+      - dialogue:
+          speaker: DROZ
+          text: We have a way of finding each other.
+      - dialogue:
+          speaker: BRAND
+          text: How do you figure?
+      - prose: |
+          Droz holds up his right hand, palm in, showing the web of scarring there.
+      - dialogue:
+          speaker: DROZ
+          text: The war left its marks on all of us.
+    choices:
+      - label: Step back
+        set: { _met_droz: true }
+
+  # ---------- 2. The log; the stonewall ----------
+
+  - id: autopsy3_log
+    stepped: true
+    blocks:
+      - prose: |
+          You put the slate from Combine legal on the table and turn it so he can read it.
+      - prose: |
+          18 OCT 2554 · 0312 |
+          SUBSTRATE CONTENT · ████████████████████ |
+          RECIPIENTS: 1 |
+          DELIVERED
+      - dialogue:
+          speaker: BRAND
+          text: |
+            Daniel Ostrowski. That came down the wave to his implant at three in the morning. Fourteen hours before he crashed out and tried to kill his wife. Your company's carrier logged it under SUBSTRATE.
+      - prose: |
+          He reads it. It doesn't take him long.
+      - dialogue:
+          speaker: DROZ
+          text: That's a targeted push. Somebody's beta, most likely. Was he a registered tester or something?
+      - dialogue:
+          speaker: BRAND
+          text: I have no idea. Was it your beta?
+      - dialogue:
+          speaker: DROZ
+          text: |
+            We're one of many feature teams at Echo Paradigm. We didn't push that update, and I don't know what team did.
+      - dialogue:
+          speaker: BRAND
+          text: Can you find out?
+      - dialogue:
+          speaker: DROZ
+          text: |
+            I can ask. There are forty-some teams writing to SUBSTRATE, and nobody shows their branch before launch. I'd be surprised if anyone tells me. I'd be more surprised if they told you.
+      - prose: |
+          He glances at the clock on the wall. You've got time for one more thing.
+    # One follow-up, the player's choice. Each shows a different tell: the ID
+    # (car_done) makes him go still; Ostrowski shows he doesn't care who the
+    # man was. Neither catches him.
+    choices:
+      - label: Give him the operator ID
+        goto: autopsy3_log_id
+        requires: car_done
+      - label: Ask if he wants to know who Ostrowski was
+        goto: autopsy3_log_ostrowski
+      - label: Leave it there
+        set: { _asked_log: true }
+
+  - id: autopsy3_log_id
+    stepped: true
+    blocks:
+      - dialogue:
+          speaker: BRAND
+          text: One more. 8169-au24-11y6-z0hm. Mean anything to you?
+      - prose: |
+          He goes very still for a half-second.
+      - dialogue:
+          speaker: DROZ
+          text: Sounds like a fleet operator code. You're on the wrong floor for that, Detective. Security's on nineteen through twenty-two.
+      - prose: |
+          He slides the slate back across the table.
+    choices:
+      - label: Step back
+        set: { _asked_log: true }
+
+  - id: autopsy3_log_ostrowski
+    stepped: true
+    blocks:
+      - dialogue:
+          speaker: BRAND
+          text: Do you want to know who he was? Ostrowski.
+      - prose: |
+          He looks at the slate, then at you.
+      - dialogue:
+          speaker: DROZ
+          text: |
+            If our carrier logged something under SUBSTRATE that we didn't send, that's a compliance problem, and I'll raise it as one. I'm not sure who he was changes that.
+      - prose: |
+          He slides the slate back across the table.
+    choices:
+      - label: Step back
+        set: { _asked_log: true }
+
+  # ---------- 3. The pitch (the lie) ----------
+
+  - id: autopsy3_pitch
+    stepped: true
+    blocks:
+      - dialogue:
+          speaker: BRAND
+          text: So what does your team do?
+      - dialogue:
+          speaker: DROZ
+          text: |
+            You've seen the ads. Euphoric, restorative. For twenty years SUBSTRATE has mapped the good half of people. Joy, wonder, relief. Pleasure. Mapped it, and responded to it. Halcyon learns from what we map, and if all it ever sees is the good half, it'll be very kind and completely useless the first time somebody's mother dies.
+      - dialogue:
+          speaker: DROZ
+          text: |
+            What we're working on is Wormwood. It's the other half of Halcyon. An engine for experiencing, and processing, the darker side of human life. Grief. Fear. Horror. The things people carry with them. The ones they can't quite put down. Suffering has to be processed, if it's going to mean anything.
+      # Autopsy 3 can be Day 4 (Tuesday) or Day 5's morning slot (Wednesday).
+      - dialogue:
+          speaker: DROZ
+          text: The first of it ships Wednesday.
+        requires: { not: { day_is: 5 } }
+      - dialogue:
+          speaker: DROZ
+          text: The first of it ships at noon.
+        requires: { day_is: 5 }
+      - prose: |
+          He says it well. He's said it before.
+      # heavy2_done: Brand knows someone is composing these.
+      - prose: |
+          You think about the man in the motel. The orders he passed on to Khalil. "They want it ugly."
+        requires: heavy2_done
+      - dialogue:
+          speaker: BRAND
+          text: Where does it come from? The negative data.
+        requires: heavy2_done
+      - dialogue:
+          speaker: DROZ
+          text: |
+            Players, same as everything else. People don't just play SUBSTRATE when they're happy. They play it to escape when they're miserable, too. Somebody has the worst day of their life, sits down at a portal, and we learn something.
+        requires: heavy2_done
+      - prose: |
+          It's a good answer. A safe answer. You don't believe it.
+        requires: heavy2_done
+      # Otherwise: Brand has nothing to hold it against.
+      - prose: |
+          It sounds like something you heard on the news. Most of what Echo says does.
+        requires: { not: heavy2_done }
+    choices:
+      - label: Step back
+        set: { _heard_pitch: true }
+
+  # ---------- 4. His war (the hollow man) ----------
+
+  - id: autopsy3_war
+    stepped: true
+    blocks:
+      - dialogue:
+          speaker: BRAND
+          text: Fourth Portlandian. What did you do out there?
+      - dialogue:
+          speaker: DROZ
+          text: I had a company. Infantry, like I said. A hundred and forty men when we went east.
+      - dialogue:
+          speaker: BRAND
+          text: And when you came back?
+      - dialogue:
+          speaker: DROZ
+          text: Sixty-one.
+      - prose: |
+          He takes a sip of coffee and sets it back down on the table, never breaking eye contact.
+      - dialogue:
+          speaker: DROZ
+          text: |
+            Three years of towns. You go house to house, and the houses are full of people who don't want you there. Lose enough men doing it, and pretty soon you stop asking who's behind a door before you go through it.
+      - prose: |
+          He looks at the wall for a while.
+      - dialogue:
+          speaker: BRAND
+          text: And then you came home.
+      - dialogue:
+          speaker: DROZ
+          text: And then I came home. They had a parade. Did you get a parade?
+      - dialogue:
+          speaker: BRAND
+          text: I was in the hospital.
+      - dialogue:
+          speaker: DROZ
+          text: |
+            You didn't miss much. The war never touched ReSeattle, but that didn't stop everyone here from having an opinion about it. None of them had to live it. Had to smell it.
+      - prose: |
+          He smiles when he says it, but you hear the bitterness. He's been home as long as you have, and he still says "everyone here." Like he's just visiting.
+    choices:
+      - label: Step back
+        set: { _asked_war: true, asked_droz_war: true }
+
+  - id: autopsy3_droz_done
+    blocks:
+      - dialogue:
+          speaker: DROZ
+          text: Anything else, Detective? Launch day's coming whether I'm ready or not. And I'd much rather be ready.
+        requires: { not: { day_is: 5 } }
+      - dialogue:
+          speaker: DROZ
+          text: Anything else, Detective? Launch is in a couple of hours, whether I'm ready or not. And I'd much rather be ready.
+        requires: { day_is: 5 }
+    choices:
+      - label: Step back
+
+  # ---------- The room ----------
+
+  - id: autopsy3_team_bare
+    blocks:
+      - prose: |
+          Five people at five desks, three on one side and two on the other. A sixth desk is empty. Droz's, you'd guess. Nobody out there is talking.
+      - prose: |
+          The one at the far left sits with his back to the corner, where he can see the whole floor. You do that too.
+    choices:
+      - label: Look away
+
+  - id: autopsy3_team_lensed
+    blocks:
+      - prose: |
+          The layer puts up their panels. Five names, five titles, all of them Halcyon, all of them Wormwood. Every panel carries the same small gold ribbon.
+      - prose: |
+          Eastern Range War. Five for five. Six, counting Droz.
+    choices:
+      - label: Look away
+
+  - id: autopsy3_coffee
+    blocks:
+      - prose: |
+          You take a sip. It's good. Smooth and rich.
+      - prose: |
+          Then there's something under it, something faintly chemical, like the smell inside a new car. You don't trust it.
+      - prose: |
+          Through the lenses, the cup wears a small gold tag: ECHO PARADIGM RESERVE · SOURCED WITH CARE.
+        requires: lenses_on
+    choices:
+      - label: Put it down
+        set: { _drank_coffee: true }
+
+  - id: autopsy3_release
+    blocks:
+      - prose: |
+          On the window glass, a hundred notes and statistics, then a panel that counts down in teal:
+      - prose: |
+          SUBSTRATE 43.0 |
+          GENERAL RELEASE · WEDNESDAY 23 OCTOBER · 12:00 |
+          ALL IMMERSION USERS · NO ACTION REQUIRED
+    choices:
+      - label: Look away
+
+  # ---------- Leaving ----------
+
+  - id: autopsy3_exit_early
+    blocks:
+      - prose: |
+          Not yet. You've got a few minutes with the only man at Echo who's willing to talk with you. Find out what his team does.
+    choices:
+      - label: Stay
+
+  - id: autopsy3_exit
+    stepped: true
+    blocks:
+      - prose: |
+          Droz walks you to the elevator himself.
+      - dialogue:
+          speaker: DROZ
+          text: It was good to meet you, Detective. Sincerely. I hope you find what you're looking for.
+      - dialogue:
+          speaker: BRAND
+          text: So do I.
+      - prose: |
+          The doors close on him with his hands in his pockets, still smiling.
+      - prose: |
+          Somewhere around the twentieth floor, the coffee catches up with you. Heartburn.
+        requires: _drank_coffee
+    choices:
+      - label: Go
+        transition: fade
+        set: { autopsy3_done: true }
+        goto_map: day_map

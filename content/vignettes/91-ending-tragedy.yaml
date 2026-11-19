@@ -1,0 +1,286 @@
+kind: location
+location: Ethan Brand's Apartment
+date: 23 October 2554
+time: "12:15 PM"
+opening_node: tragedy_street
+entry_scene: apartment
+ambient:
+  - rain-inside
+
+scenes:
+  apartment:
+    image: 91-apartment-burning-rose
+    ambient: [ rain-inside, distant_gunfire, distant_explosions ]
+    intro: |
+      Rose hasn't moved. Your pistol is still in your hand.
+    hotspots:
+      - id: rose
+        coords: { x: 0.005, y: 0.62, w: 0.185, h: 0.37 }   # on the floor in the corner under the window
+        node: tragedy_stay
+        tooltip: Go to her
+        visible: always
+
+      - id: door
+        coords: { x: 0.595, y: 0.28, w: 0.085, h: 0.36 }
+        node: tragedy_door
+        tooltip: Go to the door
+        visible: always
+
+      - id: window
+        coords: { x: 0.07, y: 0.08, w: 0.16, h: 0.45 }
+        node_off: tragedy_window_bare
+        node_on: tragedy_window_lensed
+        tooltip: Look out the window
+        visible: always
+
+      - id: tv
+        coords: { x: 0.75, y: 0.16, w: 0.10, h: 0.34 }     # where the screen would be
+        node: tragedy_tv
+        tooltip: Watch the news
+        visible: lenses_on
+
+nodes:
+  # ---------- Noon, on the street (text only) ----------
+  - id: tragedy_street
+    hide_scene: true
+    location: Outside Ethan Brand's Building
+    time: "12:00 PM"
+    ambient: [ rain-outside ]
+    stepped: true
+    blocks:
+      - prose: |
+          Noon. You're half a block from your building, in the rain, lenses on.
+      - prose: |
+          You're watching an entoptic billboard displayed on a building across the street. A beautiful woman stretches, as if just waking up, as a countdown clock ticks the final seconds towards noon.
+      - prose: |
+          At dead noon, the billboard flares gold, and the woman's eyes open, and she smiles. SUBSTRATE 43.0 is here.
+      - prose: |
+          For a few minutes, the world seems unchanged. People walk along the street. Vehicles pass. The rain falls.
+      - prose: |
+          Then the billboard dissolves into static and winks out, and at the intersection a few blocks over, there's a crunch of metal as two vehicles collide. You turn your head in that direction, craning your neck to see, when you hear a man's voice from beside you.
+      - dialogue:
+          speaker: MAN
+          text: |
+            Excuse me, sir, could you take a look at this for me?
+      - prose: |
+          No sooner do you begin to turn than he slams a pocket knife into your belly.
+      - prose: |
+          You groan. Blood runs down your front. On the man's face is an expression of warmth and attentiveness. He sees the horror and pain on your face, and he twists the blade hard.
+      - prose: |
+          You cry out, and from reflex alone, push him away, unholster your gun, and fire twice into his chest. He drops hard. From the intersection comes the sound of a woman screaming. Across the street from you, a woman walking her little toy dog hoists the animal into the air by the leash, its legs kicking wildly for purchase. She has a tender smile on her face as she looks into the animal's eyes.
+      - prose: |
+          You put a hand to the wet wound in your gut, and make for your building. You go in as the streets behind you dissolve into madness.
+      - prose: |
+          You climb four stories. On the second floor, a door opens, and a fat man in his undershirt looks out, sees your injury, and smiles. You keep climbing.
+    choices:
+      - label: ">>>"
+        goto: tragedy_home
+
+  # ---------- Home ----------
+  - id: tragedy_home
+    ambient: [ rain-inside, distant_gunfire, distant_explosions ]
+    stepped: true
+    blocks:
+      - prose: |
+          You get the door shut and locked behind you.
+      - prose: |
+          Rose is on the floor in the corner under the window, huddled against the wall, her knees up and her hands over her ears. She must have gone there the moment it started.
+      - prose: |
+          She looks up when the lock turns. She sees the blood before she sees your face.
+      - prose: |
+          Smoke is coming up past the window. Behind it, the sky over the harbor has turned orange.
+      - prose: |
+          A cargo lifter comes in low over the harbor, banking too steep. It goes down somewhere behind the towers downtown. You see the light first. The sound comes a few seconds later, and the window shakes in its frame.
+      - prose: |
+          There's nothing to shut down. It isn't in a server room anymore. It's in two million heads, and it's running.
+      # Brand's read, waved to Frenk (frenk-thread.yaml).
+      - prose: |
+          You gave Frenk Droz's name. Nobody had time to do anything with it.
+        requires: suspect_droz
+      # shred1_done: what the people outside will remember.
+      - prose: |
+          You think of Alex Wu. I liked it. That's what the people out there will remember, the ones who live through today.
+        requires: shred1_done
+      # shred2_done: Wash, out there.
+      - prose: |
+          Wash is out there somewhere, with one of these in his head. The last time you saw him, you sat with him a while and neither of you said much.
+        requires: { all: [ shred2_done, stayed_with_wash ] }
+      - prose: |
+          Wash is out there somewhere, with one of these in his head. The last time you saw him, he was reaching for the bottle before the door closed behind you.
+        requires: { all: [ shred2_done, { not: stayed_with_wash } ] }
+      - prose: |
+          It can't reach you, or her. Neither of you has an implant. But all your neighbors do.
+    choices:
+      - label: Look around
+        goto_scene: apartment
+
+  # ---------- Looking ----------
+  - id: tragedy_window_bare
+    blocks:
+      - prose: |
+          Smoke from a dozen places between here and the water. In the street below, a bus has stopped crosswise with its doors open. People are running. Some of them are chasing.
+    choices:
+      - label: Look away
+
+  - id: tragedy_window_lensed
+    blocks:
+      - prose: |
+          The ads across the light-well are gone. So are the tags, the signs, the arrows, all of it. Through the lenses there's nothing but what's really there. The warm gloss over reality stripped away at last. The truth of all things laid bare.
+      - prose: |
+          Smoke from a dozen places between here and the water. In the street below, a bus has stopped crosswise with its doors open. People are running. Some of them are chasing.
+    choices:
+      - label: Look away
+
+  - id: tragedy_tv
+    blocks:
+      - prose: |
+          Where the screen should be, there's only the wall. Every station is down. Whoever keeps them running has an implant.
+    choices:
+      - label: Look away
+
+  # ---------- The door (the way to Nihilism's ending) ----------
+  - id: tragedy_door
+    stepped: true
+    blocks:
+      - prose: |
+          Screaming, above and below. Footsteps in the hall, running. Someone pounds on a door further down. Then someone laughing.
+      - prose: |
+          Your pistol is still in your hand. The car is in the garage, four floors down.
+    choices:
+      - label: Go for the garage
+        goto: tragedy_leave
+      - label: Step back
+
+  # Nihilism's ending, reached from inside Tragedy, with one difference: he
+  # shuts the door on her. Do not narrate the verdict.
+  - id: tragedy_leave
+    stepped: true
+    blocks:
+      - prose: |
+          You unlock the door.
+      - prose: |
+          Rose looks up.
+      - dialogue:
+          speaker: ROSE
+          text: Ethan. Where are you going?
+      - prose: |
+          You go out and shut the door behind you. After a moment, you hear her lock it.
+    choices:
+      - label: ">>>"
+        goto: tragedy_garage
+
+  - id: tragedy_garage
+    image: 92-garage
+    location: Ethan Brand's Building · Garage
+    time: "12:25 PM"
+    ambient: [ distant_gunfire, distant_explosions ]
+    stepped: true
+    blocks:
+      - prose: |
+          The stairwell is full of smoke. Every step down pulls at the wound. On the second-floor landing, the man in the undershirt sits against the wall, laughing, his hands red to the wrists.
+      - prose: |
+          It can't touch you. For once in your life, the old injury is worth something. You're the only clear head in the building, and you have a gun.
+      - prose: |
+          There are two million of them.
+      - prose: |
+          The garage is quiet. You get in the car, start it, and hit the opener.
+      - prose: |
+          The door starts to go up. Light comes in under it, and smoke, and the sound of the street.
+      - prose: |
+          There's a man there in some kind of uniform, hunched over another, working at him with a box cutter. He looks up at you, and sees you.
+    choices:
+      - label: End
+        goto_screen: end
+        ending: tragedy
+
+  # ---------- Staying ----------
+  # She has an answer to the end, and it isn't his. No quoted prayer: she
+  # asks him one thing he answers honestly, and tells him to put it down
+  # (Droz, in the server room: "Can't seem to let it go.").
+  - id: tragedy_stay
+    stepped: true
+    blocks:
+      - prose: |
+          You put the pistol down on the table. Then you sit down on the floor next to her, with your back against the wall under the window. Sitting down hurts more than standing did. The glass above you is warm.
+      - prose: |
+          She takes her hands away from her ears and sees how much blood there is.
+      - prose: |
+          She pulls the blanket off the bed, folds it, and presses it hard against your stomach. Her hands are shaking. She keeps pressing anyway.
+      - dialogue:
+          speaker: ROSE
+          text: What's happening?
+      # Beat 4 waits on Autopsy 3, so every confessed Brand has met Droz.
+      - dialogue:
+          speaker: BRAND
+          text: It's the update. Droz's team. Everyone with an implant.
+      - dialogue:
+          speaker: BRAND
+          text: The whole city is crashing out.
+      - dialogue:
+          speaker: ROSE
+          text: Can it be stopped?
+      - prose: You shake your head.
+      - dialogue:
+          speaker: BRAND
+          text: No. Not anymore.
+      - dialogue:
+          speaker: ROSE
+          text: Then a hospital. We have to get you to a hospital.
+      - dialogue:
+          speaker: BRAND
+          text: Everyone at the hospital has an implant, too.
+      - prose: |
+          She looks at the door, and then back at you. She moves her hands to a dry part of the blanket and presses again.
+    choices:
+      - label: ">>>"
+        goto: tragedy_afternoon
+
+  # Time passes: hours on the floor together, not one sudden moment.
+  - id: tragedy_afternoon
+    time: "4:10 PM"
+    stepped: true
+    blocks:
+      - prose: |
+          The afternoon goes by.
+      - prose: |
+          The light in the window goes from orange to brown. The screaming continues.
+      - prose: |
+          The blanket is soaked through. She stopped folding it over a while ago. You're cold, and getting colder.
+      - prose: |
+          Across the light-well, a window breaks, and a scream falls away below you. Then another window.
+      - dialogue:
+          speaker: ROSE
+          text: Ethan.
+      - prose: |
+          It's the first time she's used your name.
+      - dialogue:
+          speaker: ROSE
+          text: Are you afraid?
+      - dialogue:
+          speaker: BRAND
+          text: Yes.
+      - dialogue:
+          speaker: ROSE
+          text: Me, too.
+      - prose: |
+          She moves closer, so her shoulder is against yours.
+      - dialogue:
+          speaker: ROSE
+          text: |
+            Whatever you're still carrying, you don't have to take it with you. Put it down. You can put it down now.
+      - prose: |
+          You think of the fifth floor. Farrah, Conlan, Bennet. Six people whose names you never learned.
+      - prose: |
+          You put it down.
+      - prose: |
+          She takes your bad hand in both of hers and starts to pray, under her breath. You can't make out the words over the noise in the hall. Her thumb moves back and forth across your knuckles.
+      - prose: |
+          Out in the hall, footsteps stop at your door.
+      - prose: |
+          She doesn't let go of your hand. You don't let go of hers.
+      - prose: |
+          Someone tries the handle.
+    choices:
+      - label: End
+        goto_screen: end
+        ending: tragedy

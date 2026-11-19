@@ -1,0 +1,313 @@
+kind: location
+location: MKSC Detention · Visiting Room
+slot: true
+# no date — inherited from the day's dawn bookend
+# no time — slot vignettes inherit the slot hour (slot_times on the dawn bookend)
+opening_node: shred1_open
+entry_scene: visiting_room
+ambient:
+  - ac_drone
+
+scenes:
+  visiting_room:
+    image: 11-wu-visiting-room
+    intro: |
+      A bolted table under a humming strip light. A guard stands by the side door. Wu sits across from you in detention grays buttoned to the collar, a paper cup of water in front of him.
+    hotspots:
+      - id: wu_look
+        coords: { x: 0.428, y: 0.32, w: 0.095, h: 0.17 }   # his head and his readout
+        node_off: shred1_look_bare
+        node_on: shred1_look_lensed
+        tooltip: Look at him
+        visible: always
+
+      # The conversation advances in three steps.
+      - id: wu_what
+        coords: { x: 0.43, y: 0.49, w: 0.15, h: 0.185 }   # his body
+        node: shred1_what
+        tooltip: Ask what happened
+        visible: always
+        requires:
+          not: _wu_what
+
+      - id: wu_remember
+        coords: { x: 0.43, y: 0.49, w: 0.15, h: 0.185 }   # his body
+        node: shred1_remember
+        tooltip: Ask about his brother
+        visible: always
+        requires:
+          all: [ _wu_what, { not: _wu_remember } ]
+
+      - id: wu_why
+        coords: { x: 0.43, y: 0.49, w: 0.15, h: 0.185 }   # his body
+        node: shred1_why
+        tooltip: Talk to him
+        visible: always
+        requires:
+          all: [ _wu_remember, { not: _wu_why } ]
+
+      - id: wu_done
+        coords: { x: 0.43, y: 0.49, w: 0.15, h: 0.185 }   # his body
+        node: shred1_done_talk
+        tooltip: Talk to him
+        visible: always
+        requires: _wu_why
+
+      - id: guard
+        coords: { x: 0.695, y: 0.345, w: 0.095, h: 0.43 }   # the guard and his readout
+        node_off: shred1_guard_bare
+        node_on: shred1_guard_lensed
+        tooltip: Look at the guard
+        visible: always
+
+      - id: room
+        coords: { x: 0.07, y: 0.29, w: 0.14, h: 0.545 }   # the door-sized portal on the left wall (lensed)
+        node_off: shred1_room_bare
+        node_on: shred1_room_lensed
+        tooltip: Look at the wall
+        visible: always
+
+      - id: exit_early
+        coords: { x: 0.35, y: 0.90, w: 0.30, h: 0.09 }   # bottom edge, behind Brand
+        node: shred1_exit_early
+        tooltip: Leave
+        visible: always
+        requires:
+          not: _wu_why
+
+      - id: exit
+        coords: { x: 0.35, y: 0.90, w: 0.30, h: 0.09 }
+        node: shred1_exit
+        tooltip: Leave
+        visible: always
+        requires: _wu_why
+
+nodes:
+  # ---------- Arrival (text only; the scene image opens after) ----------
+
+  - id: shred1_open
+    stepped: true
+    blocks:
+      - prose: |
+          You pulled every Shred crash on the Combine's books for the last month. Nineteen of them. All but one of them were killed on the scene, either in self-defense by their intended victims or by first responders afterward.
+      - prose: |
+          The last one came out of it on his own and called it in himself. Alex Wu, thirty-four, freight scheduler, three possession citations in two years. When responders got there, his younger brother Sam was dead on the floor of the apartment. Tox screen positive. Wu confessed to everything, and the Combine closed the case in a day.
+      - prose: |
+          Ostrowski did everything a crash does without ever touching Shred. This guy touched it, all right. You want to know what it's like.
+      - prose: |
+          MKSC Detention is a gray block in SoDo with no windows below the third floor. They bring him to a visiting room. He sits down slowly, like it costs him something to do it.
+      - prose: |
+          He looks at your badge, then at the table.
+      - dialogue:
+          speaker: WU
+          text: H-hello...?
+    choices:
+      - label: Sit down
+        goto_scene: visiting_room
+
+  # ---------- Looking ----------
+
+  - id: shred1_look_bare
+    blocks:
+      - prose: |
+          Thin, and gray in the face. He doesn't sleep well. His hands lie on the table and tremble faintly.
+    choices:
+      - label: Step back
+
+  - id: shred1_look_lensed
+    blocks:
+      - prose: |
+          His panel is ordinary: name, age, employer, a modest credit line. And under it, in red, a Combine flag:
+      - prose: |
+          MKSC CASE 2554-10-17 |
+          CLOSED · DETAINED
+      - prose: |
+          Anyone with an implant who looks at him sees it. They will for the rest of his life.
+    choices:
+      - label: Step back
+
+  - id: shred1_guard_bare
+    blocks:
+      - prose: |
+          He's standing guard, but his eyes keep flicking over to the wall.
+    choices:
+      - label: Look away
+
+  - id: shred1_guard_lensed
+    blocks:
+      - prose: |
+          His panel is a Combine badge number, a short service record, and a shift clock. Three hours and forty minutes to go.
+    choices:
+      - label: Look away
+
+  - id: shred1_room_bare
+    blocks:
+      - prose: |
+          A stretch of bare gray wall, scuffed at shoulder height. Further along, a notice about visiting hours that nobody reads.
+    choices:
+      - label: Look away
+
+  - id: shred1_room_lensed
+    blocks:
+      - prose: |
+          On the wall, as tall as a door, blue and staticky: a SUBSTRATE portal. The game found plenty to build on in a room like this. From beyond, you see faint outlines of figures moving in a blue fog.
+    choices:
+      - label: Look away
+
+  # ---------- 1. What happened (nothing to get) ----------
+
+  - id: shred1_what
+    stepped: true
+    blocks:
+      - dialogue:
+          speaker: BRAND
+          text: Tell me what happened.
+      - dialogue:
+          speaker: WU
+          text: It's in the file.
+      - dialogue:
+          speaker: BRAND
+          text: I read the file.
+      - dialogue:
+          speaker: WU
+          text: Then you know.
+      - prose: |
+          He picks at the skin around his thumbnail.
+      - dialogue:
+          speaker: BRAND
+          text: How long were you using?
+      - dialogue:
+          speaker: WU
+          text: I dunno. A while. Everybody does it.
+      - dialogue:
+          speaker: WU
+          text: They don't give you anything in here. Not even for the shakes.
+      - prose: |
+          He looks up at you for the first time.
+      - dialogue:
+          speaker: WU
+          text: You got anything? Anything at all?
+      - dialogue:
+          speaker: BRAND
+          text: No.
+      - dialogue:
+          speaker: WU
+          text: No. Sorry. Sorry, I know.
+      - prose: |
+          Whatever you came here hoping to learn, he doesn't have it. He was there for every second of it, and he doesn't know a thing.
+    choices:
+      - label: Step back
+        set: { _wu_what: true }
+
+  # ---------- 2. His brother (he can't speak about it) ----------
+
+  - id: shred1_remember
+    stepped: true
+    blocks:
+      - dialogue:
+          speaker: BRAND
+          text: You killed your brother.
+      - prose: |
+          His hands go still.
+      - dialogue:
+          speaker: WU
+          text: Don't.
+      - dialogue:
+          speaker: BRAND
+          text: Sam.
+      - dialogue:
+          speaker: WU
+          text: Don't. Don't, I can't, I can't—
+      - prose: |
+          His breathing goes short and fast. His hands find the edge of the table and grip it. The paper cup goes over and water runs off the edge. The guard takes a step forward. You hold up a hand, and he stops.
+      - dialogue:
+          speaker: WU
+          text: He was screaming. He was screaming and I— and I—
+      - dialogue:
+          speaker: WU
+          text: I liked it.
+      - prose: |
+          It comes out of him in a whisper, like it's being pulled.
+      - dialogue:
+          speaker: WU
+          text: I liked it. Why did I like it. He was screaming and I liked it—
+      - dialogue:
+          speaker: WU
+          text: He's still screaming. He doesn't stop. He never, ever stops.
+      - prose: |
+          Then he's crying, the ugly, helpless kind, his face in his hands. You wait. There's nothing to say, so you don't say anything. After a long time, it runs down.
+    choices:
+      - label: Step back
+        set: { _wu_remember: true }
+
+  # ---------- 3. What he holds onto (the mirror) ----------
+
+  - id: shred1_why
+    stepped: true
+    blocks:
+      - prose: |
+          When he lifts his head, there's nothing left in his face.
+      - dialogue:
+          speaker: WU
+          text: It was the drug.
+      - dialogue:
+          speaker: WU
+          text: |
+            The finding says. Chemically not responsible. It was the drug. Took eleven years off.
+      - dialogue:
+          speaker: WU
+          text: It wasn't me. It was the drug.
+      - prose: |
+          He says it again, to the table, under his breath.
+      - prose: |
+          You think about a conference room on the fifth floor of a hospital, eighteen years ago. You hadn't taken anything.
+    choices:
+      - label: Step back
+        set: { _wu_why: true }
+
+  - id: shred1_done_talk
+    blocks:
+      - prose: |
+          The cup lies on its side where he knocked it over. He's staring at the water on the table, his lips moving.
+    choices:
+      - label: Step back
+
+  # ---------- Leaving ----------
+
+  - id: shred1_exit_early
+    blocks:
+      - prose: |
+          Not yet. You came here to hear it. Hear it.
+    choices:
+      - label: Stay
+
+  - id: shred1_exit
+    stepped: true
+    blocks:
+      - prose: |
+          You stand. The guard straightens up by the door.
+      - dialogue:
+          speaker: WU
+          text: They're doing Sam today. The autopsy. Guard said. There was a... a backlog.
+      - dialogue:
+          speaker: BRAND
+          text: I wouldn't worry about it.
+      - prose: |
+          The guard takes his arm. He keeps his eyes on the floor.
+      - prose: |
+          In the elevator, your handheld shows a voice wave from Wash. Forty seconds long.
+      - dialogue:
+          speaker: WASH
+          text: Brand. 's Wash. Got one of yours on the table, brohaim. Shred thing. The Wu kid. The... the brother. Thought you'd wanna...
+      - prose: |
+          He stops. For a long time there's only breathing, and once, glass against glass.
+      - dialogue:
+          speaker: WASH
+          text: ...You there?
+      - prose: |
+          The wave ends.
+    choices:
+      - label: Go
+        transition: fade
+        set: { shred1_done: true }
+        goto_map: day_map

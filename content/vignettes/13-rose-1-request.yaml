@@ -1,0 +1,293 @@
+kind: location
+location: MKSC HQ — Holding
+slot: true                   # costs one of Day 2's two slots (order is the player's)
+date: 20 October 2554
+# no time — slot vignettes inherit the slot hour (slot_times on the dawn bookend)
+opening_node: rose1_open
+entry_scene: interview
+ambient:
+  - ac_drone
+
+scenes:
+  interview:
+    image: 13-holding-room
+    intro: |
+      The room is small and windowless. A table, two chairs, a camera in the corner with a red light. She sits with her hands on the table and her shoulders drawn in, taking up as little space as she can.
+    hotspots:
+      - id: rose_look
+        coords: { x: 0.54, y: 0.45, w: 0.14, h: 0.28 }
+        node_off: rose1_look_bare
+        node_on: rose1_look_lensed
+        tooltip: Look at her
+        visible: always
+
+      - id: rose_talk
+        coords: { x: 0.54, y: 0.63, w: 0.14, h: 0.18 }
+        node: rose1_interview
+        tooltip: Take her statement
+        visible: always
+        requires:
+          not: _interviewed
+
+      - id: rose_after
+        coords: { x: 0.54, y: 0.63, w: 0.14, h: 0.18 }
+        node: rose1_after
+        tooltip: Talk to her
+        visible: always
+        requires: _interviewed
+
+      # The exit is what fires the plea — she lets him get all the way to the
+      # door before the composure gives.
+      - id: exit_early
+        coords: { x: 0.35, y: 0.90, w: 0.30, h: 0.09 }   # bottom edge, behind Brand
+        node: rose1_exit_early
+        tooltip: Leave
+        visible: always
+        requires:
+          not:
+            all:
+              - _interviewed
+              - _looked
+
+      - id: exit
+        coords: { x: 0.35, y: 0.90, w: 0.30, h: 0.09 }   # bottom edge, behind Brand
+        node: rose1_plea
+        tooltip: Leave
+        visible: always
+        requires:
+          all:
+            - _interviewed
+            - _looked
+
+nodes:
+  - id: rose1_open
+    stepped: true
+    blocks:
+      - prose: |
+          Holding at MKSC HQ is a short corridor of numbered doors and one-way glass. Frenk is waiting outside number three, working a toothpick and a handheld at the same time.
+      - dialogue:
+          speaker: FRENK
+          text: There he is. Good. Kell's been on me twice already this shift. 'We're not a shelter for stray pets', so on, so forth.
+      - dialogue:
+          speaker: BRAND
+          text: How is she?
+      - dialogue:
+          speaker: FRENK
+          text: |
+            Quiet. Polite. Scared to death and working real hard not to show it. Hospital cleared her, said whatever they dosed her with is out of her system. But I'd bet she's tired as hell, too.
+      - dialogue:
+          speaker: BRAND
+          text: Anyone file missing on her?
+      - dialogue:
+          speaker: FRENK
+          text: |
+            Nobody. Half a day gone and not one living soul asked after her. No family, no employer, nobody. Far as the city's concerned, she was never gone.
+      - dialogue:
+          speaker: BRAND
+          text: |
+            Damn.
+      - dialogue:
+          speaker: FRENK
+          text: Yeah-huh. Well, interview's yours. When it's done, she walks. Kell's orders.
+      - prose: |
+          He passes you a data slate, containing all the information he has on her. It's not much. A sticky note might've sufficed. Then he saunters off.
+    choices:
+      - label: Go in
+        goto_scene: interview
+
+  - id: rose1_look_bare
+    blocks:
+      - prose: |
+          She's young; mid-twenties to early thirties at the absolute latest, you'd guess. Dark hair pulled back plain, the same clothes she was wearing when you pulled her out of the heavy's trunk, bruises going yellow at both wrists where they were bound.
+      - prose: |
+          Her eyes, large and dark, meet yours when you look at her, and hold there. They search your face, but without any glimmer of recognition.
+    choices:
+      - label: Step back
+        set: { _looked: true }
+
+  - id: rose1_look_lensed
+    blocks:
+      - prose: |
+          The lenses find what they found at the terminal: nothing. Even the chair and the table and the camera in the corner, if you had the settings turned on, would surface manufacturer details. She sits in the middle of the room, and the layer shows nothing where she is.
+      - prose: |
+          It was strange enough seeing it when she was unconscious in the trunk of a car. Awake is stranger. Awake, she's looking back at you, and the entoptic receiver in your lenses has no idea anyone is there.
+    choices:
+      - label: Step back
+        set: { _looked: true }
+
+  - id: rose1_interview
+    stepped: true
+    blocks:
+      - prose: |
+          She stands up when you come in. Her eyes are weary and anxious.
+      - dialogue:
+          speaker: BRAND
+          text: My name is Operative Ethan Brand. I'm with Mercer-Kell Security Combine. I was-
+      - dialogue:
+          speaker: WOMAN
+          text: Yeah, you're the one who... uhh... from last night.
+      - prose: |
+          She still can't bring herself to acknowledge it. Then, quietly, like it's the most natural thing in the world:
+      - dialogue:
+          speaker: WOMAN
+          text: Thank you.
+      - prose: |
+          You nod.
+      - dialogue:
+          speaker: BRAND
+          text: Would you confirm your name and date of birth, please.
+      - dialogue:
+          speaker: WOMAN
+          text: Rose Nasr. March 8, 2528.
+      - dialogue:
+          speaker: BRAND
+          text: All right, Ms. Nasr. I need to ask you some things about the other night.
+      - dialogue:
+          speaker: ROSE
+          text: I don't... I already told the other man. I don't know anything. I don't know who they were. I don't know why.
+      - dialogue:
+          speaker: BRAND
+          text: I know. And I'm sorry, but I need to make sure everything was taken down. Can you tell me about when and where you were taken?
+      - dialogue:
+          speaker: ROSE
+          text: |
+            I was coming back home from a... a social event. It was about 9:30, I think. I unlocked my front door, came through, closed and locked it behind me. I took a few steps in and then somebody put something over my head from behind, and there was a sting, here, in my neck. I was in and out after that. I woke up somewhere dark with my wrists taped and everything moving. Rain on metal, right over me. I knew right away I was in a trunk. But I never saw anything. I'm sorry. I never saw anything at all.
+      - dialogue:
+          speaker: BRAND
+          text: |
+            You're sure you locked the door behind you? No one came in after you?
+      - prose: She shakes her head.
+      - dialogue:
+          speaker: ROSE
+          text: |
+            It's ReSeattle. I lock the door, every time, including this time. I have a very distinct memory of it, because it's pretty much my last one before... well....
+      - dialogue:
+          speaker: BRAND
+          text: Did you hear anything after? Any voices or conversation?
+      - dialogue:
+          speaker: ROSE
+          text: |
+            No. Not really. Like I said, I was in and out. And what I could hear was muffled.
+      - prose: |
+          Clean lift, chemical dose, no faces, no words. Professional work, start to finish. It fits the man from the terminal.
+      - dialogue:
+          speaker: BRAND
+          text: Can I get your Immersion ID, for the record?
+      - dialogue:
+          speaker: ROSE
+          text: I don't have one.
+      - prose: |
+          You look up from the recorder.
+      - dialogue:
+          speaker: BRAND
+          text: You don't?
+      - dialogue:
+          speaker: ROSE
+          text: No. I just never wanted it. That's allowed.
+      - prose: |
+          There's a hint of defensiveness about it. It's a sentence she's had to say before, to people who looked at her the way you're looking at her now. Everyone you've ever met who lives outside the layer got put out there for medical reasons. You included. She's the first one you've met who walked out on her own.
+      - dialogue:
+          speaker: ROSE
+          text: Why me? Whoever they were. Why would anyone want — I don't have anything.
+      - dialogue:
+          speaker: BRAND
+          text: I don't know. Yet.
+    choices:
+      - label: Wrap up
+        set: { _interviewed: true }
+
+  - id: rose1_after
+    blocks:
+      - prose: |
+          She sits there, waiting on whatever happens to her next. It occurs to you she's been doing exactly that, in one room or another, for the last 24 hours or so.
+    choices:
+      - label: Step back
+
+  - id: rose1_exit_early
+    blocks:
+      - prose: |
+          Not yet. Frenk bought you this hour. Use it.
+    choices:
+      - label: Stay
+
+  - id: rose1_plea
+    stepped: true
+    blocks:
+      - dialogue:
+          speaker: BRAND
+          text: Right. We're done, Ms. Nasr. They'll process you out within the hour.
+      - prose: |
+          She goes very still.
+      - dialogue:
+          speaker: ROSE
+          text: Out where?
+      - dialogue:
+          speaker: BRAND
+          text: |
+            Home. Wherever you want, really. You're free to go.
+      - dialogue:
+          speaker: ROSE
+          text: I... I can't go home.
+      - dialogue:
+          speaker: BRAND
+          text: I'm sorry. We can't keep you here.
+      - dialogue:
+          speaker: ROSE
+          text: |
+            I was taken from home. And nobody heard, nobody saw, and the only reason I'm not... the only reason I'm here is you. That's what they told me. That a man from the security Combines came and there was a shootout and I was put in a car and taken to the hospital. Please. I can't go home. Not right now.
+      - prose: |
+          An ordinary woman, scared witless and out of options.
+      - dialogue:
+          speaker: BRAND
+          text: |
+            You don't have to go home. Is there family? Friends you could stay with?
+      - dialogue:
+          speaker: ROSE
+          text: |
+            The people I'd ask have children in the house. I won't bring whoever did this to their door.
+      - dialogue:
+          speaker: ROSE
+          text: |
+            I'll take anything. Literally anything. Please.
+      - prose: |
+          You have a case that doesn't make sense yet, an apartment little bigger than a closet, and no time for this. There are plenty of reasons to say no.
+    choices:
+      - label: Think it over
+        goto: rose1_say_nothing
+      - label: Offer her your place
+        goto: rose1_take_her_home
+
+  - id: rose1_say_nothing
+    stepped: true
+    blocks:
+      - dialogue:
+          speaker: BRAND
+          text: ...
+      - dialogue:
+          speaker: ROSE
+          text: |
+            I'm not asking you to fix this. I'm just asking for a few days. Until I can... I can think. Just time enough to breathe. That's all.
+      - prose: |
+          It's practical, you tell yourself. You're not sure you're buying what you're selling. You tell yourself anyway.
+    choices:
+      - label: Offer her your place
+        goto: rose1_take_her_home
+
+  - id: rose1_take_her_home
+    stepped: true
+    blocks:
+      - dialogue:
+          speaker: BRAND
+          text: Okay. Look... it's not much, and I'm not a fan of the arrangement, but... I've got a room not far away. It'll be tight quarters.
+      - prose: |
+          Her shoulders slump, tension released you didn't even realize she was carrying.
+      - dialogue:
+          speaker: ROSE
+          text: Thank you.
+      - prose: |
+          She means it completely, and you have to look at the door for a second.
+    choices:
+      - label: Take her out of there
+        set: { rose1_done: true, rose_living_with_brand: true }
+        transition: fade
+        goto_map: day_map

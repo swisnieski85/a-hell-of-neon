@@ -1,0 +1,126 @@
+kind: location
+location: Ethan Brand's Apartment
+day: 4
+slot_budget: 2
+slot_times: ["10:30 AM", "2:30 PM"]   # the day's slot clock, first pick -> first hour
+date: 22 October 2554
+time: "8:00 AM"
+opening_node: d4dawn_wake
+entry_scene: apartment
+ambient:
+  - rain-inside
+
+scenes:
+  apartment:
+    image: 03-apartment
+    intro: |
+      Rose is at the table by the window with her list.
+    hotspots:
+      - id: rose
+        coords: { x: 0.10, y: 0.30, w: 0.11, h: 0.50 }
+        node: rose_next
+        keep_lit: true   # the router opens a new beat each window; never dim
+        tooltip: Talk to Rose
+        visible: always
+        requires:
+          all:
+            - rose_living_with_brand
+            - { not: _rose_window_spent }
+            - { not: rose_aftermath_done }
+
+      # Why she was picked (addendum §13): after this window's scheduled beat.
+      - id: rose_why
+        coords: { x: 0.10, y: 0.30, w: 0.11, h: 0.50 }
+        node: rose_why
+        tooltip: Tell her why she was taken
+        visible: always
+        requires:
+          all:
+            - rose_living_with_brand
+            - heavy2_done
+            - _rose_window_spent
+            - { not: rose_why_done }
+
+      - id: list
+        coords: { x: 0.25, y: 0.545, w: 0.09, h: 0.14 }
+        node: d4dawn_list
+        tooltip: Look at her list
+        visible: always
+
+      - id: tv
+        coords: { x: 0.695, y: 0.14, w: 0.165, h: 0.38 }
+        node: d4dawn_tv
+        tooltip: Watch the news
+        visible: lenses_on
+
+      - id: door
+        coords: { x: 0.6, y: 0.3, w: 0.08, h: 0.36 }
+        node: d4dawn_leave
+        tooltip: Head out
+        visible: always
+
+nodes:
+  - id: d4dawn_wake
+    blocks:
+      - prose: |
+          You wake on the floor. Rose is already up and dressed, sitting at the table by the window.
+      - prose: |
+          Your back has gotten used to the floor, more or less.
+    choices:
+      - label: Get up
+        goto_scene: apartment
+
+  # Her want (2026-11-18): to go home, on her terms. The landlord is stalling
+  # on security. Resolved offscreen by Day 5 dawn (Landlord crossed off,
+  # "Home, Thursday").
+  - id: d4dawn_list
+    stepped: true
+    blocks:
+      - prose: |
+          Landlord still isn't crossed off. There's a new line under it, in the same small, neat hand: Church, Sunday.
+      - dialogue:
+          speaker: BRAND
+          text: What's the holdup with the landlord?
+      - dialogue:
+          speaker: ROSE
+          text: |
+            I told him I'd come back if he puts a man on the front door. Real locks on the stairwell. Cameras in the halls.
+      - dialogue:
+          speaker: ROSE
+          text: He says he'll think about it. He's been thinking about it since yesterday.
+      - dialogue:
+          speaker: ROSE
+          text: I want to go home. I'm just not going back to it the way it was.
+      - prose: You nod.
+      - dialogue:
+          speaker: BRAND
+          text: Smart.
+    choices:
+      - label: Step back
+
+  - id: d4dawn_tv
+    blocks:
+      - prose: |
+          "-an internal review by Mercer and Kell Security Combine has found that the operative involved in Saturday night's fatal shooting at Harbor Island acted within policy. The Combine again declined to name the operative. In other news, Echo Paradigm reminds Immersion users that SUBSTRATE 43.0 arrives tomorrow at noon-"
+    choices:
+      - label: Turn it off
+
+  - id: d4dawn_leave
+    stepped: true
+    blocks:
+      - prose: |
+          You pick your jacket up off the floor and put it on. Rose looks up from her list.
+      - dialogue:
+          speaker: ROSE
+          text: What time will you be home?
+      - prose: |
+          It takes you a second to answer.
+      - dialogue:
+          speaker: BRAND
+          text: Late.
+      - dialogue:
+          speaker: ROSE
+          text: Okay.
+    choices:
+      - label: Head out
+        goto_map: day_map

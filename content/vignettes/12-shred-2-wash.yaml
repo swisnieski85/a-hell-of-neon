@@ -1,0 +1,290 @@
+kind: location
+location: MKSC HQ — Coroner's Office
+slot: true
+# no date — inherited from the day's dawn bookend
+# no time — slot vignettes inherit the slot hour (slot_times on the dawn bookend)
+opening_node: shred2_open
+entry_scene: office
+ambient:
+  - ac_drone
+
+scenes:
+  office:
+    image: 12-wash-office
+    intro: |
+      Wash's office: a desk buried in paper, a visitor's chair with files stacked on the seat, an open doorway into the autopsy room. Wash sits behind the desk with a bottle at his elbow.
+    hotspots:
+      - id: wash_look
+        coords: { x: 0.36, y: 0.48, w: 0.06, h: 0.09 }   # his head, back to you
+        node_off: shred2_look_bare
+        node_on: shred2_look_lensed
+        tooltip: Look at Wash
+        visible: always
+
+      - id: wash
+        coords: { x: 0.31, y: 0.57, w: 0.15, h: 0.14 }   # his shoulders
+        node: shred2_wash
+        tooltip: Talk to Wash
+        visible: always
+
+      - id: desk
+        coords: { x: 0.47, y: 0.67, w: 0.08, h: 0.09 }   # the mug, right of him
+        node: shred2_desk
+        tooltip: Look at the desk
+        visible: always
+
+      - id: window
+        coords: { x: 0.68, y: 0.24, w: 0.10, h: 0.62 }   # the doorway, gurney beyond
+        node_off: shred2_window_bare
+        node_on: shred2_window_lensed
+        tooltip: Look through the doorway
+        visible: always
+
+      - id: chair
+        coords: { x: 0.02, y: 0.89, w: 0.18, h: 0.10 }   # bottom-left foreground
+        node: shred2_chair
+        tooltip: Look at the chair
+        visible: always
+
+      # The scene ends from the pretext's choices; the door is only "not yet."
+      - id: exit_early
+        coords: { x: 0.35, y: 0.90, w: 0.30, h: 0.09 }   # bottom edge, behind Brand
+        node: shred2_exit_early
+        tooltip: Leave
+        visible: always
+
+nodes:
+  # ---------- Arrival (text only; the scene image opens after) ----------
+
+  - id: shred2_open
+    stepped: true
+    blocks:
+      - prose: |
+          Wash's wave is still on your handheld, from the day you saw Alex Wu. You never called him back.
+        requires: { day_after: shred1_done }
+      - prose: |
+          The elevator lets you out into the cold. The autopsy room is dark except for one lamp over the slab, where a shape lies under a sheet. Wash isn't at it.
+        requires: { not: { day_after: shred1_done } }
+      - prose: |
+          The elevator lets you out into the cold. The autopsy room is dark except for one lamp over the slab, where a shape lies under a sheet. Somebody else, by now. Wash isn't at it.
+        requires: { day_after: shred1_done }
+      - prose: |
+          There's light under the door of his office. You knock and go in without waiting, the way you always do.
+      - prose: |
+          He looks up too fast. There's a bottle at his elbow, and he moves it, not quite out of sight.
+      - dialogue:
+          speaker: WASH
+          text: Brand. Hey. Hey, brohaim.
+      - dialogue:
+          speaker: WASH
+          text: Sorry 'bout the— place is a mess. What're you doin' down here?
+      - dialogue:
+          speaker: BRAND
+          text: You called me.
+      - dialogue:
+          speaker: WASH
+          text: ...Did I?
+      - prose: |
+          His handheld is face-down on the desk. He looks at it, then puts a file on top of it.
+      - dialogue:
+          speaker: WASH
+          text: Musta been the Wu kid. Figured you'd want it. Shred thing.
+      - prose: |
+          He squares up a stack of papers that doesn't need it, and sits up straighter in his chair.
+    choices:
+      - label: Step in
+        goto_scene: office
+
+  # ---------- The room ----------
+
+  - id: shred2_look_bare
+    blocks:
+      - prose: |
+          His eyes are red. He shaved this morning, badly. His hands, which you've watched do fine work with a scalpel, aren't steady.
+    choices:
+      - label: Step back
+
+  - id: shred2_look_lensed
+    blocks:
+      - prose: |
+          His panel: name, title, Mercer and Kell Security Combine, Office of the Coroner. In the corner, a small amber wellness flag.
+      - prose: |
+          It's dated eight months ago.
+    choices:
+      - label: Step back
+
+  - id: shred2_desk
+    blocks:
+      - prose: |
+          A bottle, two-thirds gone, and a coffee mug he's been drinking it from. The wastebasket under the desk clinks when your foot touches it.
+    choices:
+      - label: Step back
+
+  - id: shred2_chair
+    blocks:
+      - prose: |
+          The visitor's chair. Files are stacked on the seat, a foot high, and there's dust on the top one.
+    choices:
+      - label: Step back
+
+  - id: shred2_window_bare
+    blocks:
+      - prose: |
+          Through the doorway, the autopsy room. The slab, the lamp, and the shape under the sheet. The instruments haven't been put away.
+        requires: { not: { day_after: shred1_done } }
+      - prose: |
+          Through the doorway, the autopsy room. The slab, the lamp, and a shape under a sheet. Not Sam, not anymore. The instruments haven't been put away.
+        requires: { day_after: shred1_done }
+      - prose: |
+          You look for a while.
+    choices:
+      - label: Look away
+
+  - id: shred2_window_lensed
+    blocks:
+      - prose: |
+          Over the slab, the case file hangs in the layer where Wash left it open:
+        requires: { not: { day_after: shred1_done } }
+      - prose: |
+          Over the slab, the layer still holds the last case file Wash opened:
+        requires: { day_after: shred1_done }
+      - prose: |
+          SAM WU · 26 |
+          HOMICIDE · CLOSED
+    choices:
+      - label: Look away
+
+  - id: shred2_exit_early
+    blocks:
+      - prose: |
+          Not yet. He called you.
+    choices:
+      - label: Stay
+
+  # ---------- The pretext, and the choice ----------
+
+  - id: shred2_wash
+    stepped: true
+    blocks:
+      - dialogue:
+          speaker: BRAND
+          text: I talked to the brother.
+      - prose: |
+          Wash stops.
+      - dialogue:
+          speaker: WASH
+          text: The brother.
+      - prose: |
+          He pulls a file toward him, opens it, and has to look at it for a second before the words line up.
+      - dialogue:
+          speaker: WASH
+          text: Sam Wu, twenty-six. Healthy kid. I'll spare you the report.
+      - dialogue:
+          speaker: WASH
+          text: It wasn't quick. And he knew who was doin' it.
+      - prose: |
+          He says it the way he says everything on the job. He closes the file. Then he laughs, once, at nothing.
+      - dialogue:
+          speaker: WASH
+          text: That's what you came for. Sure. That's what you always come for.
+      - dialogue:
+          speaker: WASH
+          text: You know how many times you been down here this year, brohaim? I do. Every time, you wanted somethin'. Come look at this one. Pull the implant. How'd he die, Wash.
+      - dialogue:
+          speaker: WASH
+          text: You ever once ask how I'm doin'? Once?
+      - dialogue:
+          speaker: BRAND
+          text: Wash.
+      - dialogue:
+          speaker: WASH
+          text: No. I'm talkin'. You don't get to— I'm talkin'.
+      - prose: |
+          He's on his feet. His chair rolls back into the wall.
+      - dialogue:
+          speaker: WASH
+          text: Nineteen a month. Your Shred kids. I open every one of 'em. I'm the one gets 'em on his sleeves, and I write it up nice, so you can stand in my door and say "hell of a thing."
+      - dialogue:
+          speaker: WASH
+          text: Hell of a thing. Like it was weather.
+      - dialogue:
+          speaker: WASH
+          text: I pulled that implant for you. Against protocol, against everything, 'cause it was you askin'. You were out the door before I said yes.
+      - dialogue:
+          speaker: WASH
+          text: You're cold, Brand. You stand there with your hand on the door and you look at me like I'm one of the drawers.
+      - prose: |
+          He points at the visitor's chair, at the files stacked on it.
+      - dialogue:
+          speaker: WASH
+          text: Nobody's sat in that chair in a year.
+      - prose: |
+          His voice goes on the last word. He turns to the wall.
+      - dialogue:
+          speaker: WASH
+          text: I called you 'cause there wasn't anybody else to call. How 'bout that.
+    choices:
+      - label: Say you have to go
+        goto: shred2_leave
+      - label: Sit down
+        goto: shred2_stay
+
+  # ---------- Go ----------
+
+  - id: shred2_leave
+    stepped: true
+    blocks:
+      - dialogue:
+          speaker: BRAND
+          text: I've got somewhere to be.
+      - dialogue:
+          speaker: WASH
+          text: Yeah. Course you do. Go on, then. Wherever you gotta be.
+      - prose: |
+          He's reaching for the bottle before the door closes. The elevator carries you up out of the cold.
+    choices:
+      - label: Go
+        transition: fade
+        set: { shred2_done: true }
+        goto_map: day_map
+
+  # ---------- Sit: the person ----------
+  # No rescue, no speech, no diagnosis. Brand stays; that is all.
+
+  - id: shred2_stay
+    stepped: true
+    blocks:
+      - prose: |
+          You lift the files off the visitor's chair, set them on the floor, and sit down.
+      - prose: |
+          Wash is still standing. He looks at you like he's trying to work out what you want. You don't want anything.
+      - prose: |
+          Then he sits, all at once, and puts his face in his hands. He's crying. He doesn't try to hide it, and he doesn't try to stop.
+      - dialogue:
+          speaker: WASH
+          text: I'm sorry. Brohaim, I'm sorry. I didn't mean— I shouldn'ta said—
+      - dialogue:
+          speaker: BRAND
+          text: You were right.
+      - prose: |
+          He cries harder at that. You let him.
+      - prose: |
+          After a while he pushes the bottle across the desk. The only other cup is a mug full of pens. You dump the pens out and pour.
+      - dialogue:
+          speaker: WASH
+          text: Long day.
+      - dialogue:
+          speaker: BRAND
+          text: Yeah.
+      - prose: |
+          Neither of you says much after that. The ventilation hums. Through the doorway, the shape under the sheet doesn't move.
+      - prose: |
+          When you finally stand up, he looks up at you.
+      - dialogue:
+          speaker: WASH
+          text: Thanks, brohaim.
+    choices:
+      - label: Go
+        transition: fade
+        set: { shred2_done: true, stayed_with_wash: true }
+        goto_map: day_map

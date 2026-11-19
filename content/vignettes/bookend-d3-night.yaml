@@ -1,0 +1,131 @@
+kind: location
+location: Ethan Brand's Apartment
+day: 3
+date: 21 October 2554
+time: "9:30 PM"
+opening_node: d3night_home
+entry_scene: apartment
+ambient:
+  - rain-inside
+
+scenes:
+  apartment:
+    image: 03-night-apartment
+    intro: |
+      The only light comes in from the light-well. Rose hasn't moved.
+    hotspots:
+      - id: list
+        coords: { x: 0.19, y: 0.575, w: 0.13, h: 0.07 }   # the table top
+        node: d3night_list
+        tooltip: Look at her list
+        visible: always
+
+      - id: handheld
+        coords: { x: 0.82, y: 0.68, w: 0.10, h: 0.07 }    # the nightstand
+        node: d3night_handheld
+        tooltip: Check your handheld
+        visible: always
+
+      - id: tv
+        coords: { x: 0.695, y: 0.14, w: 0.165, h: 0.38 }
+        node: d3night_tv
+        tooltip: Watch the screen
+        visible: lenses_on
+
+      - id: commendation
+        coords: { x: 0.88, y: 0.195, w: 0.09, h: 0.235 }
+        node: d3night_commendation
+        tooltip: View your commendation
+        visible: always
+
+      - id: bed
+        coords: { x: 0.31, y: 0.76, w: 0.12, h: 0.18 }    # the floor, where he sleeps
+        node: d3night_bed
+        tooltip: Go to sleep
+        visible: always
+
+nodes:
+  - id: d3night_home
+    blocks:
+      - prose: |
+          Nine-thirty. The lights are off.
+      - prose: |
+          Rose is asleep in your bed, turned to the door, the covers pulled up to her shoulder. She doesn't move when the door opens.
+      - prose: |
+          Three of them, and he picked her.
+        requires: heavy2_done
+      - prose: |
+          You close the door slowly so the latch doesn't click, and leave the lights off.
+    choices:
+      - label: Look around
+        goto_scene: apartment
+
+  - id: d3night_list
+    blocks:
+      - prose: |
+          The envelope from this morning is on the table. Locksmith, Clothes and Bank card are crossed off. Landlord isn't.
+      - prose: |
+          There's a paper bag from the discount store on the corner under the chair, folded shut.
+    choices:
+      - label: Step back
+
+  - id: d3night_handheld
+    stepped: true
+    blocks:
+      - prose: |
+          You turn the screen all the way down so it won't wake her.
+      # Heavy 2 today: legal has the heavy's handheld routing (addendum §12).
+      - prose: |
+          One wave, from Combine legal, timestamped 1906.
+        requires: heavy2_done
+      - prose: |
+          SUBPOENA AMENDMENT · ECHO PARADIGM · WAVE RECORDS (OSTROWSKI, D.) |
+          DEVICE ROUTING RECEIVED AND ADDED |
+          CARRIER NOTIFIED
+        requires: heavy2_done
+      # Otherwise: a quiet night. (Frenk's Droz booking now arrives at
+      # Autopsy 2's exit.)
+      - prose: |
+          Nothing new.
+        requires: { not: heavy2_done }
+    choices:
+      - label: Put down the handheld
+
+  - id: d3night_tv
+    blocks:
+      - prose: |
+          It's an ad, not the news. You keep the sound down; whereas Immersion implants broadcast sound directly into your auditory cortex, the lenses play an audio layer through a tiny directional speaker mounted in the hinge.
+      - prose: |
+          A woman's face, close up, eyes shut, smiling at something. White letters come up over her: SUBSTRATE 43.0. WEDNESDAY. NOON. SOMETHING NEW IS COMING. Under them, a clock counts down: 38:29:14, 38:29:13, 38:29:12....
+      - prose: |
+          Rose couldn't see it even if she were awake. For her, the room is dark.
+    choices:
+      - label: Look away
+
+  - id: d3night_commendation
+    blocks:
+      - prose: |
+          It's too dark to read the commendation.
+    choices:
+      - label: Look away
+
+  - id: d3night_bed
+    blocks:
+      - prose: |
+          The blanket is folded against the wall.
+      - prose: |
+          You take off your shoes and lie down on the floor with your jacket under your head. It's your second night down here, and your back hasn't forgiven you for the first.
+      - prose: |
+          The heavy's handheld is in the jacket under your head. You lie awake a long time.
+        requires: heavy2_done
+      - prose: |
+          You think about a package sent to one man's implant at three in the morning. You lie awake a long time.
+        requires: autopsy2_done
+      - prose: |
+          You fall asleep listening to her breathe.
+        requires:
+          all: [ { not: autopsy2_done }, { not: heavy2_done } ]
+    choices:
+      - label: Sleep
+        transition: fade
+        goto_vignette: bookend-d4-dawn.yaml

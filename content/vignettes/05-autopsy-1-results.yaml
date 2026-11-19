@@ -1,0 +1,228 @@
+kind: location
+location: MKSC HQ — Coroner's Office
+slot: true
+date: 20 October 2554
+# no time — slot vignettes inherit the slot hour (slot_times on the dawn bookend)
+opening_node: autopsy1_open
+entry_scene: morgue
+ambient:
+  - ac_drone
+
+scenes:
+  morgue:
+    image: day2-morgue
+    intro: |
+      The slab is empty today, scrubbed and shining. What Wash has for you sits in a steel bowl on the gurney, under the light.
+    hotspots:
+      - id: wash
+        coords: { x: 0.505, y: 0.125, w: 0.10, h: 0.30 }
+        node: autopsy1_results
+        tooltip: Talk to Wash
+        visible: always
+        requires:
+          not: _got_results
+
+      - id: wash_after
+        coords: { x: 0.505, y: 0.125, w: 0.10, h: 0.30 }
+        node: autopsy1_reframe
+        tooltip: Talk to Wash
+        visible: always
+        requires:
+          all:
+            - _got_results
+            - _saw_implant
+            - not: _asked_records
+
+      - id: wash_done
+        coords: { x: 0.505, y: 0.125, w: 0.10, h: 0.30 }
+        node: autopsy1_wash_done
+        tooltip: Talk to Wash
+        visible: always
+        requires: _asked_records
+
+      - id: tray
+        coords: { x: 0.45, y: 0.46, w: 0.10, h: 0.14 }
+        node_off: autopsy1_tray_bare
+        node_on: autopsy1_tray_lensed
+        tooltip: Look in the dish
+        visible: always
+        requires: _got_results
+
+      - id: exit_early
+        coords: { x: 0.35, y: 0.90, w: 0.30, h: 0.09 }   # bottom edge, behind Brand
+        node: autopsy1_exit_early
+        tooltip: Take the elevator
+        visible: always
+        requires:
+          not: _asked_records
+
+      - id: exit
+        coords: { x: 0.35, y: 0.90, w: 0.30, h: 0.09 }   # bottom edge, behind Brand
+        node: autopsy1_exit
+        tooltip: Take the elevator
+        visible: always
+        requires: _asked_records
+
+nodes:
+  - id: autopsy1_open
+    blocks:
+      - prose: |
+          The elevator doors ding and open onto the cold, dim morgue.
+      - prose: |
+          Wash is in the exam room, leaning against the counter with his arms folded. He looks sick. This is a man you've watched eat a sandwich over an open cadaver, and he looks sick.
+    choices:
+      - label: Announce yourself
+        goto: autopsy1_greeting
+
+  - id: autopsy1_greeting
+    stepped: true
+    blocks:
+      - dialogue:
+          speaker: WASH
+          text: Hey. Brand.
+      - prose: |
+          That's it. No brohaim. No wisecracks. He uncrosses his arms and starts picking at something under a thumbnail.
+      - dialogue:
+          speaker: BRAND
+          text: You said you pulled the implant?
+      - prose: |
+          He gestures toward the steel dish sitting nearby.
+      - dialogue:
+          speaker: WASH
+          text: Yeah. There it is.
+      - dialogue:
+          speaker: BRAND
+          text: And?
+      - dialogue:
+          speaker: WASH
+          text: And I'd like it out of my building.
+    choices:
+      - label: Look around
+        goto_scene: morgue
+
+  - id: autopsy1_results
+    stepped: true
+    blocks:
+      - dialogue:
+          speaker: WASH
+          text: |
+            Opened him up yesterday. There's a bleed in the head, all right. Subdural, above the left ear, fresh. Wrote it down as impact, initially, the way I figured it at intake.
+      - dialogue:
+          speaker: BRAND
+          text: But...?
+      - dialogue:
+          speaker: WASH
+          text: |
+            But then I pulled the implant, like a certain scrag asked me to. And the port's cooked, brohaim. Toasted like a damn marshmallow. Those filaments run warm under normal load, you'd never feel it your whole life. This one ran hot enough to burn the bed. Catch the damn sheets on fire. That's your bleed. It's from the Immersion implant.
+      - dialogue:
+          speaker: BRAND
+          text: Hardware fault.
+      - dialogue:
+          speaker: WASH
+          text: |
+            That's what I wanted it to be, believe me. Was able to pull basic diagnostics off it. Unit's six years old. Service record's clean. Not one fault, not one recall. These things don't cook themselves, brohaim. Somethin' came down the wave and ran it that hot. A delivery. Big one. If I had to guess, hours before he crashed.
+      - prose: |
+          He tips his chin at the bowl on the gurney without looking at it.
+      - dialogue:
+          speaker: WASH
+          text: Go on, take a look. I'll be here.
+    choices:
+      - label: Step back
+        set: { _got_results: true }
+
+  - id: autopsy1_tray_bare
+    blocks:
+      - prose: |
+          In the dish: a sliver of hardware smaller than your thumbnail, trailing gold filaments fine as hair. One corner is dark with scorchmarks, the metal tarnished.
+      - prose: |
+          The surgeons showed you a scan once, of the place behind your left ear where one of these would have gone. You've spent eighteen years being less than everyone else in this city because you couldn't carry one. You look at the scorched little thing in the dish and, for the first time, you wonder if you got lucky.
+    choices:
+      - label: Put the dish down
+        set: { _saw_implant: true }
+
+  - id: autopsy1_tray_lensed
+    blocks:
+      - prose: |
+          Nothing looks different with the glasses on. You'd have expected it to light up the room like a Christmas tree, but there's nothing; no serial, no handshake, no service ghost. The thing just sits there. Dead hardware doesn't broadcast anything.
+    choices:
+      - label: Put the dish down
+        set: { _saw_implant: true }
+
+  - id: autopsy1_reframe
+    stepped: true
+    blocks:
+      - dialogue:
+          speaker: BRAND
+          text: |
+            A brain bleed doesn't cause what he did. It slows a man down. Muddles him. It doesn't put a grin on his face while he tries to torture his wife to death.
+      - dialogue:
+          speaker: WASH
+          text: |
+            No. It doesn't.
+      - dialogue:
+          speaker: BRAND
+          text: |
+            I don't buy it's a coincidence, either.
+      - dialogue:
+          speaker: WASH
+          text: |
+            Nope. You ask me, the burn's not what crashed him, it's whatever caused it to burn in the first place. Some script run on that thing in the dead of night. Some... payload.
+      - prose: |
+          Four months you've been chasing a drug. Labs, runners, corner boys, tox screens. You think about the panel reading NEGATIVE all the way down, and about a supply line nobody can find, and it slowly occurs to you that you may have been chasing the wrong thing all this time.
+      - dialogue:
+          speaker: BRAND
+          text: So something came down the wave, heated up his implant, and made him crash out. I need to know what that payload was. Where do I find it?
+      - dialogue:
+          speaker: WASH
+          text: |
+            Not with me, and not with him. Wave records sit with the carrier, which means Echo Paradigm. You want those, it's a subpoena through Combine legal.
+      - dialogue:
+          speaker: BRAND
+          text: How long?
+      - dialogue:
+          speaker: WASH
+          text: Ask legal, but if I had to guess, I'd say you file today and get at least redacted records tomorrow. If nobody fights it.
+      - dialogue:
+          speaker: BRAND
+          text: I'll start the paperwork, then.
+      - prose: |
+          Wash nods, slowly. His hands have found each other again.
+      - dialogue:
+          speaker: WASH
+          text: Brand. I got one of these in my head. So does every soul I know, 'cept you.
+      - prose: |
+          You nod grimly.
+      - dialogue:
+          speaker: BRAND
+          text: I'll get to the bottom of it.
+      - dialogue:
+          speaker: WASH
+          text: I hope so, brohaim. Good luck.
+    choices:
+      - label: Leave him to it
+        set: { _asked_records: true }
+
+  - id: autopsy1_wash_done
+    blocks:
+      - dialogue:
+          speaker: WASH
+          text: Go on. I'll wave you when there's somethin' worth wavin' about.
+    choices:
+      - label: Step back
+
+  - id: autopsy1_exit_early
+    blocks:
+      - prose: |
+          Not yet. Wash didn't pull a dead man's implant out of his skull for you to leave without hearing what he found.
+    choices:
+      - label: Stay
+
+  - id: autopsy1_exit
+    blocks:
+      - prose: |
+          The elevator carries you up out of the cold.
+    choices:
+      - label: Go
+        transition: fade
+        set: { autopsy1_done: true }
+        goto_map: day_map

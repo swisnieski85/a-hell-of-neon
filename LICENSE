@@ -1,0 +1,22 @@
+Copyright © 2026 Sean Wisnieski. All rights reserved.
+
+"A Hell of Neon" — including its story, characters, setting, dialogue,
+writing, game design, source code, and original assets — is the property
+of Sean Wisnieski.
+
+No permission is granted to copy, modify, publish, redistribute, sell, or
+create derivative works from any part of this work, in whole or in part,
+except as permitted by applicable law (such as fair use). The public
+availability of this repository is for playing the game and viewing its
+source, and does not grant any license to its contents.
+
+THIRD-PARTY COMPONENTS
+
+The following are not covered by the notice above and remain under their
+own licenses:
+
+- vendor/js-yaml.min.js — copyright Vitaly Puzrin, MIT License
+  (https://github.com/nodeca/js-yaml).
+- Audio files in assets/audio/ — licensed works by third-party authors;
+  see CREDITS.md for the full list of authors, sources, and license terms
+  (CC0, CC BY 4.0, CC BY-NC 4.0, and the Pixabay Content License).

@@ -1,0 +1,374 @@
+kind: location
+location: The Sandpiper Motel · Room 14
+slot: true
+# no date — inherited from the day's dawn bookend (same day as Heavy 1 is legal)
+# no time — slot vignettes inherit the slot hour (slot_times on the dawn bookend)
+opening_node: heavy2_open
+entry_scene: motel_room
+ambient:
+  - rain-inside
+
+scenes:
+  motel_room:
+    image: 10-motel
+    intro: |
+      A motel room too small for comfort: one chair, a hastily-made bed, a window over the harbor, a clock on the wall. He sits in the chair facing you, a handgun resting in his lap, barrel angled toward the floor. A packed suitcase waits on the bed.
+    hotspots:
+      - id: heavy_look
+        coords: { x: 0.355, y: 0.365, w: 0.055, h: 0.11 }   # his head
+        node_off: heavy2_look_bare
+        node_on: heavy2_look_lensed
+        tooltip: Look at him
+        visible: always
+
+      # The conversation advances in three steps, then the decision.
+      - id: heavy_meet
+        coords: { x: 0.29, y: 0.475, w: 0.17, h: 0.30 }   # his body and the chair
+        node: heavy2_meet
+        tooltip: Talk to him
+        visible: always
+        requires:
+          not: _met_heavy
+
+      - id: heavy_client
+        coords: { x: 0.29, y: 0.475, w: 0.17, h: 0.30 }   # his body and the chair
+        node: heavy2_client
+        tooltip: Ask about his client
+        visible: always
+        requires:
+          all: [ _met_heavy, { not: _heard_client } ]
+
+      - id: heavy_rose
+        coords: { x: 0.29, y: 0.475, w: 0.17, h: 0.30 }   # his body and the chair
+        node: heavy2_rose
+        tooltip: Ask about the woman
+        visible: always
+        requires:
+          all: [ _heard_client, { not: _heard_rose } ]
+
+      - id: heavy_decide
+        coords: { x: 0.29, y: 0.475, w: 0.17, h: 0.30 }   # his body and the chair
+        node: heavy2_decide
+        tooltip: Talk to him
+        visible: always
+        requires: _heard_rose
+
+      - id: window
+        coords: { x: 0.455, y: 0.12, w: 0.165, h: 0.42 }   # right of his head; the boat
+        node_off: heavy2_window_bare
+        node_on: heavy2_window_lensed
+        tooltip: Look out the window
+        visible: always
+
+      - id: bag
+        coords: { x: 0.738, y: 0.545, w: 0.108, h: 0.17 }   # suitcase on the bed
+        node: heavy2_bag
+        tooltip: Look at the suitcase
+        visible: always
+
+      - id: exit_early
+        coords: { x: 0.48, y: 0.88, w: 0.25, h: 0.11 }   # bottom edge, the door behind Brand
+        node: heavy2_exit_early
+        tooltip: Leave
+        visible: always
+        requires:
+          not: _heard_rose
+
+      # Once he's said his piece, the door leads to the same decision.
+      - id: exit
+        coords: { x: 0.48, y: 0.88, w: 0.25, h: 0.11 }
+        node: heavy2_decide
+        tooltip: Leave
+        visible: always
+        requires: _heard_rose
+
+nodes:
+  # ---------- Arrival — no location image yet ----------
+
+  - id: heavy2_open
+    hide_scene: true     # the art would give away the man in the chair
+    stepped: true
+    blocks:
+      # Heavy 1 left without the seasickness pills: Frenk's sweep had the
+      # whole city to cover, and the hit came in overnight (heavy_search_wide).
+      - prose: |
+          Frenk's sweep came back overnight. One hit: a camera by the ice machine at the Sandpiper Motel, on the harbor.
+        requires: { all: [ heavy_search_wide, { not: heavy_located } ] }
+      - prose: |
+          The Sandpiper Motel is a dump, a layover for exhausted sailors and for those who prefer their seedy adventures analogue rather than entoptic. Rooms open onto an outside walkway, the water right across the road. The breeze carries the smell of salt to you.
+      - prose: |
+          The clerk looks at your badge, then at you. Room 14, upstairs. Paid cash for a week. Checking out today.
+      - prose: |
+          You go up expecting an empty room. You're just being thorough.
+      - prose: |
+          The door to 14 is open an inch.
+      - dialogue:
+          speaker: HEAVY
+          text: Come on in, Detective. Hands where I can see them. Shut the door behind you.
+      - prose: |
+          He's sitting in the room's one chair, facing the door, with a handgun resting in his lap.
+      - dialogue:
+          speaker: HEAVY
+          text: Saw you on the stairs. Terminal Twelve. Mercer and Kell, that right?
+    choices:
+      - label: Go in
+        goto_scene: motel_room
+
+  # ---------- Looking ----------
+
+  - id: heavy2_look_bare
+    blocks:
+      - prose: |
+          Older than he looked in the rain. Forty-five, maybe. Big hands, folded around the gun in his lap. He looks tired. And fed up. And not the least bit afraid of you.
+    choices:
+      - label: Step back
+
+  - id: heavy2_look_lensed
+    blocks:
+      - prose: |
+          Nothing. Same as at the terminal. Almost everyone else in this city trails all kinds of ghosts in the layer. Not Rose, and not him. He's wiped all of his.
+    choices:
+      - label: Step back
+
+  - id: heavy2_window_bare
+    blocks:
+      - prose: |
+          The harbor, gray under the rain. At the end of the pier across the road, a small fishing boat sits with its engine running. No name on its stern.
+    choices:
+      - label: Look away
+
+  - id: heavy2_window_lensed
+    blocks:
+      - prose: |
+          Every hull in the harbor wears a tag in the layer: registry, owner, berth, cargo. The fishing boat at the end of the pier has none. Its engine is running.
+    choices:
+      - label: Look away
+
+  - id: heavy2_bag
+    blocks:
+      - prose: |
+          One suitcase, packed tight. At least a decade and change in this city, and everything he's taking fits in it.
+    choices:
+      - label: Step back
+
+  # ---------- 1. Who he is ----------
+
+  - id: heavy2_meet
+    stepped: true
+    blocks:
+      - dialogue:
+          speaker: BRAND
+          text: Armando Del Rio.
+      - dialogue:
+          speaker: HEAVY
+          text: Haven't heard that one in a while.
+      - dialogue:
+          speaker: BRAND
+          text: Is it yours?
+      - dialogue:
+          speaker: JOHNSON
+          text: No. Call me Johnson.
+      - prose: |
+          That's probably not his name, either, but you don't press.
+      - dialogue:
+          speaker: BRAND
+          text: You could've killed me at the terminal.
+      - dialogue:
+          speaker: JOHNSON
+          text: |
+            I could have.
+      - dialogue:
+          speaker: BRAND
+          text: Why didn't you?
+      - dialogue:
+          speaker: JOHNSON
+          text: |
+            Because then I'd have had a dead cop on top of everything else. And I decided in that moment I was done, anyway.
+      - dialogue:
+          speaker: BRAND
+          text: Done with what?
+      - dialogue:
+          speaker: JOHNSON
+          text: With all this. This line of work. This whole damn city.
+    choices:
+      - label: Step back
+        set: { _met_heavy: true }
+
+  # ---------- 2. The client (the seam) ----------
+
+  - id: heavy2_client
+    stepped: true
+    blocks:
+      - dialogue:
+          speaker: BRAND
+          text: Who were you working for?
+      - dialogue:
+          speaker: JOHNSON
+          text: |
+            Some shifty slag. Never saw his face, and he didn't give me his real name.
+      - dialogue:
+          speaker: JOHNSON
+          text: |
+            Gave me a handheld and sent waves over it occasionally. Jobs. Moving product, usually. Then more violent things. Money was good. The car came with the last job. Keys in it, tracking off. I didn't ask.
+      - dialogue:
+          speaker: JOHNSON
+          text: |
+            That last job was different. And I didn't like it. Not one damn bit.
+      - dialogue:
+          speaker: BRAND
+          text: Different because of the girl.
+      - dialogue:
+          speaker: JOHNSON
+          text: |
+            Different because of the girl. Yeah. They wanted her dead, and they wanted her to go badly. Ugly-like. And they wanted that rat-nosed little slag to do it. Kabob or whatever his name was.
+      - dialogue:
+          speaker: BRAND
+          text: Khalil. Why him?
+      - dialogue:
+          speaker: JOHNSON
+          text: |
+            I don't know. They said they'd be watching him do it. Watching through his eyes. I don't know what that means.
+      - dialogue:
+          speaker: BRAND
+          text: Why not you?
+      - dialogue:
+          speaker: JOHNSON
+          text: |
+            I just said I don't know, didn't I?
+    choices:
+      - label: Step back
+        set: { _heard_client: true }
+
+  # ---------- 3. Why Rose ----------
+
+  - id: heavy2_rose
+    stepped: true
+    blocks:
+      - dialogue:
+          speaker: BRAND
+          text: Did they choose the girl?
+      - dialogue:
+          speaker: JOHNSON
+          text: |
+            No. I did. They just wanted somebody no one would come looking for. People like that are hard to find in this city.
+      - dialogue:
+          speaker: JOHNSON
+          text: I found three. I picked her.
+      - dialogue:
+          speaker: BRAND
+          text: Why?
+      - dialogue:
+          speaker: JOHNSON
+          text: She was young. She was pretty. I figured that's what they wanted.
+      - prose: |
+          He holds your eye while he says it.
+      - dialogue:
+          speaker: JOHNSON
+          text: She alive?
+      - dialogue:
+          speaker: BRAND
+          text: Yes.
+      - dialogue:
+          speaker: JOHNSON
+          text: All right.
+    choices:
+      - label: Step back
+        set: { _heard_rose: true }
+
+  # ---------- The decision (live death trigger) ----------
+
+  - id: heavy2_exit_early
+    blocks:
+      - prose: |
+          Not yet. He's the only man who's ever spoken to whoever's behind this. Hear him out.
+    choices:
+      - label: Stay
+
+  - id: heavy2_decide
+    stepped: true
+    blocks:
+      - prose: |
+          He checks the clock on the wall.
+      - dialogue:
+          speaker: JOHNSON
+          text: My ride's in twenty minutes. So. You going to try and stop me?
+      - prose: |
+          The gun is still in his lap. Your hand is still a long way from your own.
+    choices:
+      - label: Let him go
+        goto: heavy2_handheld
+      - label: Try to take him in
+        goto: heavy2_death
+
+  - id: heavy2_death
+    hide_scene: true
+    stepped: true
+    blocks:
+      - prose: |
+          You go for your gun.
+      - prose: |
+          The gun in his lap comes up an inch and a half.
+      - prose: |
+          That's all it takes.
+    choices:
+      - label: ">>>"
+        death: true
+        sfx: gunshot
+
+  - id: heavy2_handheld
+    stepped: true
+    blocks:
+      - prose: |
+          You keep your hands where they are.
+      - dialogue:
+          speaker: BRAND
+          text: No. I'm not.
+      - dialogue:
+          speaker: JOHNSON
+          text: Good choice.
+      - prose: |
+          He reaches into his coat slowly, so you can watch, and tosses something onto the floor at your feet. A cheap handheld.
+      - dialogue:
+          speaker: JOHNSON
+          text: That's how they talked to me. Every job.
+      - dialogue:
+          speaker: BRAND
+          text: Why are you doing this? Why're you helping me?
+      - prose: He goes quiet for a moment.
+      - dialogue:
+          speaker: JOHNSON
+          text: |
+            I got the impression from them that there's something coming. Something bad. Something they're working on, and this was just a part of it.
+      - dialogue:
+          speaker: JOHNSON
+          text: |
+            I'd rather they not get what they want. But if they do, I'd rather not be here when it happens.
+      - prose: He looks down at the handheld on the floor.
+      - dialogue:
+          speaker: JOHNSON
+          text: |
+            Take it. I don't need it where I'm going.
+      - dialogue:
+          speaker: BRAND
+          text: Where's that?
+      - dialogue:
+          speaker: JOHNSON
+          text: Somewhere else.
+      - prose: |
+          He picks up his suitcase and goes out past you, along the walkway and down the stairs at an even pace. Across the road, the boat's engine changes pitch.
+      # Brand only states the Ostrowski link once he has the evidence: the
+      # implant package from the wave records (Autopsy 2). Before that, it's a
+      # suspicion. (Ostrowski never touched Shred — the link is the implant.)
+      - prose: |
+          You turn the handheld over. Somebody wanted Rose to die, and wanted to watch it happen through Khalil's eyes. Somebody sent a package to Daniel Ostrowski's implant at three in the morning, and by evening he was trying to torture his wife to death. You'd bet your badge it's the same somebody.
+        requires: autopsy2_done
+      - prose: |
+          You turn the handheld over. Somebody wanted Rose to die, and wanted to watch it happen through Khalil's eyes. And a man who never touched Shred crashed out anyway. You don't believe in coincidences like that.
+        requires: { not: autopsy2_done }
+      - prose: |
+          Their messages are on this, and whatever network carried them. Combine legal can add it to the subpoena.
+    choices:
+      - label: Go
+        transition: fade
+        set: { heavy2_done: true }
+        goto_map: day_map

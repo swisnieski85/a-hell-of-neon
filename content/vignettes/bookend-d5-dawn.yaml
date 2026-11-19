@@ -1,0 +1,182 @@
+kind: location
+location: Ethan Brand's Apartment
+day: 5
+slot_budget: 1
+slot_times: ["10:30 AM"]   # the day's slot clock, first pick -> first hour
+date: 23 October 2554
+time: "6:00 AM"
+opening_node: d5dawn_wake
+entry_scene: apartment
+ambient:
+  - rain-inside
+
+scenes:
+  apartment:
+    image: 04-night-apartment
+    intro: |
+      Rose is at the table by the window.
+    hotspots:
+      # Beat 4 is waiting: the confession's second (and last) window.
+      - id: rose_beat4
+        coords: { x: 0.10, y: 0.30, w: 0.11, h: 0.50 }
+        node: rose_next
+        keep_lit: true   # the router opens a new beat each window; never dim
+        tooltip: Sit down with her
+        visible: always
+        requires:
+          all:
+            - rose_living_with_brand
+            - { not: _rose_window_spent }
+            - rose3_done
+            - autopsy3_done
+            - { not: rose4_done }
+            - { not: confession_declined }
+
+      # Every other state: aftermath, closed, filler, or a beat catching up.
+      - id: rose
+        coords: { x: 0.10, y: 0.30, w: 0.11, h: 0.50 }
+        node: rose_next
+        keep_lit: true   # the router opens a new beat each window; never dim
+        tooltip: Talk to Rose
+        visible: always
+        requires:
+          all:
+            - rose_living_with_brand
+            - { not: _rose_window_spent }
+            - { not: rose_aftermath_done }
+            - { not: { all: [ rose3_done, autopsy3_done, { not: rose4_done }, { not: confession_declined } ] } }
+
+      # Why she was picked (addendum §13): after this window's scheduled beat.
+      - id: rose_why
+        coords: { x: 0.10, y: 0.30, w: 0.11, h: 0.50 }
+        node: rose_why
+        tooltip: Tell her why she was taken
+        visible: always
+        requires:
+          all:
+            - rose_living_with_brand
+            - heavy2_done
+            - _rose_window_spent
+            - { not: rose_why_done }
+
+      # Brand's read on the package, to Frenk (frenk-thread.yaml): the last
+      # chance, if Autopsy 3 was Day 4 and he hasn't named anyone yet.
+      - id: frenk_wave
+        coords: { x: 0.82, y: 0.68, w: 0.10, h: 0.07 }    # the nightstand
+        node: frenk_suspect
+        tooltip: Wave Frenk
+        visible: always
+        requires:
+          all:
+            - autopsy3_done
+            - { not: suspect_droz }
+            - { not: suspect_security }
+
+      - id: list
+        coords: { x: 0.22, y: 0.57, w: 0.10, h: 0.07 }   # the table, beside her
+        node: d5dawn_list
+        tooltip: Look at her list
+        visible: always
+
+      - id: tv
+        coords: { x: 0.695, y: 0.14, w: 0.165, h: 0.38 }
+        node: d5dawn_tv
+        tooltip: Watch the news
+        visible: lenses_on
+
+      - id: commendation
+        coords: { x: 0.88, y: 0.195, w: 0.09, h: 0.235 }
+        node: d5dawn_commendation
+        tooltip: View your commendation
+        visible: always
+        requires:
+          not: commendation_down
+
+      - id: door
+        coords: { x: 0.6, y: 0.3, w: 0.08, h: 0.36 }
+        node: d5dawn_leave
+        tooltip: Head out
+        visible: always
+
+nodes:
+  - id: d5dawn_wake
+    blocks:
+      - prose: |
+          You wake before the alarm. Six o'clock, still dark. Wednesday.
+      - prose: |
+          Rose is already up, sitting at the table by the window. From the look of her, she's been up a while.
+        requires:
+          all: [ rose3_done, autopsy3_done, { not: rose4_done }, { not: confession_declined } ]
+    choices:
+      - label: Get up
+        goto_scene: apartment
+
+  - id: d5dawn_tv
+    blocks:
+      - prose: |
+          "-and at noon today, SUBSTRATE 43.0 goes out to every Immersion user in ReSeattle. Echo Paradigm says the update installs automatically and asks nothing of users. The company is calling it the most human release in the game's history-"
+      - prose: |
+          In the corner of the screen, a clock counts down: 05:58:41.
+      - prose: |
+          The first of it ships at noon, Droz said. Grief. Fear. Horror.
+        requires: autopsy3_done
+      - prose: |
+          The last update you read about went to one man, at three in the morning.
+        requires:
+          all: [ autopsy2_done, { not: autopsy3_done } ]
+    choices:
+      - label: Turn it off
+
+  # Her want resolved (see bookend-d4-dawn.yaml d4dawn_list).
+  - id: d5dawn_list
+    blocks:
+      - prose: |
+          Landlord is crossed off. Under Church, Sunday, there's a new line: Home, Thursday.
+    choices:
+      - label: Step back
+
+  - id: d5dawn_commendation
+    blocks:
+      - prose: |
+          The commendation hangs where it always has.
+        requires: { not: confessed }
+      - prose: |
+          The commendation hangs where it always has. Everything on it is still true. Someone else knows the rest now.
+        requires: confessed
+    choices:
+      - label: Look away
+        requires: { not: confessed }
+      - label: Take it down
+        requires: confessed
+        goto: d5dawn_commendation_down
+      - label: Leave it
+        requires: confessed
+
+  - id: d5dawn_commendation_down
+    blocks:
+      - prose: |
+          You lift it off the nail and put it in the nightstand drawer, face down. There's a clean rectangle on the wall where it hung.
+    choices:
+      - label: Step back
+        set: { commendation_down: true }
+
+  - id: d5dawn_leave
+    stepped: true
+    blocks:
+      - prose: |
+          By the time you're dressed, it's getting light. You pick up your jacket.
+      # Said nothing (last night or this morning): the window is closed.
+      - prose: |
+          Rose looks up when you go to the door. She nods. You nod back.
+        requires: confession_declined
+      - dialogue:
+          speaker: ROSE
+          text: See you tonight?
+        requires: { not: confession_declined }
+      - dialogue:
+          speaker: BRAND
+          text: See you tonight.
+        requires: { not: confession_declined }
+    choices:
+      - label: Head out
+        goto_map: day_map

@@ -1,0 +1,119 @@
+kind: cutscene            # linear; entered by the endgame trigger, not the map
+location: Outside Ethan Brand's Building
+date: 23 October 2554
+time: "12:00 PM"
+opening_node: nihilism_street
+
+nodes:
+  # ---------- Noon, on the street ----------
+  # The same noon as Tragedy (the billboard, the quiet minutes, the polite
+  # man), but the knife goes into someone else, and Brand has one action.
+  - id: nihilism_street
+    ambient: [ rain-outside ]
+    stepped: true
+    blocks:
+      - prose: |
+          Noon. You're half a block from your building, in the rain, lenses on.
+      - prose: |
+          Across the street, an entoptic billboard fills the side of a building. A beautiful woman stretches, as if just waking up, while a countdown clock ticks the last seconds toward noon.
+      - prose: |
+          At noon the billboard flares gold. The woman opens her eyes and smiles. SUBSTRATE 43.0 is here.
+      - prose: |
+          For a few minutes, nothing seems to change. People walk along the street. Vehicles pass. The rain falls.
+      - prose: |
+          Then the billboard dissolves into static and winks out, and a few blocks over, two vehicles collide.
+      - prose: |
+          At the bus shelter beside you, a man in a raincoat touches a woman's elbow.
+      - dialogue:
+          speaker: MAN
+          text: Excuse me, ma'am. Could you take a look at this for me?
+      - prose: |
+          She leans in to look. He puts a knife into her, under the ribs, and holds her up while he does it, gently, the way you'd hold someone who's fainted. He's smiling at her.
+      - prose: |
+          Further down the block, a young man is helping an old woman up from a bench. He's patient with her. When she's on her feet, he walks her to the curb, and out in front of a truck.
+      - prose: |
+          The man in the raincoat lets the woman down onto the pavement, carefully, and looks up at you. He starts toward you, still smiling.
+    choices:
+      # The unconfessed column gets no real choice (addendum §15): one forced
+      # action, the counterpart to Tragedy's open choice.
+      - label: Draw your pistol
+        goto: nihilism_draw
+
+  - id: nihilism_draw
+    ambient: [ rain-outside, distant_gunfire, distant_explosions ]
+    stepped: true
+    blocks:
+      - prose: |
+          You draw and fire, twice. He goes down on the wet pavement and stays there.
+      - prose: |
+          Your hands are steady. They always are, for this.
+      - prose: |
+          The woman he stabbed is lying on her side by the shelter. You step around her.
+      - prose: |
+          You get the street door open and shut it behind you. The lobby is empty. Somewhere upstairs, a door bangs, and someone is running.
+      - prose: |
+          The stairs go up to your apartment, and down to the garage.
+      - prose: |
+          Rose is up there. Four flights. You could be at the door in a minute.
+      - prose: |
+          And then what? Sit on the floor with her and wait for whoever comes through it?
+      - prose: |
+          She has a lock on the door. She's smarter than you are. She'll keep it shut.
+      - prose: |
+          Down there, you can do something. You've always been able to do something.
+      - prose: |
+          You go down.
+    choices:
+      - label: ">>>"
+        goto: nihilism_garage
+
+  # ---------- The garage (matches Tragedy's garage) ----------
+  # Every payoff line is knowledge that does not help. Keep them flat; do not
+  # narrate the verdict.
+  - id: nihilism_garage
+    image: 92-garage
+    location: Ethan Brand's Building · Garage
+    time: "12:10 PM"
+    ambient: [ distant_gunfire, distant_explosions ]
+    stepped: true
+    blocks:
+      - prose: |
+          The garage is quiet. You get in the car and sit with the pistol in your lap.
+      # car_done: the operator ID, never followed.
+      - prose: |
+          The operator ID from the impound is still written down in your jacket pocket. 8169-au24-11y6-z0hm. You never got any further with it.
+        requires: car_done
+      # heavy2_done: someone was composing these; the heavy got out.
+      - prose: |
+          The heavy got out on a boat. Somebody was ordering these deaths, and you never found out who.
+        requires: heavy2_done
+      # Brand's read, waved to Frenk (frenk-thread.yaml). (suspect_security
+      # needs the Car, and Car + Autopsy 3 always reaches the finale.)
+      - prose: |
+          You gave Frenk Droz's name. Nobody had time to do anything with it.
+        requires: suspect_droz
+      # shred1_done: what the people outside will remember.
+      - prose: |
+          You think of Alex Wu. I liked it. That's what the people out there will remember, the ones who live through today.
+        requires: shred1_done
+      # shred2_done: Wash, out there.
+      - prose: |
+          Wash is out there somewhere, with one of these in his head. The last time you saw him, you sat with him a while and neither of you said much.
+        requires: { all: [ shred2_done, stayed_with_wash ] }
+      - prose: |
+          Wash is out there somewhere, with one of these in his head. The last time you saw him, he was reaching for the bottle before the door closed behind you.
+        requires: { all: [ shred2_done, { not: stayed_with_wash } ] }
+      - prose: |
+          It can't touch you. For once in your life, the old injury is worth something. You're the only clear head in the building, and you have a gun.
+      - prose: |
+          There are two million of them.
+      - prose: |
+          You don't know where you'll go. Toward the noise. You'll know what to do when you get there. You always have.
+      - prose: |
+          You start the car and hit the opener.
+      - prose: |
+          The door starts to go up. Light comes in under it, and smoke, and the sound of the street.
+    choices:
+      - label: End
+        goto_screen: end
+        ending: nihilism

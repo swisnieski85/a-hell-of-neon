@@ -1,0 +1,283 @@
+kind: location
+location: Ethan Brand's Apartment
+date: 19 October 2554
+time: "6 AM"
+opening_node: apartment_wake
+entry_scene: apartment
+ambient:
+  - rain-inside
+
+scenes:
+  apartment:
+    image: 01-apartment
+    intro: |
+      Your apartment is one room and a bathroom. There's your bed and a side table. A small dining table and two chairs. A window.
+    hotspots:
+      - id: table
+        coords: { x: 0.825, y: 0.685, w: 0.09, h: 0.07 }
+        node: apartment_table
+        tooltip: Take your entoptic lenses
+        visible: always
+        requires:
+          not: has_lenses
+
+      # Disabled once the lenses are taken — the "take" tooltip no longer
+      # applies. Restore alongside apartment_table_taken if the empty case
+      # should stay examinable.
+      # - id: table_taken
+      #   coords: { x: 0.31, y: 0.62, w: 0.09, h: 0.07 }
+      #   node: apartment_table_taken
+      #   visible: always
+      #   requires: has_lenses
+
+      - id: chair
+        coords: { x: 0.25, y: 0.545, w: 0.09, h: 0.14 }
+        node: apartment_handheld
+        tooltip: Take your handheld
+        visible: always
+        requires:
+          not: _seen_handheld
+
+      - id: window
+        coords: { x: 0.11, y: 0.225, w: 0.12, h: 0.26 }
+        goto_scene: lightwell
+        tooltip: Look out the window
+        visible: always
+
+      - id: to_bathroom
+        coords: { x: 0.435, y: 0.325, w: 0.08, h: 0.32 }
+        goto_scene: bathroom
+        tooltip: Go to the bathroom
+        visible: always
+      
+      - id: commendation
+        coords: { x: 0.875, y: 0.125, w: 0.08, h: 0.36 }
+        node: apartment_commendation
+        tooltip: View your commendation
+        visible: always
+      
+      - id: tv
+        coords: { x: 0.725, y: 0.165, w: 0.08, h: 0.36 }
+        node: tv
+        tooltip: Watch the news
+        visible: lenses_on
+
+      # The door is always there. Until the morning's five things are done, it
+      # answers "Not yet" with a hint for the first one still missing. (The
+      # bathroom readout is optional: it adds nothing the ad doesn't teach.)
+      - id: front_door_early
+        coords: { x: 0.6, y: 0.3, w: 0.08, h: 0.36 }
+        node: apartment_leave_early
+        tooltip: Leave for work
+        visible: always
+        requires:
+          not:
+            all:
+              - has_lenses
+              - _seen_mirror_off
+              - _seen_mirror_on
+              - _seen_handheld
+              - _seen_ad
+
+      - id: front_door
+        coords: { x: 0.6, y: 0.3, w: 0.08, h: 0.36 }
+        node: apartment_leave
+        tooltip: Leave for work
+        visible: always
+        requires:
+          all:
+            - has_lenses
+            - _seen_mirror_off
+            - _seen_mirror_on
+            - _seen_handheld
+            - _seen_ad
+
+  bathroom:
+    image: 01-bathroom
+    intro: |
+      The bathroom light flickers and hums on.
+    hotspots:
+      - id: mirror
+        coords: { x: 0.405, y: 0.13, w: 0.16, h: 0.30 }
+        node_off: bathroom_mirror_off
+        node_on: bathroom_mirror_on
+        tooltip: Look in the mirror
+        visible: always
+
+      - id: readout
+        coords: { x: 0.1, y: 0.35, w: 0.13, h: 0.10 }
+        node: bathroom_readout
+        tooltip: Check the readout
+        visible: lenses_on
+
+      - id: to_apartment
+        coords: { x: 0.89, y: 0.40, w: 0.09, h: 0.18 }
+        goto_scene: apartment
+        tooltip: Return to the apartment
+        visible: always
+
+  lightwell:
+    image: 01-lightwell
+    intro: |
+      Rain falls down the light-well.
+    hotspots:
+      - id: ad
+        coords: { x: 0.31, y: 0.18, w: 0.40, h: 0.58 }
+        node: lightwell_ad
+        tooltip: Look at the ad
+        visible: lenses_on
+
+      - id: to_apartment
+        coords: { x: 0.89, y: 0.675, w: 0.09, h: 0.14 }
+        goto_scene: apartment
+        tooltip: Return to the apartment
+        visible: always
+
+nodes:
+  - id: apartment_wake
+    blocks:
+      - prose: |
+          Your eyes flutter open, fix on a shapeless water stain on the corner of the ceiling. You are awake.
+    choices:
+      - label: Get up
+        goto: apartment_getup
+
+  - id: apartment_getup
+    blocks:
+      - prose: |
+          You swing your legs over the bed and flex your hand. It hurts. Always does when you wake.
+    choices:
+      - label: Look around
+        goto_scene: apartment
+  
+  - id: tv
+    blocks:
+      - prose: |
+          ReSeattle Health Cooperative confirms 211 deaths attributed to the stimulant colloquially known as Shred in the past twelve months, more than triple the prior year's count. A spokesman urges residents to report symptoms of acute dissociative episodes and reminds viewers that Immersion diagnostics can be scheduled through any Echo Paradigm kiosk.
+    choices:
+      - label: Ignore it
+
+  - id: apartment_table
+    blocks:
+      - prose: |
+          On the bedside table, a pair of entoptic lenses in a scratched steel case.
+      - prose: |
+          You are one of maybe forty thousand people in the city who can't take an Immersion implant. The surgeons were very kind about it. They showed you the scan, the scar tissue around the left temporal lobe. They explained in very careful language about how the implant operation would likely kill you.
+      - prose: |
+          The lenses are what they gave you instead. They let you see most of what everyone else sees. Read-only from your end, no write.
+    choices:
+      - label: Take them
+        set: { has_lenses: true }
+
+  - id: apartment_handheld
+    stepped: true
+    blocks:
+      - prose: |
+          You pick up your handheld. A few years old and battered with use. Two waves.
+      - prose: |
+          The first is from Frenk at the Combine. Timestamped 0415. It's the tip you paid COINTEL for. It reads:
+      - dialogue:
+          speaker: FRENK
+          text: |
+            harbor island container terminal 12. tonight, around midnight. ur old pal Khalil, moving something. i dunno what or to who
+      - prose: |
+          You've been chasing Shred for four months and never once have you gotten within two people of a supplier. Khalil's a runner. Khalil talks to someone.
+      - prose: |
+          Tonight, then.
+      - prose: |
+          The second wave is from Wash, timestamped 40 minutes ago.
+      - dialogue:
+          speaker: WASH
+          text: Got another one. Came in twelve hours ago. Come take a look before I open him up
+      - prose: |
+          You tap out a reply.
+      - dialogue:
+          speaker: BRAND
+          text: I've got somewhere to be tonight
+      - dialogue:
+          speaker: WASH
+          text: Then come now, ya scrag
+    choices:
+      - label: Close handheld
+        set: { _seen_handheld: true }
+
+  - id: apartment_commendation
+    blocks:
+      - prose: |
+          A framed commendation. The glass is dusty; you don't clean it often.
+      - prose: |
+          Cascadian Meritorious Service Cross. For conspicuous gallantry at the Third Battle of Red Mound during the Eastern Range War, January 2536.
+      - prose: |
+          You shut down the anti-aircraft array. You called for support. That's what the citation says. That's what happened.
+    choices:
+      - label: Look away
+
+  - id: lightwell_ad
+    blocks:
+      - prose: |
+          She's been looking at you for eleven weeks, since Echo Paradigm pushed the last SUBSTRATE update. Always a beautiful woman, never the same one twice. You're starting to get used to this one. You might even miss her when she's gone.
+      - prose: |
+          New update's due this week. Everyone's talking about it. It's supposed to change everything.
+    choices:
+      - label: Look away
+        set: { _seen_ad: true }
+
+  - id: bathroom_mirror_off
+    blocks:
+      - prose: |
+          You look at your reflection.
+      - prose: |
+          Forty-one years old now. Gray coming in at the temple, on the left, where the hair grows back wrong over the scar. A face that's been hit plenty.
+      - prose: |
+          You put your hands on the sink. The right one doesn't close all the way anymore. It hasn't since the war. Three of the metacarpals set badly and nobody ever went back in to fix them.
+    choices:
+      - label: Turn away
+        set: { _seen_mirror_off: true }
+
+  - id: bathroom_mirror_on
+    blocks:
+      - prose: |
+          The bathroom's flaws melt away. Cracked tiles resolve into a beautiful gold filigree. A patch of mold in the grout turns to gold and seems to glitter.
+      - prose: |
+          Your face in the mirror, on the other hand, is not corrected. They can't make you look like anything other than what you are. That's a licensing matter. There are rules about faces.
+      - prose: |
+          You look at your own face in the middle of all that gold.
+    choices:
+      - label: Turn away
+        set: { _seen_mirror_on: true }
+
+  - id: bathroom_readout
+    blocks:
+      - prose: |
+          A helpful readout shows the temperature outside (59 degrees), the weather (rainy, as always), the air quality (below average), and your sleep score (bad).
+    choices:
+      - label: Look away
+
+  # One hint, for the first requirement still missing (the conditions are
+  # exclusive, in this order).
+  - id: apartment_leave_early
+    blocks:
+      - prose: |
+          Not yet. Your lenses are still on the table.
+        requires: { not: has_lenses }
+      - prose: |
+          Not yet. Your handheld's been buzzing on the chair since you woke up.
+        requires: { all: [ has_lenses, { not: _seen_handheld } ] }
+      - prose: |
+          Not yet. You should check yourself in the mirror first, make sure you're presentable.
+        requires: { all: [ has_lenses, _seen_handheld, { not: { all: [ _seen_mirror_off, _seen_mirror_on ] } } ] }
+      - prose: |
+          Not yet. Take a look out the window first, with the lenses on.
+        requires: { all: [ has_lenses, _seen_handheld, _seen_mirror_off, _seen_mirror_on, { not: _seen_ad } ] }
+    choices:
+      - label: Stay
+
+  - id: apartment_leave
+    blocks:
+      - dialogue:
+          speaker: BRAND
+          text: Work to be done.
+    choices:
+      - label: Go to work
+        transition: fade
+        goto_map: reseattle_post_v01

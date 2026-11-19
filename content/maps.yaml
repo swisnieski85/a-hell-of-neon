@@ -1,0 +1,174 @@
+# Maps — one entry per map (different times get different maps). Each
+# top-level key is a map id; a vignette sends the player to one with
+# `goto_map: <id>` on a choice (or node-level goto).
+#
+# Pins:
+#   coords     fractional x/y of the pin's center (w/h optional click box)
+#   portrait   file in assets/portraits/ shown in the pin head
+#   tooltip    hover label (also the accessible name)
+#   requires   optional condition (same language as hotspots) — the pin
+#              only appears once it holds
+#   goto_vignette   where clicking leads; omit while the destination
+#                   doesn't exist yet and the pin shows Coming Soon
+#
+# Map art lives at assets/map/{image}.webp (master: assets/master/map/).
+
+reseattle_post_v01:
+  image: reseattle
+  pins:
+    - id: coroners_office
+      coords: { x: 0.54, y: 0.38 }
+      portrait: wash.webp
+      tooltip: Mercer & Kell Security Combine · Coroner's Office
+      goto_vignette: 02-coroners-office.yaml
+
+reseattle_post_v02:
+  image: reseattle
+  pins:
+    - id: harbor_island
+      coords: { x: 0.32, y: 0.21 }
+      portrait: khalil.webp
+      tooltip: Harbor Island · Container Terminal 12
+      goto_vignette: 03-terminal-12.yaml
+
+# Night One is over — the next stop is home.
+reseattle_post_v03:
+  image: reseattle
+  pins:
+    - id: brands_apartment
+      coords: { x: 0.48, y: 0.52 }
+      portrait: brand_portrait_off.webp
+      tooltip: Ethan Brand's Apartment
+      goto_vignette: 04-brands-apartment.yaml
+
+# ============================================================================
+# THE DAY MAP (Days 2-5) — one map serves the whole mid-game. The slot system
+# is pure data on top of it:
+#   - every case pin requires `{ not: slots_exhausted }`, so spending the
+#     day's slot budget (2/day; 1 on Day 5) wipes the board;
+#   - the go-home pin requires `slots_exhausted`, so it is all that remains
+#     (one per day, since each leads to a different night bookend);
+#   - Day 5 has no home pin at all — the `redirect:` below intercepts the
+#     return to the map once the last slot is spent and routes straight into
+#     the endgame, so the map is simply never seen again.
+# Institutional day-gates use `day_after` (records, subpoenas, appointments);
+# person-gates (Heavy, Shred) deliberately don't — same-day chains are legal.
+# Pin coords are placeholders — spread across the map, adjust freely.
+# ============================================================================
+day_map:
+  image: reseattle
+  redirect:
+    # Endgame dispatch — first match wins. Qualifying (stop-the-push) row
+    # needs the full Autopsy spine + one Echo route; otherwise the update
+    # ships and the confession flag picks the failure cell.
+    - requires:
+        all: [ { day_is: 5 }, slots_exhausted, autopsy2_done, autopsy3_done,
+               { any: [ car_done, heavy2_done ] } ]
+      goto_vignette: 90-finale-server-room.yaml
+    - requires:
+        all: [ { day_is: 5 }, slots_exhausted, confessed ]
+      goto_vignette: 91-ending-tragedy.yaml
+    - requires:
+        all: [ { day_is: 5 }, slots_exhausted ]
+      goto_vignette: 92-ending-nihilism.yaml
+  pins:
+    # --- Day 2's pair — the only pins lit that day; two slots, two pins, so
+    # --- both get played, but the ORDER (Wash first or Rose first) is the
+    # --- player's choice ---
+    - id: autopsy1
+      coords: { x: 0.54, y: 0.38 }
+      portrait: wash.webp
+      tooltip: MKSC HQ · Coroner's Office
+      requires:
+        all: [ { not: autopsy1_done }, { not: slots_exhausted } ]
+      goto_vignette: 05-autopsy-1-results.yaml
+    # --- Autopsy spine (mandatory for the good row; institutional gates) ---
+    - id: autopsy2
+      coords: { x: 0.54, y: 0.38 }
+      portrait: frenk.webp
+      tooltip: MKSC HQ · Records — the wave subpoena
+      requires:
+        all: [ autopsy1_done, { day_after: autopsy1_done },
+               { not: autopsy2_done }, { not: slots_exhausted } ]
+      goto_vignette: 06-autopsy-2-wave-records.yaml
+    # Same day as Autopsy 2 is allowed (Frenk books it from V06's exit), but
+    # never Day 3: Droz's wave and the confession it leads into are on Day 4
+    # night (bookend-d4-night.yaml). The confession waits on Autopsy 3, so a
+    # player who leaves A3 for Day 5 has no window left and never confesses.
+    - id: autopsy3
+      coords: { x: 0.68, y: 0.30 }
+      portrait: droz.webp
+      tooltip: Echo Paradigm · HQ
+      requires:
+        all: [ autopsy2_done, { day_at_least: 4 },
+               { not: autopsy3_done }, { not: slots_exhausted } ]
+      goto_vignette: 07-autopsy-3-stonewall.yaml
+    - id: rose1
+      coords: { x: 0.58, y: 0.44 }
+      portrait: rose.webp
+      tooltip: MKSC HQ · Holding — the woman from the trunk
+      requires:
+        all: [ { not: rose1_done }, { not: slots_exhausted } ]
+      goto_vignette: 13-rose-1-request.yaml
+    # --- Echo routes (need one for the good row) ---
+    - id: corporate_car
+      coords: { x: 0.47, y: 0.43 }
+      portrait: hartigan.webp
+      tooltip: MKSC HQ · Impound — the Echo car
+      requires:
+        all: [ { day_at_least: 3 }, { not: car_done }, { not: slots_exhausted } ]
+      goto_vignette: 08-corporate-car.yaml
+    - id: heavy1
+      coords: { x: 0.30, y: 0.48 }
+      portrait: the-heavy.webp
+      tooltip: The heavy's last known address
+      requires:
+        all: [ facematch_done, { not: heavy1_done }, { not: slots_exhausted } ]
+      goto_vignette: 09-corporate-heavy-1-apartment.yaml
+    - id: heavy2
+      coords: { x: 0.22, y: 0.60 }
+      portrait: the-heavy.webp
+      tooltip: The Sandpiper Motel
+      # Located in Heavy 1 (the seasickness pills: same day), or by Frenk's
+      # wide sweep, which lands overnight (Heavy 1 left without the pills).
+      requires:
+        all: [ { any: [ heavy_located,
+                        { all: [ heavy_search_wide, { day_after: heavy_search_wide } ] } ] },
+               { not: heavy2_done }, { not: slots_exhausted } ]
+      goto_vignette: 10-corporate-heavy-2-motel.yaml
+    # --- Shred (enriching; never required) ---
+    - id: shred1
+      coords: { x: 0.40, y: 0.30 }
+      portrait: wu.webp
+      tooltip: MKSC Detention · Alex Wu, the survivor   # Brand pulled the month's crash files (V11)
+      requires:
+        all: [ { day_at_least: 3 }, { not: shred1_done }, { not: slots_exhausted } ]
+      goto_vignette: 11-shred-1-alex-wu.yaml
+    # Not on Autopsy 2's spot: both can be lit at once (Shred 1 on Day 3,
+    # Autopsy 2 not yet done), and a stacked pin hides the one beneath it.
+    - id: shred2
+      coords: { x: 0.60, y: 0.25 }
+      portrait: wash.webp
+      tooltip: MKSC HQ · Coroner's Office · Wash called
+      requires:
+        all: [ shred1_done, { not: shred2_done }, { not: slots_exhausted } ]
+      goto_vignette: 12-shred-2-wash.yaml
+    # --- Go home (slots spent; one pin per day -> that day's night bookend) ---
+    - id: home_d2
+      coords: { x: 0.48, y: 0.52 }
+      portrait: brand_portrait_off.webp
+      tooltip: Ethan Brand's Apartment
+      requires: { all: [ slots_exhausted, { day_is: 2 } ] }
+      goto_vignette: bookend-d2-night.yaml
+    - id: home_d3
+      coords: { x: 0.48, y: 0.52 }
+      portrait: brand_portrait_off.webp
+      tooltip: Ethan Brand's Apartment
+      requires: { all: [ slots_exhausted, { day_is: 3 } ] }
+      goto_vignette: bookend-d3-night.yaml
+    - id: home_d4
+      coords: { x: 0.48, y: 0.52 }
+      portrait: brand_portrait_off.webp
+      tooltip: Ethan Brand's Apartment
+      requires: { all: [ slots_exhausted, { day_is: 4 } ] }
+      goto_vignette: bookend-d4-night.yaml

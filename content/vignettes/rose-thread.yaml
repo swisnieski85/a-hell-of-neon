@@ -1,0 +1,516 @@
+kind: fragment
+location: Ethan Brand's Apartment
+
+nodes:
+
+  # --- ROUTER: first match wins, top to bottom -----------------------------
+  # (branch entries are goto-only; the engine resolves them without rendering)
+  - id: rose_next
+    branch:
+      - requires: { all: [ rose4_done, { not: rose_aftermath_done } ] }
+        goto: rose_aftermath
+      - requires: confession_declined
+        goto: rose_closed        # repeatable — the column is closed for good
+      # Beat 4 waits on Autopsy 3 (addendum §19): meeting Droz is when Brand
+      # first sees what unresolved guilt can turn a man into. Autopsy 3 can't
+      # run before Day 4, so this also keeps the confession out of the Day 4
+      # morning window. A player who leaves A3 for Day 5 never confesses.
+      - requires: { all: [ rose3_done, autopsy3_done, { not: rose4_done } ] }
+        goto: rose_beat4
+      - requires: { all: [ rose3_done, { not: autopsy3_done } ] }
+        goto: rose_filler        # repeatable "not yet" — never sets a chain flag
+      - requires: { all: [ rose2b_done, { not: rose3_done } ] }
+        goto: rose_beat3
+      - requires: { all: [ rose2a_done, { not: rose2b_done } ] }
+        goto: rose_beat2b
+      - requires: { all: [ rose1_done, { not: rose2a_done } ] }
+        goto: rose_beat2a
+
+  # --- BEAT 2a — sleeping arrangements (MANDATORY, gates sleep) -------------
+  # Purely logistical: where she sleeps, where he sleeps, he takes the floor.
+  # ~40 seconds. None of 2b's friction leaks in here.
+  # PLANT: the commendation on the wall. She sees it. She does not ask.
+  # Does NOT spend the window — 2b stays available tonight. So it must not
+  # end on "goodnight" (that reads as the night being over), and the Rose
+  # hotspots are keep_lit so the marker doesn't dim after it.
+  - id: rose_beat2a
+    stepped: true
+    blocks:
+      - dialogue:
+          speaker: BRAND
+          text: You'll take the bed.
+      - dialogue:
+          speaker: ROSE
+          text: I'm not putting you on the floor in your own home.
+      - dialogue:
+          speaker: BRAND
+          text: You're not. I am.
+      - prose: |
+          You pull the spare blanket out of a cabinet and fold it double on the floor, and that ends the argument. Your jacket will do for a pillow.
+      - prose: |
+          While you're setting it down, she looks around the room: the table, the window, the wall. Her eyes stop on the commendation. She looks at it a moment longer than she needs to. Then she looks away.
+      - dialogue:
+          speaker: BRAND
+          text: Bathroom's through there. I put a clean towel out, and a shirt if you want something to sleep in. It'll be big on you.
+      - dialogue:
+          speaker: ROSE
+          text: Thank you.
+      - dialogue:
+          speaker: BRAND
+          text: If you need anything in the night, say so. I sleep light.
+      - dialogue:
+          speaker: ROSE
+          text: All right, Mr. Brand.
+      - prose: |
+          Mr. Brand. Nobody's called you that in years. You let it stand.
+    choices:
+      - label: Step back
+        set: { rose2a_done: true }
+
+  # --- BEAT 2b — why she's uneasy (OPTIONAL, the real beat) ----------------
+  # Brand asks a question ABOUT HER (which he has done exactly never). Her
+  # anxiety is NOT about danger — it's that it is WRONG ANYWAY, a category
+  # Brand does not have: he thinks in harm; she thinks in what a thing IS.
+  # This is the SEED OF THE CONFESSION. He files it away, uncomprehending;
+  # it detonates two days later.
+  # CRITICAL: the scene does NOT endorse Brand's read; no reassurance
+  # resolution; she must NOT be able to explain it well. The inarticulacy IS
+  # the point.
+  - id: rose_beat2b
+    stepped: true
+    blocks:
+      - prose: |
+          Her posture is stiff. It isn't fear; you know what fear looks like on people, you've caused enough of it. But it's close. She asked for this arrangement, and something about it bothers her anyway, and you can't work out what.
+      - dialogue:
+          speaker: BRAND
+          text: Can I ask you something?
+      - prose: |
+          She looks up, surprised. It occurs to you that you have asked her questions about an abduction, a car, a locked door, and never once about her.
+      - dialogue:
+          speaker: ROSE
+          text: Of course.
+      - dialogue:
+          speaker: BRAND
+          text: This arrangement. I can tell you're not comfortable with it. Is it me?
+      - prose: |
+          She's quiet for a moment. Her hands find each other in her lap.
+      - dialogue:
+          speaker: ROSE
+          text: No. It's not you. Not exactly.
+      - dialogue:
+          speaker: BRAND
+          text: Okay. So what is it?
+      - dialogue:
+          speaker: ROSE
+          text: |
+            It's... I'm not married, and I'm sleeping in a man's apartment.
+      - dialogue:
+          speaker: BRAND
+          text: |
+            Lots of people do that.
+      - dialogue:
+          speaker: ROSE
+          text: |
+            Not me.
+      - dialogue:
+          speaker: BRAND
+          text: |
+            Is it a reputation thing? No one knows you're here but Frenk. And trust me, he doesn't care.
+      - dialogue:
+          speaker: ROSE
+          text: |
+            That's not it.
+      - prose: |
+          She looks at her hands.
+      - dialogue:
+          speaker: ROSE
+          text: |
+            It's just not right. I know it's necessary, and I'm grateful you took me in when you didn't have to. But it's still not right, and I'm just a little uncomfortable, is all.
+      - dialogue:
+          speaker: BRAND
+          text: That's... old-fashioned.
+      - dialogue:
+          speaker: ROSE
+          text: I know.
+      - prose: |
+          Old-fashioned. Quaint, even. People in this city take Shred for the high, even knowing some of them will crash out and hurt someone. They pay Echo Paradigm to put feelings straight into their heads, and this week SUBSTRATE starts selling grief and fear too. For the right price, a sugar cell will give you an hour with a woman (or a man, or something else) who isn't there.
+      - prose: |
+          And she's uncomfortable sleeping in your bed while you sleep on the floor.
+    choices:
+      - label: Continue
+        set: { rose2b_done: true, _rose_window_spent: true }
+
+  # --- BEAT 3 — the commendation (OPTIONAL) --------------------------------
+  # Motive: REPAIR. She reaches for something warm: the commendation she saw.
+  # He tells the REHEARSED story — all of it true, none of it the whole.
+  # SHE BELIEVES HIM. She is kind. He does not correct her. END ON SILENCE
+  # after she says something kind.
+  - id: rose_beat3
+    stepped: true
+    blocks:
+      - prose: |
+          She keeps almost saying something. When she finally does, she asks gently.
+      - dialogue:
+          speaker: ROSE
+          text: |
+            Can I ask about the plaque? The commendation. I saw it the first night. I keep wondering about it.
+      - prose: |
+          You've told this story for eighteen years. You don't have to think about the words.
+      - dialogue:
+          speaker: BRAND
+          text: |
+            The war. The enemy held a hospital — they'd put anti-aircraft batteries on the roof. Figured nobody bombs a hospital. My unit was sent in to take the batteries down.
+      - dialogue:
+          speaker: BRAND
+          text: |
+            It went bad. I was the only one who made it. I finished the job and held it until extraction came.
+      - dialogue:
+          speaker: ROSE
+          text: Your whole unit?
+      - dialogue:
+          speaker: BRAND
+          text: All of them.
+      - prose: |
+          It's all true. You've told it to a board of review, to other soldiers, to a journalist once. It has never cost you anything to tell. It just leaves out what happened after.
+      - prose: |
+          She listens closely, still and quiet.
+      - dialogue:
+          speaker: ROSE
+          text: |
+            I'm so sorry. All of them — I can't imagine it.
+      - dialogue:
+          speaker: ROSE
+          text: |
+            You know, it makes sense to me now. That it was you who came for me. Most people wouldn't have. You're the kind that does. I'm glad it was you.
+      - prose: |
+          She smiles at you openly. She believes all of it.
+      - prose: |
+          You could correct her. You don't.
+    choices:
+      - label: "..."
+        set: { rose3_done: true, _rose_window_spent: true }
+
+  # --- PRE-CONFESSION FILLER (repeatable; sets no chain flag) --------------
+  # Fires when Beat 3 is done but Autopsy 3 is not. Reads as NOT YET, never
+  # NOTHING HERE. No anecdote specifics, no first-time markers — must survive
+  # being seen twice (Day 4 morning, and again if A3 is still undone).
+  - id: rose_filler
+    blocks:
+      - prose: |
+          She talks more easily than she used to, about nothing much. You say very little back, and she keeps talking anyway.
+      - prose: |
+          Twice, you almost tell her. The hospital. The room on the fifth floor. You could say it now. You know exactly how it would go.
+      - prose: |
+          She sees something change in your face. She waits, and when the moment passes, she goes back to what she was talking about.
+      - prose: |
+          Not yet. You don't know what you're waiting for. Only that you're waiting.
+    choices:
+      - label: Continue
+        set: { _rose_window_spent: true }
+
+  # --- BEAT 4 — the confession (chain-gated on 2b+3, flag-gated on Autopsy 3)
+  # A RETRACTION of Beat 3 — the commendation retold, corrected. (No reference
+  # to Droz's team: Brand hasn't seen anything about them yet.) Rose: monstrously
+  # evil, and not held against him; the spaghetti tangle; the confessor.
+  # Opens on "the quietest part of the night" — reads as late night OR as a
+  # conversation that has been waiting all night, per the two windows.
+  # THE FORK (addendum §9): the opener brings him to the edge and stops. The
+  # choice is the column. Both labels are plain on purpose — the player must
+  # know what they are choosing; "Say nothing" is not a "not yet."
+  - id: rose_beat4
+    stepped: true
+    blocks:
+      - prose: |
+          It's the quietest part of the night. The vidscreens across the light-well are dark, and the trains have stopped running. There's only the rain. She's awake. You knew she would be.
+      - prose: |
+          You sit down across from her. Your eyes flick to the commendation on the wall, and guilt flares in your chest. You don't know how to start, or even if you should.
+    choices:
+      - label: Tell her the truth
+        goto: rose_beat4_confess
+      - label: Say nothing
+        goto: rose_beat4_withhold
+
+  # --- BEAT 4, declined — the window closes for good -----------------------
+  # Short. No narration of what was lost; the player chose it and knows.
+  # She notices and does not push — correct here, unlike Beat 3: he has
+  # closed the door himself, and pushing would make her his confessor by force.
+  - id: rose_beat4_withhold
+    stepped: true
+    blocks:
+      - prose: |
+          You open your mouth to say it.
+      - dialogue:
+          speaker: BRAND
+          text: It's late. You should get some sleep.
+      - prose: |
+          She looks at you a moment longer. Then she nods.
+      - dialogue:
+          speaker: ROSE
+          text: Good night.
+    choices:
+      - label: Good night
+        set: { confession_declined: true, _rose_window_spent: true }
+
+  # --- AFTER THE DECLINE (repeatable; sets no chain flag) -------------------
+  # Only reachable at Day 5 dawn after a Day 4 night decline (Beat 4 can't
+  # fire earlier than Day 4 night, and nothing follows Day 5 dawn). Must read
+  # as CLOSED — the inverse of the filler's "not yet." Her own life, his
+  # small talk, nothing underneath.
+  - id: rose_closed
+    blocks:
+      - prose: |
+          She tells you the landlord finally called back. He's putting a man on the door, and she's going home tomorrow. You say something about the rain.
+    choices:
+      - label: Continue
+        set: { _rose_window_spent: true }
+
+  # --- BEAT 4, told ---------------------------------------------------------
+  - id: rose_beat4_confess
+    stepped: true
+    blocks:
+      - dialogue:
+          speaker: BRAND
+          text: That story I told you. About the commendation.
+      - prose: |
+          She sets down her handheld and folds her hands together, and waits. As if she has known this conversation was coming.
+      - dialogue:
+          speaker: ROSE
+          text: Okay.
+      - dialogue:
+          speaker: BRAND
+          text: |
+            Everything I told you was true. The hospital, the batteries, my unit. It's just not all of it.
+      - dialogue:
+          speaker: BRAND
+          text: |
+            When it was done — the batteries down, extraction called — control asked me how many for pickup. I looked at the door to the stairwell and I said: one. Because the rest had died fighting. Farrah, Conlan, Bennet. They were all dead. They were my friends, the closest friends I'd ever had, and they were all dead.
+      - prose: |
+          She's still listening.
+      - dialogue:
+          speaker: BRAND
+          text: |
+            There were people on the fifth floor. Their soldiers. Five of them, wounded, one dying already. A medic with them, a woman. Nobody had a weapon. They were out of the war. The woman just stood up and put her arms out. Like this.
+      - prose: |
+          Your bad hand aches. You've never said the next part out loud.
+      - dialogue:
+          speaker: BRAND
+          text: I killed them. All of them.
+      - prose: |
+          Her eyes are wet.
+      - dialogue:
+          speaker: BRAND
+          text: |
+            I was hurting, you understand. And in that moment all I wanted to do was hurt someone else. That's not an excuse, it's just...
+      - prose: |
+          You're quiet for a moment, shaking your head. You can't bear to look at her anymore.
+      - dialogue:
+          speaker: BRAND
+          text: |
+            I told myself they were going to die anyway. But I didn't know that.
+      - dialogue:
+          speaker: BRAND
+          text: |
+            And here you are, uneasy about sleeping in my bed because it isn't right. And I killed six people and spent eighteen years doing everything I can not to think about it.
+      - dialogue:
+          speaker: BRAND
+          text: |
+            I'm not asking you for anything. I just needed one person alive to know the truth.
+      - prose: |
+          You look up at her. She's looking right at you, the same as before. For eighteen years you've expected whoever heard this to look at you with horror.
+      - dialogue:
+          speaker: ROSE
+          text: What you did was evil.
+      - prose: |
+          She says it plainly, without cruelty, as a fact.
+      - dialogue:
+          speaker: ROSE
+          text: |
+            But it isn't the whole truth. I don't believe that, and I won't. People aren't just one thing, Mr. Brand. Everyone I've ever known is a tangle — like spaghetti, strands of light and strands of dark all knotted together. And the work of life is pulling the one from the other. The same man who killed six people also saved me from the trunk of a kidnapper's car, and gave me a place to stay when I couldn't go home.
+      - dialogue:
+          speaker: ROSE
+          text: |
+            There's a priest who hears my confessions. You could go to him. You don't have to say yes, and you don't have to say anything to me. But you've carried this alone the whole time, and that part can be over. You don't have to be alone with it anymore.
+      - prose: |
+          You can't speak. She sees that.
+      - dialogue:
+          speaker: ROSE
+          text: Thank you for telling me.
+      - prose: |
+          The rain keeps on against the light-well. For the first time in eighteen years, someone else knows.
+    choices:
+      - label: "..."
+        set: { rose4_done: true, confessed: true, _rose_window_spent: true }
+
+  # --- THE AFTERMATH (NOT boilerplate — the payoff; a REAL scene) ----------
+  # The morning after Brand told her the worst thing about himself. Reachable
+  # only if the confession fired Day 4 night (the Day 5 dawn window hosts it).
+  # The payoff is normalcy: she is exactly the same, on purpose, and he
+  # understands that as the message it is.
+  # Fires from a hotspot AFTER the Day 5 dawn bookend's own wake node, so it
+  # recalls the waking in past tense instead of waking him a second time.
+  - id: rose_aftermath
+    stepped: true
+    blocks:
+      - prose: |
+          When you woke this morning, for a moment you didn't remember. Then you did, all of it, and you lay still on the floor and waited to find out whether she would look at you with horror, or disgust, or fear, or pity. Waited to find out what that confession would cost you.
+      - prose: |
+          Nothing, it seems. She's at the kitchenette, fighting with your coffee maker.
+      - dialogue:
+          speaker: ROSE
+          text: Your machine hates me. I did nothing to it. It knows I'm a guest and it hates me.
+      - prose: |
+          She hands you a cup and looks you in the eye, the same way she did before you told her.
+      - dialogue:
+          speaker: ROSE
+          text: I'm sorry. It's terrible, but it's the best I could do.
+      - dialogue:
+          speaker: BRAND
+          text: Uhh... thanks.
+      - prose: |
+          She takes her own cup to the table and sits down by the window.
+      - dialogue:
+          speaker: ROSE
+          text: |
+            And if you ever want to meet him — my confessor — I'll walk you there myself. Whenever you have free time. Whenever this is all over.
+      - dialogue:
+          speaker: BRAND
+          text: When this is over.
+      - prose: |
+          You mean it. You haven't planned for after anything in a long time.
+      - prose: |
+          The coffee is terrible, but you drink it down, anyway.
+    choices:
+      - label: Continue
+        set: { rose_aftermath_done: true, _rose_window_spent: true }
+
+  # --- WHY SHE WAS PICKED (addendum §13) -----------------------------------
+  # Its own bookend hotspot (D4 dawn, D4 night, D5 dawn), shown after the
+  # window's scheduled beat; available until used. Two options: everything,
+  # or leave out the watching. Flags: rose_why_done + rose_why_told_all /
+  # rose_why_told_part.
+  # Opened by its own bookend hotspot after the window's scheduled beat.
+  # Timing-neutral: dawn or night.
+  - id: rose_why
+    stepped: true
+    blocks:
+      - prose: |
+          There's one more thing. You've been putting it off since the motel.
+      - dialogue:
+          speaker: BRAND
+          text: In holding, you asked me why they took you.
+      - dialogue:
+          speaker: ROSE
+          text: You said you didn't know yet.
+      - dialogue:
+          speaker: BRAND
+          text: I know now.
+      - prose: |
+          She waits.
+    choices:
+      - label: Tell her everything
+        goto: rose_why_all
+      - label: Tell her, but leave out the watching
+        goto: rose_why_part
+
+  - id: rose_why_all
+    stepped: true
+    blocks:
+      - dialogue:
+          speaker: BRAND
+          text: |
+            I found the man who took you. Somebody hired him. They wanted a person nobody would come looking for.
+      - dialogue:
+          speaker: BRAND
+          text: |
+            You don't have an implant. You're not in the layer. No records, nobody keeping track of you. And you're young. That's all it was.
+      - prose: |
+          She takes that in.
+      - dialogue:
+          speaker: BRAND
+          text: |
+            The man they were handing you to had an implant. The people who hired him were going to watch it happen through his eyes.
+      - prose: |
+          For a moment she doesn't move at all.
+      - dialogue:
+          speaker: ROSE
+          text: Watch.
+      - dialogue:
+          speaker: BRAND
+          text: Yes.
+      - prose: |
+          She gets up and goes to the window. When she speaks, she's angry, and she keeps her voice down.
+      - dialogue:
+          speaker: ROSE
+          text: |
+            I never let anyone put anything in my head. I wanted to see the world the way it is. And that's why they picked me.
+    choices:
+      - label: ">>>"
+        set: { rose_why_told_all: true }
+        goto: rose_why_rest
+
+  # The Beat 3 lie again: every word true, the worst part left out.
+  - id: rose_why_part
+    stepped: true
+    blocks:
+      - dialogue:
+          speaker: BRAND
+          text: |
+            I found the man who took you. Somebody hired him. They wanted a person nobody would come looking for.
+      - dialogue:
+          speaker: BRAND
+          text: |
+            You don't have an implant. You're not in the layer. No records, nobody keeping track of you. And you're young. That's all it was.
+      - prose: |
+          You decide not to tell her the rest.
+      - prose: |
+          She looks at you a moment, like she's waiting for more. Then she looks down at her hands.
+      - dialogue:
+          speaker: ROSE
+          text: Because I'm harder to track.
+      - dialogue:
+          speaker: BRAND
+          text: Yes.
+    choices:
+      - label: ">>>"
+        set: { rose_why_told_part: true }
+        goto: rose_why_rest
+
+  # Shared by both tellings: Rose as herself, not as his confessor.
+  - id: rose_why_rest
+    stepped: true
+    blocks:
+      - dialogue:
+          speaker: ROSE
+          text: Somebody would have come looking, though.
+      - dialogue:
+          speaker: ROSE
+          text: |
+            There's a woman at my church who calls me if I miss a Sunday. I rang her Monday, from the store on the corner. She'd already called three hospitals.
+      - dialogue:
+          speaker: ROSE
+          text: They wouldn't have found me. But they looked.
+      - prose: |
+          None of that is in the layer. The man who took her couldn't have known it. Neither could you.
+      - dialogue:
+          speaker: BRAND
+          text: You could get an ID, at least. Something on file.
+      - dialogue:
+          speaker: ROSE
+          text: No.
+      - dialogue:
+          speaker: ROSE
+          text: I'm not changing how I live because of them.
+      - prose: |
+          Then, after a while:
+      - dialogue:
+          speaker: ROSE
+          text: Are they going to do it to someone else?
+      - dialogue:
+          speaker: BRAND
+          text: I don't know.
+      - dialogue:
+          speaker: ROSE
+          text: Then find out.
+    choices:
+      - label: "..."
+        set: { rose_why_done: true }
