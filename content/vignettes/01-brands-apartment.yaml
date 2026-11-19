@@ -153,7 +153,7 @@ nodes:
   - id: tv
     blocks:
       - prose: |
-          ReSeattle Health Cooperative confirms 211 deaths attributed to the stimulant colloquially known as Shred in the past twelve months, more than triple the prior year's count. A spokesman urges residents to report symptoms of acute dissociative episodes and reminds viewers that Immersion diagnostics can be scheduled through any Echo Paradigm kiosk.
+          "ReSeattle Health Cooperative confirms 211 deaths attributed to the stimulant colloquially known as Shred in the past twelve months, more than triple the prior year's count. A spokesman urges residents to report symptoms of acute dissociative episodes and reminds viewers that Immersion diagnostics can be scheduled through any Echo Paradigm kiosk."
     choices:
       - label: Ignore it
 
@@ -179,7 +179,7 @@ nodes:
       - dialogue:
           speaker: FRENK
           text: |
-            harbor island container terminal 12. tonight, around midnight. ur old pal Khalil, moving something. i dunno what or to who
+            harbor island container terminal 12. tonight, around midnight. ur old pal khalil, moving something. i dunno what or to who
       - prose: |
           You've been chasing Shred for four months and never once have you gotten within two people of a supplier. Khalil's a runner. Khalil talks to someone.
       - prose: |
@@ -261,7 +261,7 @@ nodes:
           Not yet. Your lenses are still on the table.
         requires: { not: has_lenses }
       - prose: |
-          Not yet. Your handheld's been buzzing on the chair since you woke up.
+          Not yet. Your handheld's been buzzing on the table since you woke up.
         requires: { all: [ has_lenses, { not: _seen_handheld } ] }
       - prose: |
           Not yet. You should check yourself in the mirror first, make sure you're presentable.

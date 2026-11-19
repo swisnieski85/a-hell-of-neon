@@ -69,6 +69,11 @@ was read before it is cleared, so the next node starts a fresh transcript and
 fades in slowly. V90 uses one between Droz's gunshot and the hospital. A
 blackout node usually has no blocks, just a `>>>` choice.
 
+A node with `bare_eyed: true` is drawn as if the lenses were off (the `-off`
+art, portraits and palette) even when the player is wearing them, and the
+lens toggle is inert while it is open. V90 uses it for the server room after
+the generator is shot, and through the blackout that follows.
+
 A node can also set the status bar's `location:`, `date:` and `time:` while
 it is open, for a vignette that moves somewhere else partway through (V90's
 hospital and empty-apartment codas). Anything a node leaves out comes from the

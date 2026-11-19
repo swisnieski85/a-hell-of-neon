@@ -43,7 +43,7 @@ nodes:
       - dialogue:
           speaker: FRENK
           text: |
-            good enough. ill call in the morning
+            good enough. ill call in a few
     choices:
       - label: Put down the handheld
         set: { suspect_droz: true }

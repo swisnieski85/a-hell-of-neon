@@ -12,9 +12,12 @@ const $ = (id) => document.getElementById(id);
 
 const SCREENS = ['screen-title', 'screen-vignette', 'screen-map', 'screen-end'];
 
-export function applyLensClass() {
-  document.body.classList.toggle('lenses-on', !!(S.state && S.state.lenses_worn));
-  document.body.classList.toggle('lenses-off', !(S.state && S.state.lenses_worn));
+// `bareEyed`: draw the bare-eyed palette even with the lenses worn (a node
+// with `bare_eyed: true`, e.g. V90 after the generator is shot).
+export function applyLensClass(bareEyed = false) {
+  const worn = !!(S.state && S.state.lenses_worn) && !bareEyed;
+  document.body.classList.toggle('lenses-on', worn);
+  document.body.classList.toggle('lenses-off', !worn);
 }
 
 export function showScreen(name) {
@@ -93,7 +96,7 @@ export function updateStatusBar(vignette, node = null) {
 
   const has = !!S.state.flags.has_lenses;
   const worn = !!S.state.lenses_worn;
-  const locked = vignette.lens_toggle === 'locked';
+  const locked = vignette.lens_toggle === 'locked' || !!(node && node.bare_eyed);
   icon.src = worn ? 'assets/icons/brand_icon_on.png' : 'assets/icons/brand_icon_off.png';
   const live = has && !locked;
   toggle.classList.toggle('inert', !live);

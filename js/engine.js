@@ -374,6 +374,7 @@ export function renderCurrent() {
     S.save();
   }
   syncAmbient(ambientFor(v, node));
+  UI.applyLensClass(!!(node && node.bare_eyed));
   // Blackout nodes (blackout: true) take the screen to black; see renderNode.
   $('screen-vignette').classList.toggle('blackout', !!(node && node.blackout));
   UI.updateStatusBar(v, node);
@@ -562,10 +563,14 @@ function renderNode(v, node) {
   // A node can also name its own art (image: <base>, in any vignette kind):
   // shown alone, with no hotspots, while the node is open — e.g. the endings'
   // codas, which leave the scene they started in.
+  // `bare_eyed: true` draws the node as if the lenses were off, whatever the
+  // player is wearing, and the toggle goes inert (V90: the room after the
+  // generator dies has no color left in it).
+  const worn = st.lenses_worn && !node.bare_eyed;
   if (node.blackout) {
     // leave the art as it is; CSS fades it (and the transcript) to black
   } else if (node.image) {
-    renderNodeImage(node.image);
+    renderNodeImage(node.image, worn);
   } else if (v.kind === 'location' && !node.hide_scene && (st.scene || v.entry_scene)) {
     renderSceneBox(v, true, st.scene || v.entry_scene, !st.scene);
   } else {
@@ -602,7 +607,7 @@ function renderNode(v, node) {
   cur.innerHTML = '';
   const shown = stepped ? blocks.slice(0, stepIndex + 1) : blocks;
   shown.forEach((block, i) => {
-    const el = R.blockEl(block, st.lenses_worn);
+    const el = R.blockEl(block, worn);
     if (stepped && i === stepIndex && animateLast) {
       el.classList.add('reveal');
       // A block's sfx fires once, at the ">>>" reveal that lands it — not on
@@ -732,15 +737,14 @@ function ambientFor(v, node) {
 
 // A node's own art (node-level `image:`): the -off/-on pair for that base,
 // no hotspots.
-async function renderNodeImage(base) {
-  const st = S.state;
+async function renderNodeImage(base, worn = S.state.lenses_worn) {
   const token = ++artToken;
   setSceneShown(true);
   const pair = await R.resolveScenePair(base);
   if (token !== artToken) return; // a newer render took over
-  const url = st.lenses_worn ? pair.on : pair.off;
+  const url = worn ? pair.on : pair.off;
   $('scene-image').classList.toggle('shared-art', !!url && pair.off === pair.on);
-  R.fillImageBox($('scene-image'), url, `${base} — lenses ${st.lenses_worn ? 'on' : 'off'}`,
+  R.fillImageBox($('scene-image'), url, `${base} — lenses ${worn ? 'on' : 'off'}`,
     'placeholder — real art lands at the same fractional coords');
   $('hotspot-layer').innerHTML = '';
 }
@@ -886,6 +890,8 @@ export function toggleLenses() {
   if (!v || v.kind !== 'location') return;
   if (v.lens_toggle === 'locked') return;
   if (!st.flags.has_lenses) return;
+  const open = st.node ? nodeById(v, st.node) : null;
+  if (open && open.bare_eyed) return;
 
   st.lenses_worn = !st.lenses_worn;
   st.lens_hint_done = true; // the first-use cue has done its job

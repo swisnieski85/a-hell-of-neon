@@ -4,7 +4,12 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and adheres to [Semantic Versioning](https://www.semver.org/).
 
-## \[1.0.0] - 2026-11-19 — Initial Release
+## \[1.0.1] - 2026-11-19
+
+### Fixed
+* Numerous small corrections throughout.
+
+## \[1.0.0] - 2026-11-19 - Initial Release
 
 First public release of **A Hell of Neon**, a browser-only narrative game.
 Vanilla HTML/CSS/JavaScript with no build step and no backend; the only

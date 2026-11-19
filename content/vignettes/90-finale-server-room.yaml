@@ -315,15 +315,19 @@ nodes:
       - label: ">>>"
         goto: finale_dark
 
+  # The room drawn bare-eyed whether or not the lenses are in: with the
+  # power gone, there's no color left. Carried through the blackout so the
+  # palette doesn't flip back while the screen fades.
   - id: finale_dark
     ambient: []
     image: 90-server-room-dark
+    bare_eyed: true
     stepped: true
     blocks:
       - prose: |
           Every rack in the room goes dark at once. Over the doorway, the countdown goes out at 00:36:51.
       - prose: |
-          Droz hasn't moved. He looks at the generator, and then at you. Your gun is pointed at the floor.
+          Droz looks at the generator, and then at you. Your gun is pointed at the floor.
     choices:
       - label: ">>>"
         sfx: gunshot
@@ -332,6 +336,7 @@ nodes:
   # The gunshot, then dark. A beat, a click, and the hospital fades in.
   - id: finale_blackout
     blackout: true
+    bare_eyed: true
     ambient: []
     choices:
       - label: ">>>"
