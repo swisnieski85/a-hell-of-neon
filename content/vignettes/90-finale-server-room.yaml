@@ -232,10 +232,40 @@ nodes:
       - dialogue:
           speaker: BRAND
           text: How?
+      # The answers to the case: Shred was theirs, Rose was theirs, and
+      # Ostrowski was the test of Wormwood.
       - dialogue:
           speaker: DROZ
           text: |
-            The Shred crashouts gave us the telemetry. Dozens of them, all with Immersion implants. We know what a brain does on the way down, and we know how to send it there. Ostrowski was the test. He just never knew. In half an hour, everyone else gets the release.
+            Shred. Most people who take it just get high. A few crash. Every one of them has an implant, and every implant reports back to Echo. To us.
+      - dialogue:
+          speaker: DROZ
+          text: So we made sure there was plenty of Shred.
+      - prose: |
+          Four months you've been looking for whoever was supplying it. He's standing in front of you.
+      - dialogue:
+          speaker: DROZ
+          text: |
+            Hundreds of crashes, this past year. We know what a brain does on the way down now, and we know how to send it there.
+      - dialogue:
+          speaker: BRAND
+          text: And the woman in the trunk of your car?
+      - dialogue:
+          speaker: DROZ
+          text: |
+            A crash is fast. Nobody crashing takes his time, and nobody crashing knows what he's doing. That left holes in the data. We needed someone awake for it, start to finish.
+      - dialogue:
+          speaker: DROZ
+          text: Our driver picked her. Khalil was supposed to do the rest, and we'd have been watching.
+      - dialogue:
+          speaker: BRAND
+          text: Her name is Rose.
+      - prose: |
+          He nods.
+      - dialogue:
+          speaker: DROZ
+          text: |
+            Ostrowski was the test. We sent Wormwood to one man first, to see if it worked. He never knew. In half an hour, everyone else gets it.
       - dialogue:
           speaker: BRAND
           text: Why? Why are you doing this?
@@ -361,7 +391,7 @@ nodes:
           The room is already paid for. Nobody will tell you by whom.
         requires: { not: car_done }
       - prose: |
-          The news says there was a small fire on the thirty-eighth floor of Echo Paradigm's headquarters on Wednesday morning, and no one was hurt. SUBSTRATE 43.0 went out at noon, on schedule. People say they like it.
+          The news says there was a small fire on the thirty-eighth floor of Echo Paradigm's headquarters on Wednesday morning, and no one was hurt. SUBSTRATE 43.0's release was delayed indefinitely due to technical difficulties caused by the fire, to the disappointment of the city.
       # rose_why (addendum §13): how much he told her about why she was taken.
       - prose: |
           She told you to find out whether they'd do it to someone else. You can tell her now. They won't.
@@ -495,6 +525,8 @@ nodes:
       # missing is what was never said between them.
       - prose: |
           Her list is gone from the table. In its place there's a note in the same small, neat hand: The landlord came through a day early. Thank you for everything. Rose.
+      - prose: |
+          You are, again, alone.
     choices:
       - label: End
         goto_screen: end

@@ -4,6 +4,14 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and adheres to [Semantic Versioning](https://www.semver.org/).
 
+## \[1.0.2] - 2026-11-19
+
+### Added
+* Dialogue clarification for certain storylines added to one ending.
+
+### Changed
+* Some minor dialogue cleaning.
+
 ## \[1.0.1] - 2026-11-19
 
 ### Fixed
