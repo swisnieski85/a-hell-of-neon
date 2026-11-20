@@ -1,21 +1,20 @@
 # The four endings, in the order the title screen shows them. Each ending's
 # End choice carries `ending: <id>`; reaching the end card records it, and
 # the title screen's row (hidden until the first ending) fills that box.
-# Descriptions are placeholders.
 
 endings:
   - id: redemption
     name: REDEMPTION
-    description: He told her. He stopped it. He lived.
+    description: The hard part is letting go.
 
   - id: quietism
     name: QUIETISM
-    description: He stopped it the way he knows how. She's gone.
+    description: People don't change. Not really.
 
   - id: tragedy
     name: TRAGEDY
-    description: He told her. It came anyway. He stayed.
+    description: There are worse ways to go.
 
   - id: nihilism
     name: NIHILISM
-    description: He never told her, and never got close. He went to the garage.
+    description: Curse God and die.

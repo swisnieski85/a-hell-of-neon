@@ -138,7 +138,7 @@ nodes:
     choices:
       - label: Look away
 
-  # ---------- The door (the way to Nihilism's ending) ----------
+  # ---------- The door (the way to Nihilism) ----------
   - id: tragedy_door
     stepped: true
     blocks:
@@ -151,8 +151,9 @@ nodes:
         goto: tragedy_leave
       - label: Step back
 
-  # Nihilism's ending, reached from inside Tragedy, with one difference: he
-  # shuts the door on her. Do not narrate the verdict.
+  # A confessed Brand who leaves her gets Nihilism (addendum §25). The garage
+  # matches 92's nihilism_garage; keep their closing lines in step. Do not
+  # narrate the verdict.
   - id: tragedy_leave
     stepped: true
     blocks:
@@ -179,19 +180,23 @@ nodes:
       - prose: |
           The stairwell is full of smoke. Every step down pulls at the wound. On the second-floor landing, the man in the undershirt sits against the wall, laughing, his hands red to the wrists.
       - prose: |
-          It can't touch you. For once in your life, the old injury is worth something. You're the only clear head in the building, and you have a gun.
+          The garage is quiet. You get the car door open and drop in behind the wheel. The pistol goes in your lap.
       - prose: |
-          There are two million of them.
+          The seat under you is wet. Your hands have gone cold. It takes you two tries to start the car.
       - prose: |
-          The garage is quiet. You get in the car, start it, and hit the opener.
+          You hit the opener. The door starts to go up. Light comes in under it, and smoke, and the sound of the street.
       - prose: |
-          The door starts to go up. Light comes in under it, and smoke, and the sound of the street.
+          There's a man out there in some kind of uniform, hunched over another, working at him with a box cutter. He looks up and sees you.
       - prose: |
-          There's a man there in some kind of uniform, hunched over another, working at him with a box cutter. He looks up at you, and sees you.
+          You reach for the pistol in your lap. Your fingers slide off the grip.
+      - prose: |
+          He gets up and comes toward the car, smiling.
+      - prose: |
+          He tries the handle.
     choices:
       - label: End
         goto_screen: end
-        ending: tragedy
+        ending: nihilism
 
   # ---------- Staying ----------
   # She has an answer to the end, and it isn't his. No quoted prayer: she

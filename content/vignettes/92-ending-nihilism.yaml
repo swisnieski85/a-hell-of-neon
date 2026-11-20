@@ -7,7 +7,8 @@ opening_node: nihilism_street
 nodes:
   # ---------- Noon, on the street ----------
   # The same noon as Tragedy (the billboard, the quiet minutes, the polite
-  # man), but the knife goes into someone else, and Brand has one action.
+  # man). The knife goes into a stranger first, then into Brand. He gets one
+  # action, and it doesn't save him from the wound.
   - id: nihilism_street
     ambient: [ rain-outside ]
     stepped: true
@@ -34,8 +35,7 @@ nodes:
       - prose: |
           The man in the raincoat lets the woman down onto the pavement, carefully, and looks up at you. He starts toward you, still smiling.
     choices:
-      # The unconfessed column gets no real choice (addendum §15): one forced
-      # action, the counterpart to Tragedy's open choice.
+      # Unconfessed players get one forced action here (addendum §15).
       - label: Draw your pistol
         goto: nihilism_draw
 
@@ -44,32 +44,37 @@ nodes:
     stepped: true
     blocks:
       - prose: |
-          You draw and fire, twice. He goes down on the wet pavement and stays there.
+          He's faster than you. Your gun is halfway out when the knife goes in under your ribs. He takes your shoulder with his other hand to hold you steady, and watches your face.
+      - prose: |
+          You fire twice into his chest. He goes down on the wet pavement and stays there.
       - prose: |
           Your hands are steady. They always are, for this.
       - prose: |
-          The woman he stabbed is lying on her side by the shelter. You step around her.
+          You press a hand to the wound. Blood runs out between your fingers. The woman he stabbed first is lying on her side by the shelter. You step around her.
       - prose: |
           You get the street door open and shut it behind you. The lobby is empty. Somewhere upstairs, a door bangs, and someone is running.
       - prose: |
           The stairs go up to your apartment, and down to the garage.
       - prose: |
-          Rose is up there. Four flights. You could be at the door in a minute.
+          Rose is up there. Four flights.
       - prose: |
-          And then what? Sit on the floor with her and wait for whoever comes through it?
+          And then what? Sit on the floor with her and bleed, and wait for whoever comes through the door?
       - prose: |
           She has a lock on the door. She's smarter than you are. She'll keep it shut.
       - prose: |
-          Down there, you can do something. You've always been able to do something.
+          The car is one flight down.
       - prose: |
           You go down.
     choices:
       - label: ">>>"
         goto: nihilism_garage
 
-  # ---------- The garage (matches Tragedy's garage) ----------
+  # ---------- The garage ----------
+  # A confessed Brand who leaves Rose plays the same garage from inside
+  # Tragedy (91, tragedy_garage); keep the closing lines of the two in step.
   # Every payoff line is knowledge that does not help. Keep them flat; do not
-  # narrate the verdict.
+  # narrate the verdict. The last line rhymes with Tragedy's: someone tries
+  # the handle, and here he is alone.
   - id: nihilism_garage
     image: 92-garage
     location: Ethan Brand's Building · Garage
@@ -78,7 +83,9 @@ nodes:
     stepped: true
     blocks:
       - prose: |
-          The garage is quiet. You get in the car and sit with the pistol in your lap.
+          Every step down pulls at the wound. You keep one hand on the rail and the other pressed to your side.
+      - prose: |
+          The garage is quiet. You get the car door open and drop in behind the wheel. The pistol goes in your lap.
       # car_done: the operator ID, never followed.
       - prose: |
           The operator ID from the impound is still written down in your jacket pocket. 8169-au24-11y6-z0hm. You never got any further with it.
@@ -104,15 +111,17 @@ nodes:
           Wash is out there somewhere, with one of these in his head. The last time you saw him, he was reaching for the bottle before the door closed behind you.
         requires: { all: [ shred2_done, { not: stayed_with_wash } ] }
       - prose: |
-          It can't touch you. For once in your life, the old injury is worth something. You're the only clear head in the building, and you have a gun.
+          The seat under you is wet. Your hands have gone cold. It takes you two tries to start the car.
       - prose: |
-          There are two million of them.
+          You hit the opener. The door starts to go up. Light comes in under it, and smoke, and the sound of the street.
       - prose: |
-          You don't know where you'll go. Toward the noise. You'll know what to do when you get there. You always have.
+          There's a man out there in some kind of uniform, hunched over another, working at him with a box cutter. He looks up and sees you.
       - prose: |
-          You start the car and hit the opener.
+          You reach for the pistol in your lap. Your fingers slide off the grip.
       - prose: |
-          The door starts to go up. Light comes in under it, and smoke, and the sound of the street.
+          He gets up and comes toward the car, smiling.
+      - prose: |
+          He tries the handle.
     choices:
       - label: End
         goto_screen: end

@@ -4,6 +4,13 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and adheres to [Semantic Versioning](https://www.semver.org/).
 
+## \[1.1.0] - 2026-11-19
+
+### Changed
+* Improved descriptions for all four endings on the title screen.
+* Rewrote the Nihilism ending.
+* Leaving Rose for the garage after confessing now leads to Nihilism instead of Tragedy.
+
 ## \[1.0.2] - 2026-11-19
 
 ### Added
