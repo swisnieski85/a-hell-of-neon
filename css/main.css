@@ -84,9 +84,11 @@ button { font-family: inherit; }
 
 /* Custom tooltips — the UI speaks in its own chrome, not the browser's.
    Anything with data-tip gets one: the lens toggle and scene hotspots. */
-#lens-toggle[data-tip] { position: relative; }
+#lens-toggle[data-tip],
+.bar-btn[data-tip] { position: relative; }
 
 #lens-toggle[data-tip]::before,
+.bar-btn[data-tip]::before,
 .hotspot[data-tip]::before {
   content: "";
   position: absolute;
@@ -98,6 +100,7 @@ button { font-family: inherit; }
 }
 
 #lens-toggle[data-tip]::after,
+.bar-btn[data-tip]::after,
 .hotspot[data-tip]::after {
   content: attr(data-tip);
   position: absolute;
@@ -116,12 +119,18 @@ button { font-family: inherit; }
 #lens-toggle[data-tip]::before { top: calc(100% + 6px); left: 15px; transform: rotate(45deg); }
 #lens-toggle[data-tip]::after  { top: calc(100% + 10px); left: -1px; }
 
+/* Bar buttons sit at the right edge: below the button, right-aligned */
+.bar-btn[data-tip]::before { top: calc(100% + 6px); right: 11px; transform: rotate(45deg); }
+.bar-btn[data-tip]::after  { top: calc(100% + 10px); right: -1px; }
+
 /* Hotspots: below the box, centered */
 .hotspot[data-tip]::before { top: calc(100% + 6px); left: 50%; transform: translateX(-50%) rotate(45deg); }
 .hotspot[data-tip]::after  { top: calc(100% + 10px); left: 50%; transform: translateX(-50%); }
 
 #lens-toggle[data-tip]::before,
 #lens-toggle[data-tip]::after,
+.bar-btn[data-tip]::before,
+.bar-btn[data-tip]::after,
 .hotspot[data-tip]::before,
 .hotspot[data-tip]::after {
   opacity: 0;
@@ -135,6 +144,10 @@ button { font-family: inherit; }
 #lens-toggle[data-tip]:hover::after,
 #lens-toggle[data-tip]:focus-visible::before,
 #lens-toggle[data-tip]:focus-visible::after,
+.bar-btn[data-tip]:hover::before,
+.bar-btn[data-tip]:hover::after,
+.bar-btn[data-tip]:focus-visible::before,
+.bar-btn[data-tip]:focus-visible::after,
 .hotspot[data-tip]:hover::before,
 .hotspot[data-tip]:hover::after,
 .hotspot[data-tip]:focus-visible::before,
@@ -157,9 +170,60 @@ button { font-family: inherit; }
   letter-spacing: 0.28em;
   color: var(--bright);
   white-space: nowrap;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 #bar-extra { min-width: 40px; } /* empty container for future fields (cash…) */
+
+/* Sound control and save-and-quit, at the bar's right end. */
+#bar-sound {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.bar-btn {
+  flex-shrink: 0;
+  width: 32px;
+  height: 32px;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  background: none;
+  border: 1px solid color-mix(in srgb, var(--glow) 25%, transparent);
+  color: var(--text);
+  cursor: pointer;
+}
+.bar-btn:hover {
+  color: var(--glow);
+  border-color: var(--glow);
+  box-shadow: 0 0 10px color-mix(in srgb, var(--glow) 40%, transparent);
+}
+.bar-btn svg {
+  width: 20px;
+  height: 20px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+#sound-toggle .sound-cross { display: none; }
+#sound-toggle.muted .sound-waves { display: none; }
+#sound-toggle.muted .sound-cross { display: block; }
+
+#sound-volume {
+  width: 84px;
+  accent-color: var(--glow);
+  cursor: pointer;
+}
+
+/* Narrow windows: the slider goes; the mute button stays. */
+@media (max-width: 700px) {
+  #sound-volume { display: none; }
+}
 
 /* Dev menu: one DEBUG button, top right, opening a panel of controls.
    Floats over everything so it stays reachable on bar-less screens (the map

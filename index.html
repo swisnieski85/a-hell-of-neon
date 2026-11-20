@@ -16,10 +16,24 @@
     </button>
     <!-- First-use cue: from the moment Brand has the lenses until the player
          first toggles them (state.lens_hint_done). -->
-    <div id="lens-hint" class="hidden">&larr; Your lenses. Click to put them on.</div>
+    <div id="lens-hint" class="hidden">&larr; Click to put on your lenses.</div>
     <div id="bar-spacer"></div>
     <div id="bar-datetime"></div>
     <div id="bar-extra"></div><!-- reserved: cash and future fields land here -->
+    <div id="bar-sound">
+      <button id="sound-toggle" class="bar-btn" type="button">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M4 9.5h3.5L12 6v12l-4.5-3.5H4z"/>
+          <path class="sound-waves" d="M15 9.5a3.5 3.5 0 0 1 0 5M17.5 7a7 7 0 0 1 0 10"/>
+          <path class="sound-cross" d="M15.5 9.5l5 5M20.5 9.5l-5 5"/>
+        </svg>
+      </button>
+      <input id="sound-volume" type="range" min="0" max="100" step="1" aria-label="Volume">
+    </div>
+    <button id="btn-quit" class="bar-btn" type="button"
+            aria-label="Save and return to title" data-tip="Save and quit">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6.5 6.5l11 11M17.5 6.5l-11 11"/></svg>
+    </button>
   </header>
 
   <!-- Dev menu — one DEBUG button that opens a panel of dev controls. Floats

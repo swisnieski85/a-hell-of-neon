@@ -5,7 +5,7 @@ import * as S from './state.js';
 import { resolveSingle, fillImageBox, bust, onTapOrClick } from './render.js';
 import { DEV_DEBUG_MENU } from './config.js';
 import { evalCond } from './conditions.js';
-import { syncAmbient } from './audio.js';
+import { syncAmbient, getVolume, setVolume, setMuted } from './audio.js';
 import { DEBUG_THREADS } from './debug-threads.js';
 
 const $ = (id) => document.getElementById(id);
@@ -113,6 +113,42 @@ export function updateStatusBar(vignette, node = null) {
       : 'Click to put on entoptic lenses';
   if (tip) toggle.dataset.tip = tip;
   else delete toggle.dataset.tip;
+}
+
+// ---------- Sound control (status bar) ----------
+
+// A mute button and a volume slider (js/audio.js keeps the setting). After a
+// mouse click, focus leaves the control, so Space and Enter still advance
+// the text (engine.onAdvanceKey ignores keys while anything has focus).
+export function initSoundControl() {
+  const btn = $('sound-toggle');
+  const slider = $('sound-volume');
+  const sync = () => {
+    const { volume, muted } = getVolume();
+    const silent = muted || volume === 0;
+    btn.classList.toggle('muted', silent);
+    btn.setAttribute('aria-pressed', String(silent));
+    btn.setAttribute('aria-label', silent ? 'Unmute' : 'Mute');
+    btn.dataset.tip = silent ? 'Unmute' : 'Mute';
+    slider.value = String(Math.round(volume * 100));
+  };
+  btn.addEventListener('click', (e) => {
+    const { volume, muted } = getVolume();
+    if (muted || volume === 0) {
+      if (volume === 0) setVolume(0.5);
+      setMuted(false);
+    } else {
+      setMuted(true);
+    }
+    sync();
+    if (e.detail > 0) btn.blur(); // a mouse click, not Enter/Space on the button
+  });
+  slider.addEventListener('input', () => {
+    setVolume(Number(slider.value) / 100);
+    sync();
+  });
+  slider.addEventListener('pointerup', () => slider.blur());
+  sync();
 }
 
 // ---------- Debug menu ----------
@@ -294,6 +330,12 @@ let fadeErrorHandler = null;
 
 export function onFadeError(fn) {
   fadeErrorHandler = fn;
+}
+
+// True while the screen is going to black or holding there (the work under
+// the overlay hasn't finished yet).
+export function isFading() {
+  return $('fade-overlay').classList.contains('active');
 }
 
 export function fade(during) {

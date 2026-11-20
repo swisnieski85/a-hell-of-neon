@@ -24,9 +24,56 @@ const FADE_OUT_MS = 800;
 
 let ctx = null;
 
+// Master volume (the status bar's sound control). Ambient beds, sfx and the
+// UI click all play through it. A player preference, kept in its own
+// localStorage key: Options > Clear saved data leaves it alone.
+const VOLUME_KEY = 'hon_volume';
+let volume = 1; // 0..1, the slider's position
+let muted = false;
+let master = null; // GainNode, created with the context
+
+try {
+  const pref = JSON.parse(localStorage.getItem(VOLUME_KEY));
+  if (pref && typeof pref.volume === 'number') volume = Math.min(1, Math.max(0, pref.volume));
+  if (pref && typeof pref.muted === 'boolean') muted = pref.muted;
+} catch { /* storage blocked or junk: defaults */ }
+
+// Slider position -> gain, squared so the slider's travel sounds even.
+function masterLevel() {
+  return muted ? 0 : volume * volume;
+}
+
 function context() {
-  if (!ctx) ctx = new (window.AudioContext || window.webkitAudioContext)();
+  if (!ctx) {
+    ctx = new (window.AudioContext || window.webkitAudioContext)();
+    master = ctx.createGain();
+    master.gain.value = masterLevel();
+    master.connect(ctx.destination);
+  }
   return ctx;
+}
+
+function applyVolume() {
+  try {
+    localStorage.setItem(VOLUME_KEY, JSON.stringify({ volume, muted }));
+  } catch { /* storage unavailable: the setting lasts this page load */ }
+  if (master) master.gain.setTargetAtTime(masterLevel(), ctx.currentTime, 0.02);
+}
+
+export function getVolume() {
+  return { volume, muted };
+}
+
+// Moving the slider above zero also unmutes.
+export function setVolume(v) {
+  volume = Math.min(1, Math.max(0, v));
+  if (volume > 0) muted = false;
+  applyVolume();
+}
+
+export function setMuted(on) {
+  muted = !!on;
+  applyVolume();
 }
 
 // Autoplay unlock: contexts created outside a user gesture start suspended;
@@ -108,7 +155,7 @@ function startLoop(name, fadeMs) {
     const c = context();
     t.gain = c.createGain();
     t.gain.gain.value = 0;
-    t.gain.connect(c.destination);
+    t.gain.connect(master);
     t.source = c.createBufferSource();
     t.source.buffer = buf;
     t.source.loop = true; // gapless — the whole point of the buffer route
@@ -132,8 +179,7 @@ export function syncAmbient(names, fadeInMs = FADE_IN_MS, fadeOutMs = FADE_OUT_M
   }
 }
 
-// For tests and future UI (e.g. a mute control): names currently playing
-// or fading in.
+// For tests: names currently playing or fading in.
 export function activeAmbient() {
   return [...live.values()].filter((t) => t.target > 0).map((t) => t.name);
 }
@@ -148,7 +194,7 @@ export function playSfx(name) {
     const c = context();
     const g = c.createGain();
     g.gain.value = SFX_VOL;
-    g.connect(c.destination);
+    g.connect(master);
     const src = c.createBufferSource();
     src.buffer = buf;
     src.connect(g);
@@ -161,7 +207,9 @@ const clickBase = new Audio(`${SFX_DIR}click.mp3`);
 clickBase.preload = 'auto';
 
 export function sfxClick() {
+  const level = masterLevel();
+  if (!level) return;
   const a = clickBase.cloneNode();
-  a.volume = SFX_VOL;
+  a.volume = SFX_VOL * level;
   a.play().catch(() => {});
 }

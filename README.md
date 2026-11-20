@@ -226,7 +226,12 @@ or an ending.
 The game autosaves to `localStorage` under the single key `hon_save` on every
 state change. "Continue" on the title screen is disabled if the save is absent
 or fails validation. New Game over a populated save asks before overwriting.
-Reaching the end of the game wipes the save and returns to the title screen.
+The X at the right end of the status bar saves and returns to the title, where
+Continue picks up at the same node. Reaching the end of the game wipes the save
+and returns to the title screen.
+
+The volume and mute setting from the status bar's sound control is a
+preference, kept under `hon_volume`; clearing saved data leaves it alone.
 
 Validation checks that the vignette, node, scene and map the save points at
 still exist, so renaming a node between releases disables Continue for old

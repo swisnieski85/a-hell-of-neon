@@ -88,6 +88,20 @@ window.addEventListener('DOMContentLoaded', async () => {
     UI.showTitle(false);
   });
 
+  // Status bar: sound control, and X to save and return to the title. The
+  // save stays, so Continue picks up where the player left. Ignored during a
+  // screen fade, a death rewind or an ending's closing sequence.
+  UI.initSoundControl();
+  $('btn-quit').addEventListener('click', () => {
+    if (UI.isFading() || !engine.canQuit()) return;
+    UI.fade(() => {
+      engine.leaveToTitle();
+      S.reset();
+      UI.applyLensClass();
+      UI.showTitle(true);
+    });
+  });
+
   $('btn-end-title').addEventListener('click', () => {
     // Game over: wipe the save and return to the title, Continue grayed.
     S.clearSave();

@@ -206,6 +206,33 @@ export function startNewGame() {
   return enterVignette(firstVignette());
 }
 
+// Death rewinds and ending sequences run on timers across several steps;
+// save-and-quit waits them out (canQuit) rather than cut in partway.
+let sequenceBusy = false;
+
+export function canQuit() {
+  return !sequenceBusy;
+}
+
+// Save and quit (the bar's X). The game already autosaves, so this saves
+// once more and clears what lives outside the save — the transcript on
+// screen, stepped-reveal progress, a pending auto-advance — so a later
+// Continue renders the way a fresh page load would. The caller resets the
+// state and shows the title.
+export function leaveToTitle() {
+  S.save();
+  if (pendingAdvance) {
+    clearTimeout(pendingAdvance);
+    pendingAdvance = null;
+  }
+  stepProgress.clear();
+  $('transcript-history').innerHTML = '';
+  $('transcript-current').innerHTML = '';
+  $('choice-bar').innerHTML = '';
+  renderedNodeId = null;
+  artToken++; // scene art still loading must not land later
+}
+
 // Continue / reload-resume: load the scene's art first, like a vignette entry.
 export async function resume() {
   const st = S.state;
@@ -441,11 +468,16 @@ async function advance(d) {
     // is recorded now, in its own key, for the title screen's row.
     if (d.ending) S.recordEnding(d.ending);
     S.save();
-    await lingerOut();
-    await UI.fade(() => {
-      $('screen-vignette').classList.remove('closing-text', 'closing-image');
-      UI.showEnd();
-    });
+    sequenceBusy = true;
+    try {
+      await lingerOut();
+      await UI.fade(() => {
+        $('screen-vignette').classList.remove('closing-text', 'closing-image');
+        UI.showEnd();
+      });
+    } finally {
+      sequenceBusy = false;
+    }
     return;
   }
   if (d.goto_map || d.goto_screen === 'map') {
@@ -504,20 +536,25 @@ function closeNodeToScene(targetScene) {
 async function doDeath(choice) {
   const st = S.state;
   const v = vignetteData();
-  if (choice.goto) {
-    st.node = choice.goto;
-    S.save();
-    const node = nodeById(v, choice.goto);
-    renderBlocksOnly(v, node); // 1. render the death node's prose
+  sequenceBusy = true;
+  try {
+    if (choice.goto) {
+      st.node = choice.goto;
+      S.save();
+      const node = nodeById(v, choice.goto);
+      renderBlocksOnly(v, node); // 1. render the death node's prose
+    }
+    await new Promise((r) => setTimeout(r, 1500));
+    await UI.fade(() => {
+      S.restoreSnapshot(); // 3. restore the vignette-entry snapshot wholesale
+      stepProgress.clear(); //   ...and the stepped-reveal progress, which lives
+                            //   outside the save — or every node replays read-through
+      clearTranscript();    //   ...and the transcript: the vignette starts over
+      renderCurrent();     // 4. fade in at the vignette's first node
+    });
+  } finally {
+    sequenceBusy = false;
   }
-  await new Promise((r) => setTimeout(r, 1500));
-  await UI.fade(() => {
-    S.restoreSnapshot(); // 3. restore the vignette-entry snapshot wholesale
-    stepProgress.clear(); //   ...and the stepped-reveal progress, which lives
-                          //   outside the save — or every node replays read-through
-    clearTranscript();    //   ...and the transcript: the vignette starts over
-    renderCurrent();     // 4. fade in at the vignette's first node
-  });
 }
 
 // ---------- Node rendering ----------

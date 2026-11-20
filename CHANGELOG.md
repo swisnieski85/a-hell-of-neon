@@ -6,7 +6,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) 
 
 ## \[1.1.0] - 2026-11-19
 
+### Added
+* Sound control on the status bar.
+* An X button on the status bar that saves the game and returns to the title screen.
+
 ### Changed
+* Shortened the hint that points to the lenses.
 * Improved descriptions for all four endings on the title screen.
 * Rewrote the Nihilism ending.
 * Leaving Rose for the garage after confessing now leads to Nihilism instead of Tragedy.
